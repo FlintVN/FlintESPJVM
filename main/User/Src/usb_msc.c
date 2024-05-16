@@ -12,25 +12,132 @@
 #define EPNUM_MSC               1
 #define TUSB_DESC_TOTAL_LEN     (TUD_CONFIG_DESC_LEN + TUD_MSC_DESC_LEN)
 
-enum {
-    ITF_NUM_MSC = 0,
-    ITF_NUM_TOTAL
-};
+#define MSC_INTERFACE_IDX       0x00
+#define CDC_INTERFACE_IDX       0x01
 
-enum {
-    EDPT_CTRL_OUT = 0x00,
-    EDPT_CTRL_IN  = 0x80,
-
-    EDPT_MSC_OUT  = 0x01,
-    EDPT_MSC_IN   = 0x81,
-};
+#define OUT_ENPOINT(id)         (0x7F & (id))
+#define IN_ENPOINT(id)          (0x80 | (id))
 
 static uint8_t const desc_configuration[] = {
-    // Config number, interface count, string index, total length, attribute, power in mA
-    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, TUSB_DESC_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+    /* Configuration Descriptor */
+    0x09,                               /* bLength */
+    TUSB_DESC_CONFIGURATION,            /* bDescriptorType */
+    U16_TO_U8S_LE(0x0062),              /* wTotalLength */
+    0x03,                               /* bNumInterfaces */
+    0x01,                               /* bConfigurationValue */
+    0x00,                               /* iConfiguration */
+    0xA0,                               /* bmAttributes - Bus Powered*/
+    100 >> 1,                           /* MaxPower - 100mA */
 
-    // Interface number, string index, EP Out & EP In address, EP size
-    TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EDPT_MSC_OUT, EDPT_MSC_IN, TUD_OPT_HIGH_SPEED ? 512 : 64),
+    /* Mass Storage USB Device Interface Class Descriptor */
+    0x09,                               /* bLength */
+    TUSB_DESC_INTERFACE,                /* bDescriptorType */
+    MSC_INTERFACE_IDX,                  /* bInterfaceNumber */
+    0x00,                               /* bAlternateSetting */
+    0x02,                               /* bNumEndpoints */
+    0x08,                               /* bInterfaceClass - Mass Storage USB Device Interface Class */
+    0x06,                               /* bInterfaceSubClass */
+    0x50,                               /* bInterfaceProtocol */
+    0x00,                               /* iInterface */
+
+    /* OUT Endpoint 1 Descriptor */
+    0x07,                               /* bLength */
+    TUSB_DESC_ENDPOINT,                 /* bDescriptorType */
+    OUT_ENPOINT(0x01),                  /* bEndpointAddress */
+    0x02,                               /* bmAttributes - Bulk Transfer Type*/
+    U16_TO_U8S_LE(0x0040),              /* wMaxPacketSize - 64 byte */
+    0x00,                               /* bInterval */
+
+    /* IN Endpoint 1 Descriptor */
+    0x07,                               /* bLength */
+    TUSB_DESC_ENDPOINT,                 /* bDescriptorType */
+    IN_ENPOINT(0x01),                   /* bEndpointAddress */
+    0x02,                               /* bmAttributes - Bulk Transfer Type */
+    U16_TO_U8S_LE(0x0040),              /* wMaxPacketSize - 64 byte */
+    0x00,                               /* bInterval */
+
+    /* IAD Descriptor */
+    0x08,                               /* bLength */
+    TUSB_DESC_INTERFACE_ASSOCIATION,    /* bDescriptorType */
+    CDC_INTERFACE_IDX,                  /* bFirstInterface */
+    0x02,                               /* bInterfaceCount */
+    0x02,                               /* bFunctionClass - CDC Control */
+    0x02,                               /* bFunctionSubClass */
+    0x00,                               /* bFunctionProtocol */
+    0x00,                               /* iFunction */
+
+    /* (CDC Control) USB Device Interface Class Descriptor */
+    0x09,                               /* bLength */
+    TUSB_DESC_INTERFACE,                /* bDescriptorType */
+    CDC_INTERFACE_IDX,                  /* bInterfaceNumber */
+    0x00,                               /* bAlternateSetting */
+    0x01,                               /* bNumEndpoints */
+    0x02,                               /* bInterfaceClass */
+    0x02,                               /* bInterfaceSubClass */
+    0x00,                               /* bInterfaceProtocol */
+    0x04,                               /* iInterface */
+
+    /* Header Functional Descriptor */
+    0x05,                               /* bLength */
+    0x24,                               /* bDescriptorType */
+    0x00,                               /* bDescriptorSubtype - Header Func Desc */
+    0x20,                               /* bcdCDC - Spec release number */
+    0x01,
+
+    /* Call Management Functional Descriptor */
+    0x05,                               /* bLength */
+    0x24,                               /* bDescriptorType */
+    0x01,                               /* bDescriptorSubtype - Call Management Functional Descriptor */
+    0x00,                               /* bmCapabilities - D0 + D1 */
+    CDC_INTERFACE_IDX + 1,              /* bDataInterface */
+
+    /* ACM Functional Descriptor */
+    0x04,                               /* bLength */
+    0x24,                               /* bDescriptorType */
+    0x02,                               /* bDescriptorSubtype - Abstract Control Management Descriptor */
+    0x02,                               /* bmCapabilities */
+
+    /* Union Functional Descriptor */
+    0x05,                               /* bLength */
+    0x24,                               /* bDescriptorType */
+    0x06,                               /* bDescriptorSubtype - Union Functional Descriptor */
+    CDC_INTERFACE_IDX,                  /* bMasterInterface - Communication class interface */
+    CDC_INTERFACE_IDX + 1,              /* bSlaveInterface0 - Data Class Interface */
+
+    /* IN Endpoint 2 Descriptor */
+    0x07,                               /* bLength */
+    TUSB_DESC_ENDPOINT,                 /* bDescriptorType */
+    IN_ENPOINT(0x02),                   /* bEndpointAddress */
+    0x03,                               /* bmAttributes - Interrupt Transfer Type */
+    U16_TO_U8S_LE(0x0008),              /* wMaxPacketSize - 8 bytes */
+    0x10,                               /* bInterval */
+
+    /* CDC Data USB Device Interface Class Descriptor */
+    0x09,                               /* bLength */
+    TUSB_DESC_INTERFACE,                /* bDescriptorType */
+    CDC_INTERFACE_IDX + 1,              /* bInterfaceNumber */
+    0x00,                               /* bAlternateSetting */
+    0x02,                               /* bNumEndpoints */
+    0x0A,                               /* bInterfaceClass */
+    0x00,                               /* bInterfaceSubClass */
+    0x00,                               /* bInterfaceProtocol */
+    0x00,                               /* iInterface */
+
+    /* OUT Endpoint 3 Descriptor */
+    0x07,                               /* bLength */
+    TUSB_DESC_ENDPOINT,                 /* bDescriptorType */
+    OUT_ENPOINT(0x03),                  /* bEndpointAddress */
+    0x02,                               /* bmAttributes -  Bulk Transfer Type */
+    U16_TO_U8S_LE(0x0040),              /* wMaxPacketSize - 64 bytes */
+    0x00,                               /* bInterval */
+
+    /* IN Endpoint 3 Descriptor */
+    0x07,                               /* bLength */
+    TUSB_DESC_ENDPOINT,                 /* bDescriptorType */
+    IN_ENPOINT(0x03),                   /* bEndpointAddress */
+    0x02,                               /* bmAttributes - Bulk Transfer Type */
+    U16_TO_U8S_LE(0x0040),              /* wMaxPacketSize - 64 bytes */
+    0x00,                               /* bInterval */
 };
 
 static tusb_desc_device_t descriptor_config = {
@@ -51,15 +158,15 @@ static tusb_desc_device_t descriptor_config = {
 };
 
 static char const *string_desc_arr[] = {
-    (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
-    "TinyUSB",                      // 1: Manufacturer
-    "TinyUSB Device",               // 2: Product
-    "123456",                       // 3: Serials
-    "Example MSC",                  // 4. MSC
+    (const char[]){0x09, 0x04},     /* 0: is supported language is English (0x0409) */
+    "TinyUSB",                      /* 1: Manufacturer */
+    "TinyUSB Device",               /* 2: Product */
+    "123456",                       /* 3: Serials */
+    "Example MSC",                  /* 4. MSC */
 };
 
 static void storage_mount_changed_cb(tinyusb_msc_event_t *event) {
-    // bool isMounted = event->mount_changed_data.is_mounted;
+    /* bool isMounted = event->mount_changed_data.is_mounted; */
 }
 
 static esp_err_t storage_init_spiflash(wl_handle_t *wl_handle) {

@@ -7,6 +7,7 @@ endif()
 idf_component_register(
     SRCS "User/Src/main.cpp"
     SRCS "User/Src/usb_msc.c"
+    SRCS "User/Src/usb_cdc.c"
     SRCS "User/Src/esp_system_api.cpp"
     INCLUDE_DIRS "User/Inc"
 

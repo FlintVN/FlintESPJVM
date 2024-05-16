@@ -4,6 +4,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "usb_msc.h"
+#include "usb_cdc.h"
 
 #define BLINK_GPIO              15
 
@@ -21,4 +22,9 @@ static void GPIO_Init() {
 extern "C" void app_main() {
     GPIO_Init();
     USB_MSC_Init();
+    USB_CDC_Init();
+
+    while (1) {
+
+    }
 }
