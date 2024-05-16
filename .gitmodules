@@ -1,0 +1,3 @@
+[submodule "main/MJVM"]
+	path = main/MJVM
+	url = https://github.com/ElectricThanhTung/MJVM
