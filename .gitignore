@@ -3,4 +3,5 @@ build
 managed_components
 
 *.lock
+sdkconfig
 sdkconfig.old
