@@ -27,7 +27,7 @@ static uint8_t const cdc_desc_configuration[] = {
     0x02,                               /* bNumInterfaces */
     0x01,                               /* bConfigurationValue */
     0x00,                               /* iConfiguration */
-    0xA0,                               /* bmAttributes - Bus Powered*/
+    0xE0,                               /* bmAttributes -  Self Powered */
     100 >> 1,                           /* MaxPower - 100mA */
 
     /* IAD Descriptor */

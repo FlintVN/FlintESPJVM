@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include "esp_timer.h"
 #include "mjvm_string.h"
 #include "mjvm_system_api.h"
 
@@ -30,5 +31,5 @@ void MjvmSystem_Write(const char *text, uint32_t length, uint8_t coder) {
 }
 
 int64_t MjvmSystem_GetNanoTime(void) {
-    throw "MjvmSystem_GetNanoTime is not implemented in VM";
+    return esp_timer_get_time();
 }
