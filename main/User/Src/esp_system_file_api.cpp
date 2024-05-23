@@ -51,7 +51,7 @@ uint32_t MjvmSystem_FileTell(void *fileHandle) {
 }
 
 MjvmSys_FileResult MjvmSystem_FileSeek(void *fileHandle, uint32_t offset) {
-    return fseek((FILE *)fileHandle, 0, SEEK_SET) != 0 ? FILE_RESULT_ERR : FILE_RESULT_OK;
+    return fseek((FILE *)fileHandle, offset, SEEK_SET) != 0 ? FILE_RESULT_ERR : FILE_RESULT_OK;
 }
 
 MjvmSys_FileResult MjvmSystem_FileClose(void *fileHandle) {
