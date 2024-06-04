@@ -21,6 +21,7 @@ idf_component_register(
     SRCS "MJVM/MJVM/VM/Src/mjvm_field_info.cpp"
     SRCS "MJVM/MJVM/VM/Src/mjvm_fields_data.cpp"
     SRCS "MJVM/MJVM/VM/Src/mjvm_method_info.cpp"
+    SRCS "MJVM/MJVM/VM/Src/mjvm_class.cpp"
     SRCS "MJVM/MJVM/VM/Src/mjvm_object.cpp"
     SRCS "MJVM/MJVM/VM/Src/mjvm_string.cpp"
     SRCS "MJVM/MJVM/VM/Src/mjvm_throwable.cpp"
@@ -28,6 +29,7 @@ idf_component_register(
 
     SRCS "MJVM/MJVM/Native/Src/mjvm_native_character_class.cpp"
     SRCS "MJVM/MJVM/Native/Src/mjvm_native_class.cpp"
+    SRCS "MJVM/MJVM/Native/Src/mjvm_native_class_class.cpp"
     SRCS "MJVM/MJVM/Native/Src/mjvm_native_double_class.cpp"
     SRCS "MJVM/MJVM/Native/Src/mjvm_native_float_class.cpp"
     SRCS "MJVM/MJVM/Native/Src/mjvm_native_math_class.cpp"
