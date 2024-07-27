@@ -9,8 +9,8 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 
-#include "mjvm.h"
-#include "mjvm_system_api.h"
+#include "flint.h"
+#include "flint_system_api.h"
 #include "usb_device.h"
 
 #define BLINK_GPIO              15
@@ -96,27 +96,6 @@ extern "C" void app_main() {
         static wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
         esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle);
 
-        try {
-            Execution &execution = Mjvm::newExecution();
-            int64_t retVal = execution.run("test");
-            Mjvm::destroy(execution);
-        }
-        catch(MjvmThrowable *ex) {
-            MjvmString &str = ex->getDetailMessage();
-            MjvmSystem_Write(str.getText(), str.getLength(), str.getCoder());
-        }
-        catch(OutOfMemoryError *err) {
-            const char *msg = err->getMessage();
-            MjvmSystem_Write(msg, strlen(msg), 0);
-        }
-        catch(LoadFileError* file) {
-            const char *fileName = file->getFileName();
-            MjvmSystem_Write("Could not find or load class ", 29, 0);
-            MjvmSystem_Write(fileName, strlen(fileName), 0);
-        }
-        catch(const char *msg) {
-            MjvmSystem_Write(msg, strlen(msg), 0);
-        }
-        MjvmSystem_Write("\n", 1, 0);
+        
     }
 }

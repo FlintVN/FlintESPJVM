@@ -1,3 +1,3 @@
-[submodule "main/MJVM"]
-	path = main/MJVM
-	url = https://github.com/ElectricThanhTung/MJVM
+[submodule "main/FlintJVM"]
+	path = main/FlintJVM
+	url = https://github.com/FlintVN/FlintJVM.git
