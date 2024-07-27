@@ -8,6 +8,7 @@ idf_component_register(
     SRCS "User/Src/main.cpp"
     SRCS "User/Src/usb_device.c"
     SRCS "User/Src/esp_system_api.cpp"
+    SRCS "User/Src/esp_system_thread.cpp"
     SRCS "User/Src/esp_system_file_api.cpp"
     SRCS "User/Src/esp_system_memory_api.cpp"
 
