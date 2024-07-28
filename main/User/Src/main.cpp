@@ -8,10 +8,9 @@
 #include "esp_vfs_fat.h"
 #include "nvs_flash.h"
 #include "nvs.h"
-
-#include "flint.h"
-#include "flint_system_api.h"
 #include "usb_device.h"
+#include "flint.h"
+#include "esp_uart_debugger.h"
 
 #define BLINK_GPIO              15
 #define BUTTON_GPIO             0
@@ -96,6 +95,12 @@ extern "C" void app_main() {
         static wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
         esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle);
 
-        
+        Flint &flint = Flint::getInstance();
+        EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);
+        flint.setDebugger(&dbg);
+
+        while(1) {
+            vTaskDelay(1);
+        }
     }
 }
