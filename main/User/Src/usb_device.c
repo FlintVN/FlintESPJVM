@@ -19,7 +19,7 @@
 #define OUT_ENPOINT(id)         (0x7F & (id))
 #define IN_ENPOINT(id)          (0x80 | (id))
 
-static uint8_t const cdc_desc_configuration[] = {
+static const uint8_t cdc_desc_configuration[] = {
     /* Configuration Descriptor */
     0x09,                               /* bLength */
     TUSB_DESC_CONFIGURATION,            /* bDescriptorType */
@@ -114,7 +114,7 @@ static uint8_t const cdc_desc_configuration[] = {
     0x00,                               /* bInterval */
 };
 
-static uint8_t const cdc_msc_desc_configuration[] = {
+static const uint8_t cdc_msc_desc_configuration[] = {
     /* Configuration Descriptor */
     0x09,                               /* bLength */
     TUSB_DESC_CONFIGURATION,            /* bDescriptorType */
@@ -253,7 +253,7 @@ static tusb_desc_device_t descriptor_config = {
     .bNumConfigurations = 0x01
 };
 
-static char const *string_desc_arr[] = {
+static const char *string_desc_arr[] = {
     (const char[]){0x09, 0x04},     /* 0: is supported language is English (0x0409) */
     "TinyUSB",                      /* 1: Manufacturer */
     "TinyUSB Device",               /* 2: Product */
@@ -305,7 +305,7 @@ void USB_DeviceInit(USB_Mode mode) {
         ESP_ERROR_CHECK(tinyusb_msc_register_callback(TINYUSB_MSC_EVENT_MOUNT_CHANGED, storage_mount_changed_cb));
         ESP_ERROR_CHECK(tinyusb_msc_storage_mount("/data"));
 
-        const tinyusb_config_t tusb_cfg = {
+        static const tinyusb_config_t tusb_cfg = {
             .device_descriptor = &descriptor_config,
             .string_descriptor = string_desc_arr,
             .string_descriptor_count = sizeof(string_desc_arr) / sizeof(string_desc_arr[0]),
@@ -315,7 +315,7 @@ void USB_DeviceInit(USB_Mode mode) {
         ESP_ERROR_CHECK(tinyusb_driver_install(&tusb_cfg));
     }
     else {
-        const tinyusb_config_t tusb_cfg = {
+        static const tinyusb_config_t tusb_cfg = {
             .device_descriptor = &descriptor_config,
             .string_descriptor = string_desc_arr,
             .string_descriptor_count = sizeof(string_desc_arr) / sizeof(string_desc_arr[0]),

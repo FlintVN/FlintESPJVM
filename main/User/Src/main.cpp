@@ -87,13 +87,13 @@ extern "C" void app_main() {
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     if(usbMode == USB_CDC) {
         const esp_vfs_fat_mount_config_t mount_config = {
-            .format_if_mount_failed = true,
-            .max_files = 4,
+            .format_if_mount_failed = false,
+            .max_files = 16,
             .allocation_unit_size = CONFIG_WL_SECTOR_SIZE,
             .disk_status_check_enable = false
         };
         static wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
-        esp_err_t err = esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle);
+        ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
 
         Flint &flint = Flint::getInstance();
         EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);

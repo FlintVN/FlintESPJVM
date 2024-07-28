@@ -49,6 +49,7 @@ idf_component_register(
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address)
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-volatile)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-uninitialized)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-strict-aliasing)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-implicit-fallthrough)
