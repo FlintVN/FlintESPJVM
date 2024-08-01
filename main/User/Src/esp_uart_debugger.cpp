@@ -1,26 +1,17 @@
 
 #include <iostream>
+#include "tusb.h"
 #include "tusb_cdc_acm.h"
 #include "esp_uart_debugger.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include "driver/gpio.h"
 
 static EspUartDebugger *espUartDbg = 0;
 
-static void cdcRxCallback(int itf, cdcacm_event_t *event) {
-    static uint8_t buf[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];
-    size_t rx_size = 0;
-    esp_err_t ret = tinyusb_cdcacm_read(TINYUSB_CDC_ACM_0, buf, CONFIG_TINYUSB_CDC_RX_BUFSIZE, &rx_size);
-    if(ret == ESP_OK) {
-        if(espUartDbg)
-            espUartDbg->receivedDataHandler(buf, rx_size);
-    }
-}
-
 EspUartDebugger::EspUartDebugger(Flint &flint) : FlintDebugger(flint) {
-    ESP_ERROR_CHECK(tinyusb_cdcacm_register_callback(
-        TINYUSB_CDC_ACM_0,
-        CDC_EVENT_RX,
-        cdcRxCallback
-    ));
+
 }
 
 EspUartDebugger &EspUartDebugger::getInstance(Flint &flint) {
@@ -40,6 +31,34 @@ bool EspUartDebugger::sendData(uint8_t *data, uint32_t length) {
         data += queueSize;
     }
     return true;
+}
+
+void EspUartDebugger::receiveTask(void) {
+    static uint8_t rxData[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];
+    uint32_t rxDataLength = 0;
+    uint32_t rxDataLengthReceived = 0;
+    TickType_t startTick = 0;
+
+    while(1) {
+        if(tud_cdc_n_available(TINYUSB_CDC_ACM_0)) {
+            TickType_t tick = xTaskGetTickCount();
+            if((rxDataLength == 0) || ((tick - startTick) >= pdMS_TO_TICKS(100))) {
+                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, rxData, sizeof(rxData));
+                rxDataLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
+                rxDataLengthReceived = rxSize;
+            }
+            else {
+                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
+                rxDataLengthReceived += rxSize;
+            }
+            if(rxDataLength && (rxDataLengthReceived >= rxDataLength) && espUartDbg) {
+                espUartDbg->receivedDataHandler(rxData, rxDataLengthReceived);
+                rxDataLength = 0;
+                rxDataLengthReceived = 0;
+            }
+        }
+        vTaskDelay(1);
+    }
 }
 
 EspUartDebugger::~EspUartDebugger(void) {

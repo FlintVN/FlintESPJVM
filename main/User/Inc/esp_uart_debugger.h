@@ -15,6 +15,7 @@ private:
 public:
     static EspUartDebugger &getInstance(Flint &flint);
     bool sendData(uint8_t *data, uint32_t length);
+    void receiveTask(void);
 };
 
 #endif /* __ESP_UART_DEBUGGER_H */

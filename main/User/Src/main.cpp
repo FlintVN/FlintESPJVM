@@ -98,9 +98,6 @@ extern "C" void app_main() {
         Flint &flint = Flint::getInstance();
         EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);
         flint.setDebugger(&dbg);
-
-        while(1) {
-            vTaskDelay(1);
-        }
+        dbg.receiveTask();
     }
 }
