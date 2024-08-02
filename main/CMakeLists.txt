@@ -9,9 +9,9 @@ idf_component_register(
     SRCS "User/Src/usb_device.c"
     SRCS "User/Src/esp_uart_debugger.cpp"
     SRCS "User/Src/esp_system_api.cpp"
-    SRCS "User/Src/esp_system_thread.cpp"
     SRCS "User/Src/esp_system_file_api.cpp"
-    SRCS "User/Src/esp_system_memory_api.cpp"
+    SRCS "User/Src/esp_system_thread_api.cpp"
+    SRCS "User/Src/esp_system_native.cpp"
 
     SRCS "FlintJVM/VM/Src/flint_attribute_info.cpp"
     SRCS "FlintJVM/VM/Src/flint_class_loader.cpp"

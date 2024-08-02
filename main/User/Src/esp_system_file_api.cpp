@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "flint_system_api.h"
 
-void *FlintSystem_FileOpen(const char *fileName, FlintSys_FileMode mode) {
+void *FlintAPI::File::open(const char *fileName, FlintFileMode mode) {
     char buff[6];
     uint32_t index = 0;
     if(mode & (FLINT_FILE_CREATE_ALWAYS | FLINT_FILE_CREATE_NEW)) {
@@ -20,7 +20,7 @@ void *FlintSystem_FileOpen(const char *fileName, FlintSys_FileMode mode) {
     return fopen(fileName, buff);
 }
 
-FlintSys_FileResult FlintSystem_FileRead(void *fileHandle, void *buff, uint32_t btr, uint32_t *br) {
+FlintFileResult FlintAPI::File::read(void *fileHandle, void *buff, uint32_t btr, uint32_t *br) {
     uint32_t temp = fread(buff, 1, btr, (FILE *)fileHandle);
     *br = temp;
     if(temp != btr)
@@ -28,7 +28,7 @@ FlintSys_FileResult FlintSystem_FileRead(void *fileHandle, void *buff, uint32_t 
     return FILE_RESULT_OK;
 }
 
-FlintSys_FileResult FlintSystem_FileWrite(void *fileHandle, void *buff, uint32_t btw, uint32_t *bw) {
+FlintFileResult FlintAPI::File::write(void *fileHandle, void *buff, uint32_t btw, uint32_t *bw) {
     uint32_t temp = fwrite(buff , 1, btw, (FILE *)fileHandle);
     *bw = temp;
     if(temp != btw)
@@ -36,7 +36,7 @@ FlintSys_FileResult FlintSystem_FileWrite(void *fileHandle, void *buff, uint32_t
     return FILE_RESULT_OK;
 }
 
-uint32_t FlintSystem_FileSize(void *fileHandle) {
+uint32_t FlintAPI::File::size(void *fileHandle) {
     uint32_t temp = ftell((FILE *)fileHandle);
     if(fseek((FILE *)fileHandle, 0, SEEK_END) != 0)
         throw "error while getting file size";
@@ -46,15 +46,15 @@ uint32_t FlintSystem_FileSize(void *fileHandle) {
     return length;
 }
 
-uint32_t FlintSystem_FileTell(void *fileHandle) {
+uint32_t FlintAPI::File::tell(void *fileHandle) {
     return ftell((FILE *)fileHandle);
 }
 
-FlintSys_FileResult FlintSystem_FileSeek(void *fileHandle, uint32_t offset) {
+FlintFileResult FlintAPI::File::seek(void *fileHandle, uint32_t offset) {
     return fseek((FILE *)fileHandle, offset, SEEK_SET) != 0 ? FILE_RESULT_ERR : FILE_RESULT_OK;
 }
 
-FlintSys_FileResult FlintSystem_FileClose(void *fileHandle) {
+FlintFileResult FlintAPI::File::close(void *fileHandle) {
     if(fileHandle != 0)
         if(fclose((FILE *)fileHandle) != 0)
             return FILE_RESULT_ERR;

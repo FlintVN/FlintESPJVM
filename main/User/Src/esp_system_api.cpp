@@ -2,9 +2,23 @@
 #include <stdio.h>
 #include "esp_timer.h"
 #include "flint_string.h"
+#include "esp_heap_caps.h"
 #include "flint_system_api.h"
 
-void FlintSystem_Write(const char *text, uint32_t length, uint8_t coder) {
+void *FlintAPI::System::malloc(uint32_t size) {
+    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+}
+
+void *FlintAPI::System::realloc(void *p, uint32_t size) {
+    return heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM);
+}
+
+void FlintAPI::System::free(void *p) {
+    heap_caps_free(p);
+}
+
+
+void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
     char buff[64];
     if(coder == 0) {
         while(length) {
@@ -30,6 +44,6 @@ void FlintSystem_Write(const char *text, uint32_t length, uint8_t coder) {
     }
 }
 
-int64_t FlintSystem_GetNanoTime(void) {
+int64_t FlintAPI::System::getNanoTime(void) {
     return esp_timer_get_time();
 }
