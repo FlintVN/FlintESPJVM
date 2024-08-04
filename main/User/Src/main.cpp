@@ -27,7 +27,7 @@ static void NVS_Init(void) {
 static USB_Mode NVS_GetUSBMode(void) {
     nvs_handle_t handle;
     int32_t usbMode = 0;
-    ESP_ERROR_CHECK(nvs_open("storage", NVS_READONLY, &handle));
+    ESP_ERROR_CHECK(nvs_open("storage", NVS_READWRITE, &handle));
     nvs_get_i32(handle, "usbMode", &usbMode);
     nvs_close(handle);
     return usbMode ? USB_CDC_MSC : USB_CDC;
@@ -84,10 +84,9 @@ extern "C" void app_main() {
     USB_Mode usbMode = NVS_GetUSBMode();
     USB_DeviceInit(usbMode);
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
     if(usbMode == USB_CDC) {
         const esp_vfs_fat_mount_config_t mount_config = {
-            .format_if_mount_failed = false,
+            .format_if_mount_failed = true,
             .max_files = 16,
             .allocation_unit_size = CONFIG_WL_SECTOR_SIZE,
             .disk_status_check_enable = false
@@ -97,7 +96,8 @@ extern "C" void app_main() {
 
         Flint &flint = Flint::getInstance();
         EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);
-        flint.setDebugger(&dbg);
+        if(f_stat("main.class", NULL) == FR_OK)
+            flint.runToMain("main");
         dbg.receiveTask();
     }
 }
