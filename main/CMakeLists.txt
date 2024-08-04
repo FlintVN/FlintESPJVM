@@ -13,6 +13,8 @@ idf_component_register(
     SRCS "User/Src/esp_system_thread_api.cpp"
     SRCS "User/Src/esp_system_native.cpp"
 
+    SRCS "User/Src/esp_system_native_pin.cpp"
+
     SRCS "FlintJVM/VM/Src/flint_attribute_info.cpp"
     SRCS "FlintJVM/VM/Src/flint_class_loader.cpp"
     SRCS "FlintJVM/VM/Src/flint_class.cpp"
