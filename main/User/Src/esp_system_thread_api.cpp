@@ -5,7 +5,7 @@
 
 void *FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
     TaskHandle_t xHandle = NULL;
-    xTaskCreate(task, "FlintThread", stackSize ? stackSize : 10240, param, tskIDLE_PRIORITY, &xHandle);
+    xTaskCreate(task, "FlintThread", stackSize ? stackSize : 4096, param, tskIDLE_PRIORITY + 1, &xHandle);
     return (void *)xHandle;
 }
 
