@@ -84,6 +84,7 @@ extern "C" void app_main() {
     USB_Mode usbMode = NVS_GetUSBMode();
     USB_DeviceInit(usbMode);
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     if(usbMode == USB_CDC) {
         const esp_vfs_fat_mount_config_t mount_config = {
             .format_if_mount_failed = true,
