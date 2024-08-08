@@ -17,7 +17,6 @@ void FlintAPI::System::free(void *p) {
     heap_caps_free(p);
 }
 
-
 void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
     char buff[64];
     if(coder == 0) {
