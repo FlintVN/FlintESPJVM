@@ -60,4 +60,4 @@ static const FlintNativeMethod methods[] = {
     NATIVE_METHOD("\x08\x00\x52\x03""writePin", "\x05\x00\x4A\x01""(IZ)V", nativeWritePin),
 };
 
-const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x0C\x00\x7C\x04""esp/gpio/Pin", methods);
+const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\x09\x06""machine/gpio/Pin", methods);
