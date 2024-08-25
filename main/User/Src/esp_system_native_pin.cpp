@@ -2,6 +2,7 @@
 #include <string.h>
 #include "flint.h"
 #include "driver/gpio.h"
+#include "flint_system_api.h"
 #include "esp_system_native_pin.h"
 
 static bool nativeSetMode(FlintExecution &execution) {
@@ -36,7 +37,6 @@ static bool nativeSetMode(FlintExecution &execution) {
             io_conf.mode = GPIO_MODE_DISABLE;
             break;
     }
-
     gpio_config(&io_conf);
     return true;
 }
