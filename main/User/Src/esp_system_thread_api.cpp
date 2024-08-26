@@ -4,35 +4,40 @@
 #include "freertos/semphr.h"
 #include "flint_system_api.h"
 
-static int32_t lockNest = 0;
-static volatile TaskHandle_t lockThreadId = 0;
-static SemaphoreHandle_t semaphore = xSemaphoreCreateMutex();
+FlintAPI::Thread::LockHandle *FlintAPI::Thread::createLockHandle(void) {
+    FlintAPI::Thread::LockHandle *lockHandle;
+    lockHandle = (FlintAPI::Thread::LockHandle *)FlintAPI::System::malloc(sizeof(FlintAPI::Thread::LockHandle));
+    lockHandle->mutexHandle = (void *)xSemaphoreCreateMutex();
+    lockHandle->lockThreadId = 0;
+    lockHandle->lockNest = 0;
+    return lockHandle;
+}
 
-void FlintAPI::Thread::lock(void) {
+void FlintAPI::Thread::lock(FlintAPI::Thread::LockHandle *lockHandle) {
     TaskHandle_t currentThreadId = xTaskGetCurrentTaskHandle();
     while(1) {
-        while(xSemaphoreTake(semaphore, 100) != pdTRUE);
-        if(lockThreadId == 0) {
-            lockNest = 1;
-            lockThreadId = currentThreadId;
-            xSemaphoreGive(semaphore);
+        while(xSemaphoreTake((SemaphoreHandle_t)lockHandle->mutexHandle, 100) != pdTRUE);
+        if(lockHandle->lockThreadId == 0) {
+            lockHandle->lockNest = 1;
+            lockHandle->lockThreadId = currentThreadId;
+            xSemaphoreGive((SemaphoreHandle_t)lockHandle->mutexHandle);
             return;
         }
-        else if(lockThreadId == currentThreadId) {
-            lockNest++;
-            xSemaphoreGive(semaphore);
+        else if(lockHandle->lockThreadId == currentThreadId) {
+            lockHandle->lockNest++;
+            xSemaphoreGive((SemaphoreHandle_t)lockHandle->mutexHandle);
             return;
         }
-        xSemaphoreGive(semaphore);
+        xSemaphoreGive((SemaphoreHandle_t)lockHandle->mutexHandle);
         FlintAPI::Thread::yield();
     }
 }
 
-void FlintAPI::Thread::unlock(void) {
-    while(xSemaphoreTake(semaphore, 100) != pdTRUE);
-    if(--lockNest == 0)
-        lockThreadId = 0;
-    xSemaphoreGive(semaphore);
+void FlintAPI::Thread::unlock(FlintAPI::Thread::LockHandle *lockHandle) {
+    while(xSemaphoreTake((SemaphoreHandle_t)lockHandle->mutexHandle, 100) != pdTRUE);
+    if(--lockHandle->lockNest == 0)
+        lockHandle->lockThreadId = 0;
+    xSemaphoreGive((SemaphoreHandle_t)lockHandle->mutexHandle);
 }
 
 void *FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
