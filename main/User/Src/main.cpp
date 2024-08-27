@@ -98,7 +98,7 @@ extern "C" void app_main() {
 
         Flint &flint = Flint::getInstance();
         EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);
-        if(f_stat("main.class", NULL) == FR_OK)
+        if(FlintAPI::File::exists("main.class") == FILE_RESULT_OK)
             flint.runToMain("main");
         dbg.receiveTask();
     }
