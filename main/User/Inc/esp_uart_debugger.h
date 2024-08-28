@@ -7,6 +7,7 @@
 
 class EspUartDebugger : public FlintDebugger {
 private:
+    static EspUartDebugger *espUartDbgInstance;
     EspUartDebugger(Flint &flint);
     EspUartDebugger(const EspUartDebugger &) = delete;
     void operator=(const EspUartDebugger &) = delete;

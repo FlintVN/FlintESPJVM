@@ -8,18 +8,18 @@
 
 #include "driver/gpio.h"
 
-static EspUartDebugger *espUartDbg = 0;
+EspUartDebugger *EspUartDebugger::espUartDbgInstance = 0;
 
 EspUartDebugger::EspUartDebugger(Flint &flint) : FlintDebugger(flint) {
 
 }
 
 EspUartDebugger &EspUartDebugger::getInstance(Flint &flint) {
-    if(espUartDbg == 0) {
-        espUartDbg = (EspUartDebugger *)Flint::malloc(sizeof(EspUartDebugger));
-        new (espUartDbg)EspUartDebugger(flint);
+    if(espUartDbgInstance == 0) {
+        espUartDbgInstance = (EspUartDebugger *)Flint::malloc(sizeof(EspUartDebugger));
+        new (espUartDbgInstance)EspUartDebugger(flint);
     }
-    return *espUartDbg;
+    return *espUartDbgInstance;
 }
 
 bool EspUartDebugger::sendData(uint8_t *data, uint32_t length) {
@@ -51,8 +51,8 @@ void EspUartDebugger::receiveTask(void) {
                 uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
                 rxDataLengthReceived += rxSize;
             }
-            if(rxDataLength && (rxDataLengthReceived >= rxDataLength) && espUartDbg) {
-                espUartDbg->receivedDataHandler(rxData, rxDataLengthReceived);
+            if(rxDataLength && (rxDataLengthReceived >= rxDataLength) && espUartDbgInstance) {
+                espUartDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                 rxDataLength = 0;
                 rxDataLengthReceived = 0;
             }
