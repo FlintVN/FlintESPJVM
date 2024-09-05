@@ -292,7 +292,7 @@ void USB_DeviceInit(USB_Mode mode) {
         .callback_line_coding_changed = NULL
     };
     ESP_ERROR_CHECK(tusb_cdc_acm_init(&acmCfg));
-    
+
     if(mode == USB_CDC_MSC) {
         static wl_handle_t wl_handle = WL_INVALID_HANDLE;
         ESP_ERROR_CHECK(storage_init_spiflash(&wl_handle));

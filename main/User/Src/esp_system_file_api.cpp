@@ -1,12 +1,37 @@
 
 #include <stdio.h>
 #include "esp_vfs_fat.h"
+#include "flint_common.h"
 #include "flint_system_api.h"
 
 FlintFileResult FlintAPI::File::exists(const char *fileName) {
     FRESULT ret = f_stat(fileName, NULL);
     if(ret == FR_OK)
         return FILE_RESULT_OK;
+    else if((ret == FR_NO_PATH) || (ret == FR_NO_FILE) || (ret == FR_INVALID_NAME))
+        return FILE_RESULT_NO_PATH;
+    else if(ret == FR_DENIED)
+        return FILE_RESULT_DENIED;
+    else if(ret == FR_WRITE_PROTECTED)
+        return FILE_RESULT_WRITE_PROTECTED;
+    else
+        return FILE_RESULT_ERR;
+}
+
+FlintFileResult FlintAPI::File::info(const char *fileName, uint32_t *size, int64_t *time) {
+    FILINFO fno;
+    FRESULT ret = f_stat(fileName, &fno);
+    if(ret == FR_OK) {
+        uint16_t year = (fno.fdate >> 9) + 1980;
+        uint8_t month = (fno.fdate >> 5) & 0x0F;
+        uint8_t day = fno.fdate & 0x1F;
+        uint8_t hour = fno.ftime >> 11;
+        uint8_t minute = (fno.ftime >> 5) & 0x3F;
+        uint8_t second = (fno.ftime & 0x1F) * 2;
+        *size = fno.fsize;
+        *time = Flint_GetUnixTime(year, month, day, hour, minute, second);
+        return FILE_RESULT_OK;
+    }
     else if((ret == FR_NO_PATH) || (ret == FR_NO_FILE) || (ret == FR_INVALID_NAME))
         return FILE_RESULT_NO_PATH;
     else if(ret == FR_DENIED)
