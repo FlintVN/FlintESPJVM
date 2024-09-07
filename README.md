@@ -10,5 +10,5 @@ This project implement [FlintJVM](https://github.com/FlintVN/FlintJVM) and is ba
 - Run `idf.py -p PORT flash` to build and flash the project. Or you can build this project using the [ESP-IDF](https://marketplace.visualstudio.com/items?itemName=espressif.esp-idf-extension) extension on VS Code.
 ### 3. Build java project to run on FlintESPJVM
 - To build a java project for FlintESPJVM you need to build your project with the FlintJDK module to be able to use the base java libraries compatible with FlintJVM and FlintESPJDK module if you want to access the peripherals/features of ESP32.
-- To be able to run debugging your java project. You need to install [FlintJVM Debug](https://marketplace.visualstudio.com/items?itemName=ElectricThanhTung.flintjvm-debugger) extension on VS Code and the [FlintJVMUartServer](https://github.com/FlintVN/FlintTool/tree/master/UARTServer) tool as a converter between serial port and TCP/IP.
+- To be able to run debugging your java project. You need to install [FlintJVM Debug](https://marketplace.visualstudio.com/items?itemName=ElectricThanhTung.flintjvm-debugger) extension on VS Code and the [FlintUartServer](https://github.com/FlintVN/FlintUARTServer) tool as a converter between serial port and TCP/IP.
 - Refer to [FlintExample](https://github.com/FlintVN/FlintExample) for a FlintJVM java project basic example.
