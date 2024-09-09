@@ -1,5 +1,6 @@
 
 #include "esp_vfs_fat.h"
+#include "flint_common.h"
 #include "flint_system_api.h"
 
 void *FlintAPI::Directory::open(const char *dirName) {
@@ -13,11 +14,20 @@ void *FlintAPI::Directory::open(const char *dirName) {
     }
 }
 
-FlintFileResult FlintAPI::Directory::read(void *handle, bool *isFile, char *nameBuff, uint32_t buffSize) {
+FlintFileResult FlintAPI::Directory::read(void *handle, uint8_t *attribute, char *nameBuff, uint32_t buffSize, uint32_t *size, int64_t *time) {
     FILINFO fno;
     FRESULT ret = f_readdir((FF_DIR *)handle, &fno);
     if(ret == FR_OK && fno.fname[0]) {
         uint16_t index = 0;
+        uint16_t year = (fno.fdate >> 9) + 1980;
+        uint8_t month = (fno.fdate >> 5) & 0x0F;
+        uint8_t day = fno.fdate & 0x1F;
+        uint8_t hour = fno.ftime >> 11;
+        uint8_t minute = (fno.ftime >> 5) & 0x3F;
+        uint8_t second = (fno.ftime & 0x1F) * 2;
+        *attribute = fno.fattrib;
+        *size = fno.fsize;
+        *time = Flint_GetUnixTime(year, month, day, hour, minute, second);
         while(fno.fname[index]) {
             if(index < buffSize) {
                 nameBuff[index] = fno.fname[index];
