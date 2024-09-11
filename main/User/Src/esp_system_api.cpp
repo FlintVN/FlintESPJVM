@@ -1,20 +1,33 @@
 
 #include <stdio.h>
+#include "sdkconfig.h"
 #include "esp_timer.h"
 #include "flint_string.h"
 #include "esp_heap_caps.h"
 #include "flint_system_api.h"
 
 void *FlintAPI::System::malloc(uint32_t size) {
+#if CONFIG_SPIRAM
     return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+#else
+    return ::malloc(size);
+#endif
 }
 
 void *FlintAPI::System::realloc(void *p, uint32_t size) {
+#if CONFIG_SPIRAM
     return heap_caps_realloc(p, size, MALLOC_CAP_SPIRAM);
+#else
+    return ::realloc(p, size);
+#endif
 }
 
 void FlintAPI::System::free(void *p) {
+#if CONFIG_SPIRAM
     heap_caps_free(p);
+#else
+    ::free(p);
+#endif
 }
 
 void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
