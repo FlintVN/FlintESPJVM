@@ -6,7 +6,7 @@ endif()
 
 idf_component_register(
     SRCS "../../ESPJVM/User/Src/main.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_board_esp32_s3.cpp"
+    SRCS "../../ESPJVM/User/Src/esp_board_esp32_s2.cpp"
     SRCS "../../ESPJVM/User/Src/esp_usb_device.c"
     SRCS "../../ESPJVM/User/Src/esp_uart_debugger.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_api.cpp"

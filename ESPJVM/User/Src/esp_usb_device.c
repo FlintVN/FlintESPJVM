@@ -7,8 +7,8 @@
 #include "tinyusb.h"
 #include "tusb_cdc_acm.h"
 #include "tusb_msc_storage.h"
-#include "usb_device.h"
 #include "tusb_tasks.h"
+#include "esp_usb_device.h"
 
 #define EPNUM_MSC               1
 #define TUSB_DESC_TOTAL_LEN     (TUD_CONFIG_DESC_LEN + TUD_MSC_DESC_LEN)
