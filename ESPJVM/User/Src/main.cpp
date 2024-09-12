@@ -3,7 +3,7 @@
 #include "esp_vfs_fat.h"
 #include "flint.h"
 #include "esp_board.h"
-#include "esp_uart_debugger.h"
+#include "esp_debugger.h"
 
 extern "C" void app_main() {
     static const esp_vfs_fat_mount_config_t mount_config = {
@@ -20,7 +20,7 @@ extern "C" void app_main() {
     ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
 
     Flint &flint = Flint::getInstance();
-    EspUartDebugger &dbg = EspUartDebugger::getInstance(flint);
+    EspDebugger &dbg = EspDebugger::getInstance(flint);
     if(FlintAPI::File::exists("main.class") == FILE_RESULT_OK)
         flint.runToMain("main");
     dbg.receiveTask();

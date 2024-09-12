@@ -2,27 +2,25 @@
 #include <iostream>
 #include "tusb.h"
 #include "tusb_cdc_acm.h"
-#include "esp_uart_debugger.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include "esp_debugger.h"
 
-#include "driver/gpio.h"
+EspDebugger *EspDebugger::espDbgInstance = 0;
 
-EspUartDebugger *EspUartDebugger::espUartDbgInstance = 0;
-
-EspUartDebugger::EspUartDebugger(Flint &flint) : FlintDebugger(flint) {
+EspDebugger::EspDebugger(Flint &flint) : FlintDebugger(flint) {
 
 }
 
-EspUartDebugger &EspUartDebugger::getInstance(Flint &flint) {
-    if(espUartDbgInstance == 0) {
-        espUartDbgInstance = (EspUartDebugger *)Flint::malloc(sizeof(EspUartDebugger));
-        new (espUartDbgInstance)EspUartDebugger(flint);
+EspDebugger &EspDebugger::getInstance(Flint &flint) {
+    if(espDbgInstance == 0) {
+        espDbgInstance = (EspDebugger *)Flint::malloc(sizeof(EspDebugger));
+        new (espDbgInstance)EspDebugger(flint);
     }
-    return *espUartDbgInstance;
+    return *espDbgInstance;
 }
 
-bool EspUartDebugger::sendData(uint8_t *data, uint32_t length) {
+bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
     while(length) {
         size_t queueSize = tinyusb_cdcacm_write_queue(TINYUSB_CDC_ACM_0, data, length);
         if(tinyusb_cdcacm_write_flush(TINYUSB_CDC_ACM_0, 0) != ESP_OK)
@@ -33,7 +31,7 @@ bool EspUartDebugger::sendData(uint8_t *data, uint32_t length) {
     return true;
 }
 
-void EspUartDebugger::receiveTask(void) {
+void EspDebugger::receiveTask(void) {
     static uint8_t rxData[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];
     uint32_t rxDataLength = 0;
     uint32_t rxDataLengthReceived = 0;
@@ -51,8 +49,8 @@ void EspUartDebugger::receiveTask(void) {
                 uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
                 rxDataLengthReceived += rxSize;
             }
-            if(rxDataLength && (rxDataLengthReceived >= rxDataLength) && espUartDbgInstance) {
-                espUartDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
+            if(rxDataLength && (rxDataLengthReceived >= rxDataLength) && espDbgInstance) {
+                espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                 rxDataLength = 0;
                 rxDataLengthReceived = 0;
             }
@@ -61,6 +59,6 @@ void EspUartDebugger::receiveTask(void) {
     }
 }
 
-EspUartDebugger::~EspUartDebugger(void) {
+EspDebugger::~EspDebugger(void) {
 
 }

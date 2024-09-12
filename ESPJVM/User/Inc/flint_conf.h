@@ -6,7 +6,7 @@
 #include "flint_common.h"
 
 #if CONFIG_IDF_TARGET_ESP32
-    #error "Not supported for ESP32"
+    #define FLINT_VARIANT_NAME      "ESP32 FlintJVM"
 #elif CONFIG_IDF_TARGET_ESP32C2
     #error "Not supported for ESP32C2"
 #elif CONFIG_IDF_TARGET_ESP32C3
