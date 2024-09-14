@@ -10,8 +10,7 @@ idf_component_register(
     SRCS "../../ESPJVM/User/Src/esp_usb_device.c"
     SRCS "../../ESPJVM/User/Src/esp_usb_cdc_debugger.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_file_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_directory_api.cpp"
+    SRCS "../../ESPJVM/User/Src/esp_system_io_api.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_thread_api.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_native.cpp"
 

@@ -5,8 +5,7 @@ idf_component_register(
     SRCS "../../ESPJVM/User/Src/esp_board_esp32.cpp"
     SRCS "../../ESPJVM/User/Src/esp_uart_debugger.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_file_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_directory_api.cpp"
+    SRCS "../../ESPJVM/User/Src/esp_system_io_api.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_thread_api.cpp"
     SRCS "../../ESPJVM/User/Src/esp_system_native.cpp"
 
