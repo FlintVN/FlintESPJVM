@@ -43,7 +43,7 @@ void EspDebugger::receiveTask(void) {
             rxDataLengthReceived = 0;
             startTick = tick;
         }
-        uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 100 / portTICK_PERIOD_MS);
+        uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
         if(length > 0) {
             if(rxDataToltalLength == 0)
                 rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
@@ -53,7 +53,7 @@ void EspDebugger::receiveTask(void) {
                 rxDataToltalLength = 0;
                 rxDataLengthReceived = 0;
             }
-            startTick = tick;
+            startTick = xTaskGetTickCount();
         }
         vTaskDelay(1);
     }
