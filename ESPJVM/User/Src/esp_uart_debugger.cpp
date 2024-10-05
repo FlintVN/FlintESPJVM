@@ -32,32 +32,37 @@ bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
 
 void EspDebugger::receiveTask(void) {
     static uint8_t rxData[1024 + 1];
+    static QueueHandle_t uartQueue;
     uint32_t rxDataToltalLength = 0;
     uint32_t rxDataLengthReceived = 0;
-    TickType_t startTick = 0;
+    uart_event_t event;
+    TickType_t startTick = xTaskGetTickCount();
+
+    uart_driver_install(UART_NUM_0, 1024 * 2, 0, 20, &uartQueue, 0);
 
     while(1) {
-        TickType_t tick = xTaskGetTickCount();
-        if((tick - startTick) >= pdMS_TO_TICKS(100)) {
-            rxDataToltalLength = 0;
-            rxDataLengthReceived = 0;
-            startTick = tick;
-        }
-        uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
-        if(length > 0) {
-            rxDataLengthReceived += length;
-            if(rxDataToltalLength == 0) {
-                if(rxDataLengthReceived >= 4)
-                    rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
-            }
-            if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
-                espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
+        if(xQueueReceive(uartQueue, (void *)&event, portMAX_DELAY)) {
+            TickType_t tick = xTaskGetTickCount();
+            if((tick - startTick) >= pdMS_TO_TICKS(100)) {
                 rxDataToltalLength = 0;
                 rxDataLengthReceived = 0;
+                startTick = tick;
             }
-            startTick = xTaskGetTickCount();
+            uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
+            if(length > 0) {
+                rxDataLengthReceived += length;
+                if(rxDataToltalLength == 0) {
+                    if(rxDataLengthReceived >= 4)
+                        rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
+                }
+                if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
+                    espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
+                    rxDataToltalLength = 0;
+                    rxDataLengthReceived = 0;
+                }
+                startTick = xTaskGetTickCount();
+            }
         }
-        vTaskDelay(1);
     }
 }
 

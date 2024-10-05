@@ -23,5 +23,6 @@ extern "C" void app_main() {
     EspDebugger &dbg = EspDebugger::getInstance(flint);
     if(FlintAPI::IO::finfo("main.class", NULL, NULL) == FILE_RESULT_OK)
         flint.runToMain("main");
+    vTaskPrioritySet(NULL, 2);
     dbg.receiveTask();
 }

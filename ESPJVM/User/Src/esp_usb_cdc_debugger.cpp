@@ -6,6 +6,8 @@
 #include <freertos/task.h>
 #include "esp_debugger.h"
 
+static SemaphoreHandle_t cdcRxSemaphore = NULL;
+
 EspDebugger *EspDebugger::espDbgInstance = 0;
 
 EspDebugger::EspDebugger(Flint &flint) : FlintDebugger(flint) {
@@ -31,14 +33,23 @@ bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
     return true;
 }
 
+static void cdcRxCallback(int itf, cdcacm_event_t *event) {
+    xSemaphoreGiveFromISR(cdcRxSemaphore, NULL);
+}
+
 void EspDebugger::receiveTask(void) {
     static uint8_t rxData[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];
     uint32_t rxDataToltalLength = 0;
     uint32_t rxDataLengthReceived = 0;
-    TickType_t startTick = 0;
+    TickType_t startTick = xTaskGetTickCount();
+
+    if(cdcRxSemaphore == NULL)
+        cdcRxSemaphore = xSemaphoreCreateBinary();
+
+    tinyusb_cdcacm_register_callback(TINYUSB_CDC_ACM_0, CDC_EVENT_RX, &cdcRxCallback);
 
     while(1) {
-        if(tud_cdc_n_available(TINYUSB_CDC_ACM_0)) {
+        if(xSemaphoreTake(cdcRxSemaphore, portMAX_DELAY) == pdTRUE) {
             TickType_t tick = xTaskGetTickCount();
             if((tick - startTick) >= pdMS_TO_TICKS(100)) {
                 rxDataToltalLength = 0;
@@ -61,7 +72,6 @@ void EspDebugger::receiveTask(void) {
             }
             startTick = tick;
         }
-        vTaskDelay(1);
     }
 }
 
