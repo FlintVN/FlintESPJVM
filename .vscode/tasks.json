@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ESP32",
+            "group": "build",
+            "type": "shell",
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/c"]
+                    }
+                },
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32",
+            },
+        },
+
+        {
+            "label": "ESP32-S2",
+            "group": "build",
+            "type": "shell",
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/c"]
+                    }
+                },
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32-S2",
+            },
+        },
+
+        {
+            "label": "ESP32-S3",
+            "group": "build",
+            "type": "shell",
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/c"]
+                    }
+                },
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/ESP32-S3",
+            },
+        },
+    ]
+}
