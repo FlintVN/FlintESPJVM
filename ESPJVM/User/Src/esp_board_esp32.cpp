@@ -5,7 +5,7 @@
 #define TXD_PIN             1
 #define RXD_PIN             3
 
-static void Uart_Init(uart_port_t uartNum, int32_t baudRate) {
+static void UART_Init(uart_port_t uartNum, int32_t baudRate) {
     uart_config_t uart_config = {
         .baud_rate = baudRate,
         .data_bits = UART_DATA_8_BITS,
@@ -18,6 +18,11 @@ static void Uart_Init(uart_port_t uartNum, int32_t baudRate) {
     uart_driver_install(uartNum, 1024 * 2, 0, 0, NULL, 0);
 }
 
+static void GPIO_Init(void) {
+
+}
+
 void Board_Init(void ) {
-    Uart_Init(UART_NUM_0, 2000000);
+    GPIO_Init();
+    UART_Init(UART_NUM_0, 921600);
 }
