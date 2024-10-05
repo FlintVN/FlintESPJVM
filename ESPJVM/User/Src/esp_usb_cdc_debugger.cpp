@@ -40,10 +40,15 @@ void EspDebugger::receiveTask(void) {
     while(1) {
         if(tud_cdc_n_available(TINYUSB_CDC_ACM_0)) {
             TickType_t tick = xTaskGetTickCount();
-            if((rxDataToltalLength == 0) || ((tick - startTick) >= pdMS_TO_TICKS(100))) {
-                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, rxData, sizeof(rxData));
-                rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
-                rxDataLengthReceived = rxSize;
+            if((tick - startTick) >= pdMS_TO_TICKS(100)) {
+                rxDataToltalLength = 0;
+                rxDataLengthReceived = 0;
+            }
+            if(rxDataToltalLength == 0) {
+                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
+                rxDataLengthReceived += rxSize;
+                if(rxDataLengthReceived >= 4)
+                    rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
             }
             else {
                 uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);

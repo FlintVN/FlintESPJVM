@@ -45,9 +45,11 @@ void EspDebugger::receiveTask(void) {
         }
         uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
         if(length > 0) {
-            if(rxDataToltalLength == 0)
-                rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
             rxDataLengthReceived += length;
+            if(rxDataToltalLength == 0) {
+                if(rxDataLengthReceived >= 4)
+                    rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
+            }
             if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
                 espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                 rxDataToltalLength = 0;
