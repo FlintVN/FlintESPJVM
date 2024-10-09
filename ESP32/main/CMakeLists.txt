@@ -4,12 +4,13 @@ idf_component_register(
     SRCS "../../ESPJVM/User/Src/main.cpp"
     SRCS "../../ESPJVM/User/Src/esp_board_esp32.cpp"
     SRCS "../../ESPJVM/User/Src/esp_uart_debugger.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_io_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_thread_api.cpp"
-    SRCS "../../ESPJVM/User/Src/esp_system_native.cpp"
 
-    SRCS "../../ESPJVM/User/Src/esp_system_native_pin.cpp"
+    SRCS "../../ESPJVM/SystemAPI/Src/esp_system_api.cpp"
+    SRCS "../../ESPJVM/SystemAPI/Src/esp_system_io_api.cpp"
+    SRCS "../../ESPJVM/SystemAPI/Src/esp_system_thread_api.cpp"
+
+    SRCS "../../ESPJVM/Native/Src/esp_system_native.cpp"
+    SRCS "../../ESPJVM/Native/Src/esp_system_native_pin.cpp"
 
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_attribute_info.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_class_loader.cpp"
@@ -42,6 +43,8 @@ idf_component_register(
     SRCS "../../ESPJVM/FlintJVM/Native/Src/flint_native_system_class.cpp"
 
     INCLUDE_DIRS "../../ESPJVM/User/Inc"
+    INCLUDE_DIRS "../../ESPJVM/Native/Inc"
+    INCLUDE_DIRS "../../ESPJVM/SystemAPI/Inc"
     INCLUDE_DIRS "../../ESPJVM/FlintJVM/VM/Inc"
     INCLUDE_DIRS "../../ESPJVM/FlintJVM/Native/Inc"
 
