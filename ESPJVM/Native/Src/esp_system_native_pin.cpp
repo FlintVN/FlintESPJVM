@@ -57,6 +57,10 @@ static bool nativeReadPin(FlintExecution &execution) {
         else
             execution.stackPushInt32(REG_READ(GPIO_IN1_REG) & (1 << (pin - 32)) ? 1 : 0);
     }
+    #else
+    {
+        #error "Pin.readPin method not supported for this ESP32 chip"
+    }
     #endif
 
     return true;
@@ -87,6 +91,10 @@ static bool nativeWritePin(FlintExecution &execution) {
             else
                 REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
         }
+    }
+    #else
+    {
+        #error "Pin.writePin method not supported for this ESP32 chip"
     }
     #endif
 

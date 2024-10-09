@@ -16,6 +16,7 @@ idf_component_register(
 
     SRCS "../../ESPJVM/Native/Src/esp_system_native.cpp"
     SRCS "../../ESPJVM/Native/Src/esp_system_native_pin.cpp"
+    SRCS "../../ESPJVM/Native/Src/esp_system_native_port.cpp"
 
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_attribute_info.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_class_loader.cpp"
