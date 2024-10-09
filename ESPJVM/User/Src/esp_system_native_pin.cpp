@@ -1,6 +1,8 @@
 
 #include <string.h>
 #include "flint.h"
+#include "sdkconfig.h"
+#include "soc/gpio_reg.h"
 #include "driver/gpio.h"
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
@@ -43,14 +45,51 @@ static bool nativeSetMode(FlintExecution &execution) {
 
 static bool nativeReadPin(FlintExecution &execution) {
     int32_t pin = execution.stackPopInt32();
-    execution.stackPushInt32(gpio_get_level((gpio_num_t)pin) ? 1 : 0);
+
+    #if CONFIG_IDF_TARGET_ESP32
+    {
+        execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
+    }
+    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    {
+        if(pin < 32)
+            execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
+        else
+            execution.stackPushInt32(REG_READ(GPIO_IN1_REG) & (1 << (pin - 32)) ? 1 : 0);
+    }
+    #endif
+
     return true;
 }
 
 static bool nativeWritePin(FlintExecution &execution) {
     int32_t level = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
-    gpio_set_level((gpio_num_t)pin, level ? 1 : 0);
+
+    #if CONFIG_IDF_TARGET_ESP32
+    {
+        if(level)
+            REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+        else
+            REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+    }
+    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    {
+        if(pin < 32) {
+            if(level)
+                REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+            else
+                REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+        }
+        else {
+            if(level)
+                REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
+            else
+                REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
+        }
+    }
+    #endif
+
     return true;
 }
 
