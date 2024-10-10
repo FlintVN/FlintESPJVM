@@ -121,9 +121,9 @@ static bool nativeWritePin(FlintExecution &execution) {
 }
 
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD1\x02""setMode",  "\x05\x00\x39\x01""(II)V", nativeSetMode),
-    NATIVE_METHOD("\x07\x00\xC3\x02""readPin",  "\x04\x00\xF4\x00""(I)Z",  nativeReadPin),
-    NATIVE_METHOD("\x08\x00\x52\x03""writePin", "\x05\x00\x4A\x01""(IZ)V", nativeWritePin),
+    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode",  "\x05\x00\xE3\xDD""(II)V", nativeSetMode),
+    NATIVE_METHOD("\x07\x00\xB2\x58""readPin",  "\x04\x00\xB8\x06""(I)Z",  nativeReadPin),
+    NATIVE_METHOD("\x08\x00\xA3\x62""writePin", "\x05\x00\x12\x18""(IZ)V", nativeWritePin),
 };
 
-const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\x09\x06""machine/gpio/Pin", methods);
+const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\x20\xBB""machine/gpio/Pin", methods);

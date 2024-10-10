@@ -164,9 +164,9 @@ static bool nativeWritePort(FlintExecution &execution) {
 }
 
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x08\x00\x01\x03""setMode",   "\x06\x00\x8D\x01""([BI)V", nativeSetMode),
-    NATIVE_METHOD("\x08\x00\x41\x03""readPort",  "\x05\x00\x37\x01""([B)I",  nativeReadPort),
-    NATIVE_METHOD("\x09\x00\xD0\x03""writePort", "\x06\x00\x8D\x01""([BI)V", nativeWritePort),
+    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode",   "\x06\x00\xC6\x01""([BI)V", nativeSetMode),
+    NATIVE_METHOD("\x08\x00\x70\x2C""readPort",  "\x05\x00\xD6\xAF""([B)I",  nativeReadPort),
+    NATIVE_METHOD("\x09\x00\x8A\x20""writePort", "\x06\x00\xC6\x01""([BI)V", nativeWritePort),
 };
 
-const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x11\x00\x87\x06""machine/gpio/Port", methods);
+const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x11\x00\x12\x81""machine/gpio/Port", methods);
