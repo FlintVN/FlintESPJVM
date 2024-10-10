@@ -12,15 +12,6 @@
 #define BLINK_GPIO              15
 #define BUTTON_GPIO             0
 
-static void NVS_Init(void) {
-    esp_err_t err = nvs_flash_init();
-    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(err);
-}
-
 static USB_Mode NVS_GetUSBMode(void) {
     nvs_handle_t handle;
     int32_t usbMode = 0;
@@ -71,6 +62,15 @@ static void LED_Flash(void) {
     gpio_set_level((gpio_num_t)BLINK_GPIO, 1);
     vTaskDelay(50 / portTICK_PERIOD_MS);
     gpio_set_level((gpio_num_t)BLINK_GPIO, 0);
+}
+
+static void NVS_Init(void) {
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(err);
 }
 
 void Board_Init(void) {
