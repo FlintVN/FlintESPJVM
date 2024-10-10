@@ -29,6 +29,7 @@ idf_component_register(
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_field_info.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_fields_data.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_load_file_error.cpp"
+    SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_find_native_error.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_method_info.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_object.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_out_of_memory.cpp"
