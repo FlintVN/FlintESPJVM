@@ -31,10 +31,10 @@ void FlintAPI::System::free(void *p) {
 }
 
 void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
-    uint32_t count = 0;
     char buff[64];
     if(coder == 0) {
         while(length) {
+            uint32_t count = 0;
             while(length && ((count + 2) <= sizeof(buff))) {
                 count += FlintString::utf8Encode((uint8_t)*text, &buff[count]);
                 text++;
@@ -45,6 +45,7 @@ void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
     }
     else {
         while(length) {
+            uint32_t count = 0;
             while(length && ((count + 3) <= sizeof(buff))) {
                 count += FlintString::utf8Encode(*(uint16_t *)text, &buff[count]);
                 text += 2;
