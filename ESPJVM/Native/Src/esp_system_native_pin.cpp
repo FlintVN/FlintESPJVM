@@ -7,7 +7,7 @@
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
 
-static bool nativeSetMode(FlintExecution &execution) {
+static bool nativeSetMode0(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
@@ -94,7 +94,7 @@ static bool nativeWritePin(FlintExecution &execution) {
 }
 
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD1\x02""setMode",  "\x05\x00\x39\x01""(II)V", nativeSetMode),
+    NATIVE_METHOD("\x08\x00\x01\x03""setMode0", "\x05\x00\x39\x01""(II)V", nativeSetMode0),
     NATIVE_METHOD("\x07\x00\xC3\x02""readPin",  "\x04\x00\xF4\x00""(I)Z",  nativeReadPin),
     NATIVE_METHOD("\x08\x00\x52\x03""writePin", "\x05\x00\x4A\x01""(IZ)V", nativeWritePin),
 };
