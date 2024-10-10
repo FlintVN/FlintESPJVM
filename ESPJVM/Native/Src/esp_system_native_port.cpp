@@ -7,18 +7,50 @@
 #include "flint_system_api.h"
 #include "esp_system_native_port.h"
 
+#if CONFIG_IDF_TARGET_ESP32
+static bool checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
+    uint8_t *pins = pinsObj->data;
+    for(uint8_t i = 0; i < arrayLength; i++) {
+        uint8_t pin = pins[i];
+        if((pin == 1) || (pin == 3)) {
+            const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
+            FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
+            FlintThrowable &excpObj = execution.flint.newException(strObj);
+            execution.stackPushObject(&excpObj);
+            return false;
+        }
+        else if((6 <= pin) && (pin <= 11)) {
+            FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
+            FlintThrowable &excpObj = execution.flint.newException(strObj);
+            execution.stackPushObject(&excpObj);
+            return false;
+        }
+    }
+    return true;
+}
+#else
+static bool checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
+    // TODO
+    return true;
+}
+#endif
+
 static bool checkParam(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
     if((pinsObj == 0) || (arrayLength < 1) || (arrayLength > 32)) {
         FlintString *strObj;
-        if(pinsObj == 0)
+        FlintThrowable *excpObj;
+        if(pinsObj == 0) {
             strObj = &execution.flint.newString(STR_AND_SIZE("pins array cannot be null object"));
-        else
+            excpObj = &execution.flint.newNullPointerException(*strObj);
+        }
+        else {
             strObj = &execution.flint.newString(STR_AND_SIZE("The pin number must be from 1 to 32"));
-        FlintThrowable &excpObj = execution.flint.newNullPointerException(*strObj);
-        execution.stackPushObject(&excpObj);
+            excpObj = &execution.flint.newException(*strObj);
+        }
+        execution.stackPushObject(excpObj);
         return false;
     }
-    return true;
+    return checkPin(execution, pinsObj, arrayLength);
 }
 
 static bool nativeSetMode(FlintExecution &execution) {
@@ -70,17 +102,9 @@ static bool nativeReadPort(FlintExecution &execution) {
     FlintObject *pinsObj = execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? (pinsObj->size / pinsObj->parseTypeSize()) : 0;
 
-    if(!checkParam(execution, pinsObj, arrayLength))
-        return false;
-
     uint8_t *pins = pinsObj->data;
     uint32_t value = 0;
-    #if CONFIG_IDF_TARGET_ESP32
-    {
-        for(uint8_t i = 0; i < arrayLength; i++)
-            value |= ((REG_READ(GPIO_IN_REG) & (1 << pins[i])) ? 1 : 0) << i;
-    }
-    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    #if GPIO_IN1_REG
     {
         for(uint8_t i = 0; i < arrayLength; i++) {
             if(pins[i] < 32)
@@ -91,7 +115,8 @@ static bool nativeReadPort(FlintExecution &execution) {
     }
     #else
     {
-        #error "Port.readPort method not supported for this ESP32 chip"
+        for(uint8_t i = 0; i < arrayLength; i++)
+            value |= ((REG_READ(GPIO_IN_REG) & (1 << pins[i])) ? 1 : 0) << i;
     }
     #endif
     execution.stackPushInt32(value);
@@ -104,24 +129,8 @@ static bool nativeWritePort(FlintExecution &execution) {
     FlintObject *pinsObj = execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? (pinsObj->size / pinsObj->parseTypeSize()) : 0;
 
-    if(!checkParam(execution, pinsObj, arrayLength))
-        return false;
-
     uint8_t *pins = pinsObj->data;
-    #if CONFIG_IDF_TARGET_ESP32
-    {
-        uint32_t setMask = 0;
-        uint32_t clearMask = 0;
-        for(uint8_t i = 0; i < arrayLength; i++) {
-            if(value & (1 << i))
-                setMask |= 1 << pins[i];
-            else
-                clearMask |= 1 << pins[i];
-        }
-        REG_WRITE(GPIO_OUT_W1TC_REG, clearMask);
-        REG_WRITE(GPIO_OUT_W1TS_REG, setMask);
-    }
-    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    #if GPIO_OUT1_W1TC_REG
     {
         uint64_t setMask = 0;
         uint64_t clearMask = 0;
@@ -138,7 +147,16 @@ static bool nativeWritePort(FlintExecution &execution) {
     }
     #else
     {
-        #error "Port.writePort method not supported for this ESP32 chip"
+        uint32_t setMask = 0;
+        uint32_t clearMask = 0;
+        for(uint8_t i = 0; i < arrayLength; i++) {
+            if(value & (1 << i))
+                setMask |= 1 << pins[i];
+            else
+                clearMask |= 1 << pins[i];
+        }
+        REG_WRITE(GPIO_OUT_W1TC_REG, clearMask);
+        REG_WRITE(GPIO_OUT_W1TS_REG, setMask);
     }
     #endif
 

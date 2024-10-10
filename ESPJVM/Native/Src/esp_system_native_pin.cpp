@@ -7,9 +7,36 @@
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
 
+#if CONFIG_IDF_TARGET_ESP32
+static bool checkPin(FlintExecution &execution, int32_t pin) {
+    if((pin == 1) || (pin == 3)) {
+        const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
+        FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
+        FlintThrowable &excpObj = execution.flint.newException(strObj);
+        execution.stackPushObject(&excpObj);
+        return false;
+    }
+    else if((6 <= pin) && (pin <= 11)) {
+        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
+        FlintThrowable &excpObj = execution.flint.newException(strObj);
+        execution.stackPushObject(&excpObj);
+        return false;
+    }
+    return true;
+}
+#else
+static bool checkPin(FlintExecution &execution, int32_t pin) {
+    // TODO
+    return true;
+}
+#endif
+
 static bool nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
+
+    if(!checkPin(execution, pin))
+        return false;
 
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -46,11 +73,7 @@ static bool nativeSetMode(FlintExecution &execution) {
 static bool nativeReadPin(FlintExecution &execution) {
     int32_t pin = execution.stackPopInt32();
 
-    #if CONFIG_IDF_TARGET_ESP32
-    {
-        execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
-    }
-    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    #if GPIO_IN1_REG
     {
         if(pin < 32)
             execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
@@ -59,7 +82,7 @@ static bool nativeReadPin(FlintExecution &execution) {
     }
     #else
     {
-        #error "Pin.readPin method not supported for this ESP32 chip"
+        execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
     }
     #endif
 
@@ -70,14 +93,7 @@ static bool nativeWritePin(FlintExecution &execution) {
     int32_t level = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
-    #if CONFIG_IDF_TARGET_ESP32
-    {
-        if(level)
-            REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
-        else
-            REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
-    }
-    #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    #if GPIO_OUT_W1TC_REG
     {
         if(pin < 32) {
             if(level)
@@ -94,7 +110,10 @@ static bool nativeWritePin(FlintExecution &execution) {
     }
     #else
     {
-        #error "Pin.writePin method not supported for this ESP32 chip"
+        if(level)
+            REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+        else
+            REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
     }
     #endif
 
