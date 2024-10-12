@@ -1,4 +1,4 @@
-set(priv_requires fatfs console esp_timer nvs_flash driver wear_levelling esp_partition)
+set(priv_requires fatfs console esp_timer nvs_flash driver wear_levelling esp_partition esp_wifi)
 
 idf_component_register(
     SRCS "../../ESPJVM/User/Src/main.cpp"
@@ -12,6 +12,7 @@ idf_component_register(
     SRCS "../../ESPJVM/Native/Src/esp_system_native.cpp"
     SRCS "../../ESPJVM/Native/Src/esp_system_native_pin.cpp"
     SRCS "../../ESPJVM/Native/Src/esp_system_native_port.cpp"
+    SRCS "../../ESPJVM/Native/Src/esp_system_native_wifi.cpp"
 
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_attribute_info.cpp"
     SRCS "../../ESPJVM/FlintJVM/VM/Src/flint_class_loader.cpp"
