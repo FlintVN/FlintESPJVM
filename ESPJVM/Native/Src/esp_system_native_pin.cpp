@@ -12,13 +12,13 @@ static bool checkPin(FlintExecution &execution, int32_t pin) {
     if((pin == 1) || (pin == 3)) {
         const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
         FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
-        FlintThrowable &excpObj = execution.flint.newException(strObj);
+        FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
         execution.stackPushObject(&excpObj);
         return false;
     }
     else if((6 <= pin) && (pin <= 11)) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
-        FlintThrowable &excpObj = execution.flint.newException(strObj);
+        FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
         execution.stackPushObject(&excpObj);
         return false;
     }
