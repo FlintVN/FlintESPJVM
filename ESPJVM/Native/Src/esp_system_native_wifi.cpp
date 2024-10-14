@@ -1,5 +1,7 @@
 
+#include <new>
 #include "flint.h"
+#include <string.h>
 #include "esp_wifi.h"
 #include "sdkconfig.h"
 #include "flint_string.h"
@@ -105,18 +107,27 @@ static bool nativeIsConnected(FlintExecution &execution) {
     return true;
 }
 
-static bool nativeGetMacAddress(FlintExecution &execution) {
-    uint8_t mac[6];
-    esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, mac);
+static FlintObject &createAccessPointRecordObj(FlintExecution &execution, FlintConstUtf8 &className, wifi_ap_record_t &apRecord) {
+    FlintObject &obj = execution.flint.newObject(className);
+
+    /* mac array */
+    FlintObject &macArray = execution.flint.newObject(6, *(FlintConstUtf8 *)primTypeConstUtf8List[4], 1);
+    memcpy(macArray.data, apRecord.bssid, 6);
+
+    obj.getFields().getFieldObject("mac").object = &macArray;
+    obj.getFields().getFieldObject("ssid").object = &execution.flint.newString((char *)apRecord.ssid, strlen((char *)apRecord.ssid));
+    obj.getFields().getFieldData32("rssi").value = apRecord.rssi;
+    obj.getFields().getFieldData32("authMode").value = apRecord.authmode;
+
+    return obj;
+}
+
+static bool nativeGetAPinfo(FlintExecution &execution) {
+    wifi_ap_record_t apInfo;
+    esp_err_t ret = esp_wifi_sta_get_ap_info(&apInfo);
     if(ret == ESP_OK) {
-        FlintObject &byteArray = execution.flint.newObject(6, *(FlintConstUtf8 *)primTypeConstUtf8List[4], 1);
-        byteArray.data[0] = mac[0];
-        byteArray.data[1] = mac[1];
-        byteArray.data[2] = mac[2];
-        byteArray.data[3] = mac[3];
-        byteArray.data[4] = mac[4];
-        byteArray.data[5] = mac[5];
-        execution.stackPushObject(&byteArray);
+        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
+        execution.stackPushObject(&createAccessPointRecordObj(execution, className, apInfo));
     }
     else
         execution.stackPushObject(0);
@@ -169,16 +180,73 @@ static bool nativeSoftAPdisconnect(FlintExecution &execution) {
     return true;
 }
 
+static bool nativeStartScan(FlintExecution &execution) {
+    int32_t block = execution.stackPopInt32();
+    execution.flint.lock();
+    esp_err_t ret = esp_wifi_scan_start(NULL, block ? true : false);
+    execution.flint.unlock();
+    return checkReturn(execution, ret);
+}
+
+static bool nativeGetScanResult(FlintExecution &execution) {
+    uint16_t count = 0;
+    esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
+
+    if(!checkReturn(execution, ret))
+        return false;
+    
+    if(count == 0) {
+        execution.stackPushObject(0);
+        return true;
+    }
+
+    execution.flint.lock();
+    try {
+        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
+        FlintObject &arrayObj = execution.flint.newObject(4 * count, className, 1);
+        memset(arrayObj.data, 0, 4 * count);
+
+        for(uint16_t i = 0; i < count; i++) {
+            wifi_ap_record_t apRecords;
+            ret = esp_wifi_scan_get_ap_record(&apRecords);
+            if(!checkReturn(execution, ret)) {
+                execution.flint.unlock();
+                return false;
+            }
+            ((FlintObject **)arrayObj.data)[i] = &createAccessPointRecordObj(execution, className, apRecords);
+        }
+
+        execution.stackPushObject(&arrayObj);
+    }
+    catch(...) {
+        execution.flint.unlock();
+        throw;
+    }
+
+    execution.flint.unlock();
+
+    return true;
+}
+
+static bool nativeStopScan(FlintExecution &execution) {
+    esp_wifi_scan_stop();
+    return true;
+}
+
 static const FlintNativeMethod methods[] = {
     NATIVE_METHOD("\x0B\x00\x2B\x6D""isSupported",      "\x03\x00\x91\x9C""()Z",                                        nativeIsSupported),
 
     NATIVE_METHOD("\x07\x00\x73\x4F""connect",          "\x28\x00\x84\x65""(Ljava/lang/String;Ljava/lang/String;I)V",   nativeConnect),
     NATIVE_METHOD("\x0B\x00\x07\x5C""isConnected",      "\x03\x00\x91\x9C""()Z",                                        nativeIsConnected),
-    NATIVE_METHOD("\x0D\x00\x72\x55""getMacAddress",    "\x04\x00\x9C\xB2""()[B",                                       nativeGetMacAddress),
+    NATIVE_METHOD("\x09\x00\x51\xFD""getAPinfo",        "\x1D\x00\x50\xDF""()Lnetwork/AccessPointRecord;",              nativeGetAPinfo),
     NATIVE_METHOD("\x0A\x00\xDF\x40""disconnect",       "\x03\x00\x91\x99""()V",                                        nativeDisconnect),
 
     NATIVE_METHOD("\x06\x00\x4E\x10""softAP",           "\x2A\x00\xED\x0C""(Ljava/lang/String;Ljava/lang/String;III)V", nativeSoftAP),
     NATIVE_METHOD("\x10\x00\x71\xA1""softAPdisconnect", "\x03\x00\x91\x99""()V",                                        nativeSoftAPdisconnect),
+
+    NATIVE_METHOD("\x09\x00\x01\xD3""startScan",        "\x04\x00\x49\xC6""(Z)V",                                       nativeStartScan),
+    NATIVE_METHOD("\x0E\x00\x13\x81""getScanResults",   "\x1E\x00\x79\x2F""()[Lnetwork/AccessPointRecord;",             nativeGetScanResult),
+    NATIVE_METHOD("\x08\x00\xCD\x70""stopScan",         "\x03\x00\x91\x99""()V",                                        nativeStopScan),
 };
 
 const FlintNativeClass WIFI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x0C\x00\xE6\x3F""network/WiFi", methods);
