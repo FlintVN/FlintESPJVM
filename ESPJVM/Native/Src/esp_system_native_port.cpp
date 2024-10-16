@@ -8,8 +8,8 @@
 #include "esp_system_native_port.h"
 
 #if CONFIG_IDF_TARGET_ESP32
-static bool checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
-    uint8_t *pins = pinsObj->data;
+static bool checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+    uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
         uint8_t pin = pins[i];
         if((pin == 1) || (pin == 3)) {
@@ -35,7 +35,7 @@ static bool checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t a
 }
 #endif
 
-static bool checkParam(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
+static bool checkParam(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     if((pinsObj == 0) || (arrayLength < 1) || (arrayLength > 32)) {
         FlintString *strObj;
         FlintThrowable *excpObj;
@@ -55,13 +55,13 @@ static bool checkParam(FlintExecution &execution, FlintObject *pinsObj, uint32_t
 
 static bool nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
-    FlintObject *pinsObj = execution.stackPopObject();
-    uint32_t arrayLength = pinsObj ? (pinsObj->size / pinsObj->parseTypeSize()) : 0;
+    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+    uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
     if(!checkParam(execution, pinsObj, arrayLength))
         return false;
 
-    uint8_t *pins = pinsObj->data;
+    uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint64_t pinMask = 0;
     for(uint8_t i = 0; i < arrayLength; i++)
         pinMask |= (uint64_t)1 << pins[i];
@@ -99,10 +99,10 @@ static bool nativeSetMode(FlintExecution &execution) {
 }
 
 static bool nativeReadPort(FlintExecution &execution) {
-    FlintObject *pinsObj = execution.stackPopObject();
-    uint32_t arrayLength = pinsObj ? (pinsObj->size / pinsObj->parseTypeSize()) : 0;
+    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+    uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    uint8_t *pins = pinsObj->data;
+    uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint32_t value = 0;
     #if GPIO_IN1_REG
     {
@@ -126,10 +126,10 @@ static bool nativeReadPort(FlintExecution &execution) {
 
 static bool nativeWritePort(FlintExecution &execution) {
     uint32_t value = execution.stackPopInt32();
-    FlintObject *pinsObj = execution.stackPopObject();
-    uint32_t arrayLength = pinsObj ? (pinsObj->size / pinsObj->parseTypeSize()) : 0;
+    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+    uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    uint8_t *pins = pinsObj->data;
+    uint8_t *pins = (uint8_t *)pinsObj->getData();
     #if GPIO_OUT1_W1TC_REG
     {
         uint64_t setMask = 0;

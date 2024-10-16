@@ -111,8 +111,8 @@ static FlintObject &createAccessPointRecordObj(FlintExecution &execution, FlintC
     FlintObject &obj = execution.flint.newObject(className);
 
     /* mac array */
-    FlintObject &macArray = execution.flint.newObject(6, *(FlintConstUtf8 *)primTypeConstUtf8List[4], 1);
-    memcpy(macArray.data, apRecord.bssid, 6);
+    FlintInt8Array &macArray = execution.flint.newByteArray(6);
+    memcpy(macArray.getData(), apRecord.bssid, 6);
 
     obj.getFields().getFieldObject("mac").object = &macArray;
     obj.getFields().getFieldObject("ssid").object = &execution.flint.newString((char *)apRecord.ssid, strlen((char *)apRecord.ssid));
@@ -203,9 +203,9 @@ static bool nativeGetScanResult(FlintExecution &execution) {
     execution.flint.lock();
     try {
         FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
-        FlintObject &arrayObj = execution.flint.newObject(4 * count, className, 1);
-        memset(arrayObj.data, 0, 4 * count);
-
+        FlintObjectArray &arrayObj = execution.flint.newObjectArray(className, count);
+        FlintObject **data = arrayObj.getData();
+        memset(data, 0, 4 * count);
         for(uint16_t i = 0; i < count; i++) {
             wifi_ap_record_t apRecords;
             ret = esp_wifi_scan_get_ap_record(&apRecords);
@@ -213,7 +213,7 @@ static bool nativeGetScanResult(FlintExecution &execution) {
                 execution.flint.unlock();
                 return false;
             }
-            ((FlintObject **)arrayObj.data)[i] = &createAccessPointRecordObj(execution, className, apRecords);
+            data[i] = &createAccessPointRecordObj(execution, className, apRecords);
         }
 
         execution.stackPushObject(&arrayObj);
