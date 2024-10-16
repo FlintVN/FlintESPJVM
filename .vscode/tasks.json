@@ -62,9 +62,9 @@
             "label": "ESP32 Flash",
             "group": "build",
             "type": "shell",
-            "command": ". ${env:IDF_PATH}/export.sh && idf.py -p COM5 -b 921600 flash",
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py -p COM19 -b 921600 flash",
             "windows": {
-                "command": "${env:IDF_PATH}/export.bat && idf.py -p COM5 -b 921600 flash",
+                "command": "${env:IDF_PATH}/export.bat && idf.py -p COM19 -b 921600 flash",
                 "options": {
                     "shell": {
                         "executable": "cmd.exe",
