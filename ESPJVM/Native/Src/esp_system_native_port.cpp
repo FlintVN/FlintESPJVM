@@ -8,7 +8,7 @@
 #include "esp_system_native_port.h"
 
 #if CONFIG_IDF_TARGET_ESP32
-static bool checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+static FlintThrowable *checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
         uint8_t pin = pins[i];
@@ -16,30 +16,28 @@ static bool checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_
             const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
             FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
             FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-            execution.stackPushObject(&excpObj);
-            return false;
+            return &excpObj;
         }
         else if((6 <= pin) && (pin <= 11)) {
             FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
             FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-            execution.stackPushObject(&excpObj);
-            return false;
+            return &excpObj;
         }
     }
-    return true;
+    return NULL;
 }
 #else
-static bool checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
+static FlintThrowable *checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
     // TODO
-    return true;
+    return NULL;
 }
 #endif
 
-static bool checkParam(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
-    if((pinsObj == 0) || (arrayLength < 1) || (arrayLength > 32)) {
+static FlintThrowable *checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+    if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
         FlintString *strObj;
         FlintThrowable *excpObj;
-        if(pinsObj == 0) {
+        if(pinsObj == NULL) {
             strObj = &execution.flint.newString(STR_AND_SIZE("pins array cannot be null object"));
             excpObj = &execution.flint.newNullPointerException(*strObj);
         }
@@ -47,8 +45,7 @@ static bool checkParam(FlintExecution &execution, FlintInt8Array *pinsObj, uint3
             strObj = &execution.flint.newString(STR_AND_SIZE("The pin number must be from 1 to 32"));
             excpObj = &execution.flint.newErrorException(*strObj);
         }
-        execution.stackPushObject(excpObj);
-        return false;
+        return excpObj;
     }
     return checkPin(execution, pinsObj, arrayLength);
 }
@@ -58,8 +55,10 @@ static bool nativeSetMode(FlintExecution &execution) {
     FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    if(!checkParam(execution, pinsObj, arrayLength))
+    if(FlintThrowable *excp = checkParams(execution, pinsObj, arrayLength)) {
+        execution.stackPushObject(excp);
         return false;
+    }
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint64_t pinMask = 0;

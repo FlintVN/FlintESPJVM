@@ -8,26 +8,24 @@
 #include "esp_system_native_pin.h"
 
 #if CONFIG_IDF_TARGET_ESP32
-static bool checkPin(FlintExecution &execution, int32_t pin) {
+static FlintThrowable *checkPin(FlintExecution &execution, int32_t pin) {
     if((pin == 1) || (pin == 3)) {
         const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
         FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
         FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
     else if((6 <= pin) && (pin <= 11)) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
         FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
-    return true;
+    return NULL;
 }
 #else
-static bool checkPin(FlintExecution &execution, int32_t pin) {
+static FlintThrowable *checkPin(FlintExecution &execution, int32_t pin) {
     // TODO
-    return true;
+    return NULL;
 }
 #endif
 
@@ -35,8 +33,10 @@ static bool nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
-    if(!checkPin(execution, pin))
+    if(FlintThrowable *excp = checkPin(execution, pin)) {
+        execution.stackPushObject(excp);
         return false;
+    }
 
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;

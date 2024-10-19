@@ -26,19 +26,17 @@ static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_DPP,
 };
 
-static bool checkParam(FlintExecution &execution, FlintString *ssid, FlintString *password, uint32_t authMode) {
+static FlintThrowable *checkParams(FlintExecution &execution, FlintString *ssid, FlintString *password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList)) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Authentication mode is invalid"));
         FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
-    if((ssid == 0) || ((password == 0) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
-        const char *msg[] = {(ssid == 0) ? "ssid" : "password", " cannot be null object"};
+    if((ssid == NULL) || ((password == NULL) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
+        const char *msg[] = {(ssid == NULL) ? "ssid" : "password", " cannot be null object"};
         FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
         FlintThrowable &excpObj = execution.flint.newNullPointerException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
 
     uint32_t ssidLen = ssid->getLength();
@@ -47,20 +45,18 @@ static bool checkParam(FlintExecution &execution, FlintString *ssid, FlintString
         const char *msg[] = {(ssidLen > 32) ? "ssid" : "password", " value is invalid"};
         FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
         FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
-    return true;
+    return NULL;
 }
 
-static bool checkReturn(FlintExecution &execution, esp_err_t value) {
+static FlintThrowable *checkReturn(FlintExecution &execution, esp_err_t value) {
     if(value != ESP_OK) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("An error occurred while connecting to wifi"));
         FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-        execution.stackPushObject(&excpObj);
-        return false;
+        return &excpObj;
     }
-    return true;
+    return NULL;
 }
 
 static bool nativeIsSupported(FlintExecution &execution) {
@@ -73,8 +69,10 @@ static bool nativeConnect(FlintExecution &execution) {
     FlintString *password = (FlintString *)execution.stackPopObject();
     FlintString *ssid = (FlintString *)execution.stackPopObject();
 
-    if(!checkParam(execution, ssid, password, authMode))
+    if(FlintThrowable *excp = checkParams(execution, ssid, password, authMode)) {
+        execution.stackPushObject(excp);
         return false;
+    }
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -97,7 +95,12 @@ static bool nativeConnect(FlintExecution &execution) {
         ret = esp_wifi_connect();
     execution.flint.unlock();
 
-    return checkReturn(execution, ret);
+    if(FlintThrowable *excp = checkReturn(execution, ret)) {
+        execution.stackPushObject(excp);
+        return false;
+    }
+
+    return true;
 }
 
 static bool nativeIsConnected(FlintExecution &execution) {
@@ -146,8 +149,10 @@ static bool nativeSoftAP(FlintExecution &execution) {
     FlintString *password = (FlintString *)execution.stackPopObject();
     FlintString *ssid = (FlintString *)execution.stackPopObject();
 
-    if(!checkParam(execution, ssid, password, authMode))
+    if(FlintThrowable *excp = checkParams(execution, ssid, password, authMode)) {
+        execution.stackPushObject(excp);
         return false;
+    }
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -172,7 +177,12 @@ static bool nativeSoftAP(FlintExecution &execution) {
         ret = esp_wifi_start();
     execution.flint.unlock();
 
-    return checkReturn(execution, ret);
+    if(FlintThrowable *excp = checkReturn(execution, ret)) {
+        execution.stackPushObject(excp);
+        return false;
+    }
+
+    return true;
 }
 
 static bool nativeSoftAPdisconnect(FlintExecution &execution) {
@@ -185,15 +195,23 @@ static bool nativeStartScan(FlintExecution &execution) {
     execution.flint.lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, block ? true : false);
     execution.flint.unlock();
-    return checkReturn(execution, ret);
+
+    if(FlintThrowable *excp = checkReturn(execution, ret)) {
+        execution.stackPushObject(excp);
+        return false;
+    }
+
+    return true;
 }
 
 static bool nativeGetScanResult(FlintExecution &execution) {
     uint16_t count = 0;
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
 
-    if(!checkReturn(execution, ret))
+    if(FlintThrowable *excp = checkReturn(execution, ret)) {
+        execution.stackPushObject(excp);
         return false;
+    }
     
     if(count == 0) {
         execution.stackPushObject(0);
@@ -205,12 +223,13 @@ static bool nativeGetScanResult(FlintExecution &execution) {
         FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
         FlintObjectArray &arrayObj = execution.flint.newObjectArray(className, count);
         FlintObject **data = arrayObj.getData();
-        memset(data, 0, 4 * count);
+        arrayObj.clearData();
         for(uint16_t i = 0; i < count; i++) {
             wifi_ap_record_t apRecords;
             ret = esp_wifi_scan_get_ap_record(&apRecords);
-            if(!checkReturn(execution, ret)) {
+            if(FlintThrowable *excp = checkReturn(execution, ret)) {
                 execution.flint.unlock();
+                execution.stackPushObject(excp);
                 return false;
             }
             data[i] = &createAccessPointRecordObj(execution, className, apRecords);
