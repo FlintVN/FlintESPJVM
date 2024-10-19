@@ -6,6 +6,7 @@
 #include "tusb_console.h"
 #include "nvs_flash.h"
 #include "nvs.h"
+#include "esp_wifi.h"
 #include "esp_usb_device.h"
 #include "esp_board.h"
 
