@@ -8,57 +8,47 @@
 #include "esp_system_native_port.h"
 
 #if CONFIG_IDF_TARGET_ESP32
-static FlintThrowable *checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+static void checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
         uint8_t pin = pins[i];
         if((pin == 1) || (pin == 3)) {
             const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
             FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
-            FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-            return &excpObj;
+            throw &execution.flint.newErrorException(strObj);
         }
         else if((6 <= pin) && (pin <= 11)) {
             FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
-            FlintThrowable &excpObj = execution.flint.newErrorException(strObj);
-            return &excpObj;
+            throw &execution.flint.newErrorException(strObj);
         }
     }
-    return NULL;
 }
 #else
-static FlintThrowable *checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
+static void checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
     // TODO
-    return NULL;
 }
 #endif
 
-static FlintThrowable *checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+static void checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
-        FlintString *strObj;
-        FlintThrowable *excpObj;
         if(pinsObj == NULL) {
-            strObj = &execution.flint.newString(STR_AND_SIZE("pins array cannot be null object"));
-            excpObj = &execution.flint.newNullPointerException(*strObj);
+            FlintString &strObj = execution.flint.newString(STR_AND_SIZE("pins array cannot be null object"));
+            throw &execution.flint.newNullPointerException(strObj);
         }
         else {
-            strObj = &execution.flint.newString(STR_AND_SIZE("The pin number must be from 1 to 32"));
-            excpObj = &execution.flint.newErrorException(*strObj);
+            FlintString &strObj = execution.flint.newString(STR_AND_SIZE("The pin number must be from 1 to 32"));
+            throw &execution.flint.newErrorException(strObj);
         }
-        return excpObj;
     }
-    return checkPin(execution, pinsObj, arrayLength);
+    checkPin(execution, pinsObj, arrayLength);
 }
 
-static bool nativeSetMode(FlintExecution &execution) {
+static void nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
     FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    if(FlintThrowable *excp = checkParams(execution, pinsObj, arrayLength)) {
-        execution.stackPushObject(excp);
-        return false;
-    }
+    checkParams(execution, pinsObj, arrayLength);
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint64_t pinMask = 0;
@@ -94,10 +84,9 @@ static bool nativeSetMode(FlintExecution &execution) {
             break;
     }
     gpio_config(&io_conf);
-    return true;
 }
 
-static bool nativeReadPort(FlintExecution &execution) {
+static void nativeReadPort(FlintExecution &execution) {
     FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
@@ -119,11 +108,9 @@ static bool nativeReadPort(FlintExecution &execution) {
     }
     #endif
     execution.stackPushInt32(value);
-
-    return true;
 }
 
-static bool nativeWritePort(FlintExecution &execution) {
+static void nativeWritePort(FlintExecution &execution) {
     uint32_t value = execution.stackPopInt32();
     FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
@@ -158,8 +145,6 @@ static bool nativeWritePort(FlintExecution &execution) {
         REG_WRITE(GPIO_OUT_W1TS_REG, setMask);
     }
     #endif
-
-    return true;
 }
 
 static const FlintNativeMethod methods[] = {

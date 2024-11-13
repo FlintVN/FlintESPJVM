@@ -26,7 +26,7 @@ static void UART_Init(uart_port_t uartNum, int32_t baudRate) {
     uart_config_t uartConfig = {};
     uartConfig.baud_rate = baudRate;
     uartConfig.data_bits = UART_DATA_8_BITS;
-    uartConfig.parity    = UART_PARITY_DISABLE;
+    uartConfig.parity= UART_PARITY_DISABLE;
     uartConfig.stop_bits = UART_STOP_BITS_1;
     uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
     uart_param_config(uartNum, &uartConfig);
