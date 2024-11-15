@@ -15,7 +15,7 @@ static void checkPin(FlintExecution &execution, int32_t pin) {
         throw &execution.flint.newErrorException(strObj);
     }
     else if((6 <= pin) && (pin <= 11)) {
-        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Pins from 6 to 11 are used for debugger, You cannot use these pins"));
+        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("You cannot use these pins from 6 to 11"));
         throw &execution.flint.newErrorException(strObj);
     }
 }
