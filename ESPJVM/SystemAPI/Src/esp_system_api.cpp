@@ -44,6 +44,6 @@ void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
     }
 }
 
-int64_t FlintAPI::System::getNanoTime(void) {
-    return esp_timer_get_time();
+uint64_t FlintAPI::System::getNanoTime(void) {
+    return (uint64_t)esp_timer_get_time() * 1000;
 }
