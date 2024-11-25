@@ -21,7 +21,7 @@
                 },
             },
             "options": {
-                "cwd": "${workspaceFolder}/BUILD SYSTEM",
+                "cwd": "${workspaceFolder}/BUILD_SYSTEM",
             },
         },
     ]
