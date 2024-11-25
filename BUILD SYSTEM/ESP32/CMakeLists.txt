@@ -7,3 +7,13 @@ cmake_minimum_required(VERSION 3.16)
 # "Trim" the build. Include the minimal set of components, main, and anything it depends on.
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(ESP32_FlintJVM)
+
+add_custom_command(
+    TARGET app
+    POST_BUILD
+    COMMAND ../../Tools/FlintBuildTool.exe
+    merge -o ESP32_FlintJVM_Release.bin
+    0x1000 bootloader/bootloader.bin
+    0x8000 partition_table/partition-table.bin
+    0x10000 ESP32_FlintJVM.bin
+)
