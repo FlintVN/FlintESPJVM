@@ -5,13 +5,15 @@
             "label": "Build Release",
             "group": "build",
             "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
             "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
             "windows": {
                 "command": [
                     "${env:IDF_PATH}/export.bat", "&&",
                     "cd ESP32", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S2FN4R2", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3FH4R2", "&&", "idf.py build"
+                    "cd ../ESP32-S3FH4R2", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-S3N16R8", "&&", "idf.py build"
                 ],
                 "options": {
                     "shell": {
@@ -19,9 +21,6 @@
                         "args": ["/c"]
                     }
                 },
-            },
-            "options": {
-                "cwd": "${workspaceFolder}/BUILD_SYSTEM",
             },
         },
     ]
