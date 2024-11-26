@@ -14,7 +14,7 @@ add_custom_command(
     COMMAND ../../Tools/esptool-win64/esptool.exe
     --chip esp32s3 merge_bin --flash_mode dio --flash_size 4MB --flash_freq 80m
     -o ESP32-S3FH4R2_FlintJVM_Release.bin
-    0x1000 bootloader/bootloader.bin
+    0x0 bootloader/bootloader.bin
     0x8000 partition_table/partition-table.bin
     0x10000 ESP32-S3FH4R2_FlintJVM.bin
     0x110000 ../../Resources/FlintESPJDK_V0.0.2.img
