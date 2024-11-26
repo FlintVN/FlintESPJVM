@@ -13,6 +13,7 @@
                     "cd ESP32", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S2FN4R2", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3FH4R2", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-S3N8R8", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3N16R8", "&&", "idf.py build"
                 ],
                 "options": {
