@@ -2,9 +2,37 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Clean",
+            "group": "none",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
+            "command": "rm -rf build */build",
+            "windows": {
+                "command": [
+                    "rd /S /Q", "build", "ESP32\\build", "ESP32-S2FN4R2\\build",
+                    "ESP32-S3FH4R2\\build", "ESP32-S3N8R8\\build", "ESP32-S3N16R8\\build",
+                    "2>nul || cmd /c exit 0"
+                ],
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            }
+        },
+        {
+            "label": "Make Dir",
+            "group": "none",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
+            "command": "mkdir -p build",
+            "windows": {
+                "command": ["mkdir build 2>nul || cmd /c exit 0"],
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            }
+        },
+        {
             "label": "Build Release",
             "group": "build",
             "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Clean", "Make Dir"],
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
             "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
             "windows": {
@@ -16,13 +44,8 @@
                     "cd ../ESP32-S3N8R8", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3N16R8", "&&", "idf.py build"
                 ],
-                "options": {
-                    "shell": {
-                        "executable": "cmd.exe",
-                        "args": ["/c"]
-                    }
-                },
-            },
-        },
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            }
+        }
     ]
 }

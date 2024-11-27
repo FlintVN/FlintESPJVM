@@ -11,11 +11,22 @@ project(ESP32_FlintJVM)
 add_custom_command(
     TARGET app
     POST_BUILD
+    COMMAND $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
+    --output_file storage.bin
+    --partition_size 0x2F0000
+    --sector_size 512
+    --long_name_support
+    ../../Resources/ESPJDK
+)
+
+add_custom_command(
+    TARGET app
+    POST_BUILD
     COMMAND ../../Tools/esptool-win64/esptool.exe
     --chip esp32 merge_bin --flash_mode dio --flash_size 4MB --flash_freq 80m
-    -o ESP32_FlintJVM_Release.bin
+    -o ../../build/ESP32_FlintJVM_Release.bin
     0x1000 bootloader/bootloader.bin
     0x8000 partition_table/partition-table.bin
     0x10000 ESP32_FlintJVM.bin
-    0x110000 ../../Resources/FlintESPJDK_V0.0.2.img
+    0x110000 storage.bin
 )
