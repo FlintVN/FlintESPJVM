@@ -1,4 +1,6 @@
 # Change Log
+## V0.0.3
+- Support for S3N16R8 and S3N8R8 boards.
 ## V0.0.2
 - Stable communication between Flint Client and Flint Server.
 - Change default UART baud rate from 2000000 to 921600.
