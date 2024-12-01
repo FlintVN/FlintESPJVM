@@ -32,7 +32,9 @@
                     "cd ../ESP32-S2FN4R2", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3FH4R2", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3N8R8", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N16R8", "&&", "idf.py build"
+                    "cd ../ESP32-S3N16R8", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-C6FH4", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-C6FH8", "&&", "idf.py build"
                 ],
                 "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
             }

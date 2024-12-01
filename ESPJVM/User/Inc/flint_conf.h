@@ -12,7 +12,7 @@
 #elif CONFIG_IDF_TARGET_ESP32C3
     #error "Not supported for ESP32C3"
 #elif CONFIG_IDF_TARGET_ESP32C6
-    #error "Not supported for ESP32C6"
+    #define FLINT_VARIANT_NAME      "ESP32C6 FlintJVM"
 #elif CONFIG_IDF_TARGET_ESP32C5
     #error "Not supported for ESP32C5"
 #elif CONFIG_IDF_TARGET_ESP32H2
