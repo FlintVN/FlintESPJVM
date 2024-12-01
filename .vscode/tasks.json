@@ -6,26 +6,16 @@
             "group": "none",
             "type": "shell",
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "command": "rm -rf build */build",
-            "windows": {
-                "command": [
-                    "rd /S /Q", "build", "ESP32\\build", "ESP32-S2FN4R2\\build",
-                    "ESP32-S3FH4R2\\build", "ESP32-S3N8R8\\build", "ESP32-S3N16R8\\build",
-                    "2>nul || cmd /c exit 0"
-                ],
-                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
-            }
+            "linux": {"command": "rm -rf build */build */sdkconfig */.vscode */dependencies.lock */managed_components"},
+            "windows": {"command": "Tools/rm -rf build */build */sdkconfig */.vscode */dependencies.lock */managed_components"}
         },
         {
             "label": "Make Dir",
             "group": "none",
             "type": "shell",
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "command": "mkdir -p build",
-            "windows": {
-                "command": ["mkdir build 2>nul || cmd /c exit 0"],
-                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
-            }
+            "linux": {"command": "mkdir -p build"},
+            "windows": {"command": "Tools/mkdir -p build"}
         },
         {
             "label": "Build Release",
