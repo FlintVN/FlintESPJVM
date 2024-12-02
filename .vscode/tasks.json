@@ -6,16 +6,8 @@
             "group": "none",
             "type": "shell",
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "linux": {"command": "rm -rf build */build */sdkconfig */.vscode */dependencies.lock */managed_components"},
-            "windows": {"command": "Tools/rm -rf build */build */sdkconfig */.vscode */dependencies.lock */managed_components"}
-        },
-        {
-            "label": "Make Dir",
-            "group": "none",
-            "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "linux": {"command": "mkdir -p build"},
-            "windows": {"command": "Tools/mkdir -p build"}
+            "linux": {"command": "rm -rf build/* */build */sdkconfig */.vscode */dependencies.lock */managed_components"},
+            "windows": {"command": "Tools/rm -rf build/* */build */sdkconfig */.vscode */dependencies.lock */managed_components"}
         },
         {
             "label": "Build Release",
@@ -31,8 +23,9 @@
                     "cd ESP32", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S2FN4R2", "&&", "idf.py build", "&&",
                     "cd ../ESP32-S3FH4R2", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N8R8", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N16R8", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-S3N4RX", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-S3N8RX", "&&", "idf.py build", "&&",
+                    "cd ../ESP32-S3N16RX", "&&", "idf.py build", "&&",
                     "cd ../ESP32-C6FH4", "&&", "idf.py build", "&&",
                     "cd ../ESP32-C6FH8", "&&", "idf.py build"
                 ],
