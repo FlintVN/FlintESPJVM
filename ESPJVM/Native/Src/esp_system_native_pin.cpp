@@ -65,7 +65,7 @@ static void nativeSetMode(FlintExecution &execution) {
 static void nativeReadPin(FlintExecution &execution) {
     int32_t pin = execution.stackPopInt32();
 
-    #if GPIO_IN1_REG
+    #ifdef GPIO_IN1_REG
     {
         if(pin < 32)
             execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
@@ -83,7 +83,7 @@ static void nativeWritePin(FlintExecution &execution) {
     int32_t level = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
-    #if GPIO_OUT_W1TC_REG
+    #ifdef GPIO_OUT1_W1TC_REG
     {
         if(pin < 32) {
             if(level)

@@ -92,7 +92,7 @@ static void nativeReadPort(FlintExecution &execution) {
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint32_t value = 0;
-    #if GPIO_IN1_REG
+    #ifdef GPIO_IN1_REG
     {
         for(uint8_t i = 0; i < arrayLength; i++) {
             if(pins[i] < 32)
@@ -116,7 +116,7 @@ static void nativeWritePort(FlintExecution &execution) {
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
-    #if GPIO_OUT1_W1TC_REG
+    #ifdef GPIO_OUT1_W1TC_REG
     {
         uint64_t setMask = 0;
         uint64_t clearMask = 0;
