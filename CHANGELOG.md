@@ -1,4 +1,10 @@
 # Change Log
+## V0.0.4
+- Support for boards:
+  - ESP32-S3N4RX
+  - ESP32-C3FH4
+  - ESP32-C6FH4
+  - ESP32-C6FH8
 ## V0.0.3
 - Support for S3N16RX and S3N8RX boards.
 ## V0.0.2
