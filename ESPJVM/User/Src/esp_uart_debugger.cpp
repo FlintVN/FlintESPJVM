@@ -46,22 +46,19 @@ void EspDebugger::receiveTask(void) {
             if((tick - startTick) >= pdMS_TO_TICKS(100)) {
                 rxDataToltalLength = 0;
                 rxDataLengthReceived = 0;
-                startTick = tick;
             }
-            uint32_t length = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
-            if(length > 0) {
-                rxDataLengthReceived += length;
-                if(rxDataToltalLength == 0) {
-                    if(rxDataLengthReceived >= 4)
-                        rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
-                }
+            uint32_t rxSize = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
+            if(rxSize > 0) {
+                rxDataLengthReceived += rxSize;
+                if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4)
+                    rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
                 if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
                     espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                     rxDataToltalLength = 0;
                     rxDataLengthReceived = 0;
                 }
-                startTick = xTaskGetTickCount();
             }
+            startTick = tick;
         }
     }
 }

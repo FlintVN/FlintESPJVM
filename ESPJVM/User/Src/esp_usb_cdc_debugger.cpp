@@ -55,20 +55,16 @@ void EspDebugger::receiveTask(void) {
                 rxDataToltalLength = 0;
                 rxDataLengthReceived = 0;
             }
-            if(rxDataToltalLength == 0) {
-                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
+            uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
+            if(rxSize > 0) {
                 rxDataLengthReceived += rxSize;
-                if(rxDataLengthReceived >= 4)
+                if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4)
                     rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
-            }
-            else {
-                uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
-                rxDataLengthReceived += rxSize;
-            }
-            if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
-                espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
-                rxDataToltalLength = 0;
-                rxDataLengthReceived = 0;
+                if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
+                    espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
+                    rxDataToltalLength = 0;
+                    rxDataLengthReceived = 0;
+                }
             }
             startTick = tick;
         }
