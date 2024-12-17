@@ -39,6 +39,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_double_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_float_class.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_graphics_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_math_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_object_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_thread_class.cpp"
