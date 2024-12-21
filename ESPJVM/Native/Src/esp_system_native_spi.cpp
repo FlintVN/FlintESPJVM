@@ -11,7 +11,7 @@ static spi_device_handle_t spiHandle[2] = {0};
 static void checkError(FlintExecution &execution, esp_err_t err, const char *msg) {
     if(err != ESP_OK) {
         FlintString &strObj = execution.flint.newString(msg, strlen(msg));
-        throw &execution.flint.newErrorException(strObj);
+        throw &execution.flint.newIOException(strObj);
     }
 }
 
@@ -24,7 +24,7 @@ static void checkSpiId(FlintExecution &execution, int32_t spiId) {
     else
         return;
     FlintString &strObj = execution.flint.newString(msg, strlen(msg));
-    throw &execution.flint.newErrorException(strObj);
+    throw &execution.flint.newIOException(strObj);
 }
 
 static int32_t checkSpiHandle(FlintExecution &execution, int32_t handle) {
@@ -33,7 +33,7 @@ static int32_t checkSpiHandle(FlintExecution &execution, int32_t handle) {
             return i + 1;
     }
     FlintString &strObj = execution.flint.newString(STR_AND_SIZE("handle is invalue"));
-    throw &execution.flint.newErrorException(strObj);
+    throw &execution.flint.newIOException(strObj);
 }
 
 static int32_t getDefaultMosiPin(int32_t spiId) {

@@ -29,7 +29,7 @@ static const wifi_auth_mode_t authValueList[] = {
 static void checkParams(FlintExecution &execution, FlintString *ssid, FlintString *password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList)) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Authentication mode is invalid"));
-        throw &execution.flint.newErrorException(strObj);
+        throw &execution.flint.newIOException(strObj);
     }
     if((ssid == NULL) || ((password == NULL) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
         const char *msg[] = {(ssid == NULL) ? "ssid" : "password", " cannot be null object"};
@@ -42,14 +42,14 @@ static void checkParams(FlintExecution &execution, FlintString *ssid, FlintStrin
     if((ssidLen > 32) || (passwordLen > 64)) {
         const char *msg[] = {(ssidLen > 32) ? "ssid" : "password", " value is invalid"};
         FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
-        throw &execution.flint.newErrorException(strObj);
+        throw &execution.flint.newIOException(strObj);
     }
 }
 
 static void checkReturn(FlintExecution &execution, esp_err_t value) {
     if(value != ESP_OK) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("An error occurred while connecting to wifi"));
-        throw &execution.flint.newErrorException(strObj);
+        throw &execution.flint.newIOException(strObj);
     }
 }
 
