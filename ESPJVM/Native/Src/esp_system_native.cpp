@@ -2,11 +2,13 @@
 #include "flint_system_api.h"
 #include "flint_class_loader.h"
 #include "esp_system_native_pin.h"
+#include "esp_system_native_spi.h"
 #include "esp_system_native_port.h"
 #include "esp_system_native_wifi.h"
 
 static const FlintNativeClass *ESP_NATIVE_CLASS_LIST[] = {
     &PIN_CLASS,
+    &SPI_CLASS,
     &PORT_CLASS,
     &WIFI_CLASS,
 };
