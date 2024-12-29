@@ -13,6 +13,11 @@ static const FlintNativeClass *ESP_NATIVE_CLASS_LIST[] = {
     &WIFI_CLASS,
 };
 
+void FlintAPI::System::reset(Flint &flint) {
+    NativePin_Reset(flint);
+    NativeSPI_Reset(flint);
+}
+
 FlintNativeMethodPtr FlintAPI::System::findNativeMethod(const FlintMethodInfo &methodInfo) {
     FlintConstUtf8 &className = methodInfo.classLoader.getThisClass();
     for(uint32_t i = 0; i < LENGTH(ESP_NATIVE_CLASS_LIST); i++) {

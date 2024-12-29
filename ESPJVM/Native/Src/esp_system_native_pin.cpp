@@ -7,23 +7,38 @@
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
 
+const char *NativePin_CheckPin(int32_t pin) {
+    if((1ULL << pin) & ~SOC_GPIO_VALID_GPIO_MASK)
+        return "Invalid pin";
 #if CONFIG_IDF_TARGET_ESP32
-static void checkPin(FlintExecution &execution, int32_t pin) {
-    if((pin == 1) || (pin == 3)) {
-        const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
-        FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
-        throw &execution.flint.newIOException(strObj);
-    }
-    else if((6 <= pin) && (pin <= 11)) {
-        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("You cannot use these pins from 6 to 11"));
-        throw &execution.flint.newIOException(strObj);
-    }
-}
-#else
-static void checkPin(FlintExecution &execution, int32_t pin) {
-    // TODO
-}
+    else if((pin == 1) || (pin == 3))
+        return "Pin 1 and 3 have been used for debugging";
+    else if((6 <= pin) && (pin <= 11))
+        return "You cannot use these pins from 6 to 11";
+#elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    else if(pin == 0)
+        return "Pin 0 was used to select USB mode";
+    else if((pin == 19) || (pin == 20))
+        return "Pin 19 and 20 have been used for debugging (USB CDC)";
 #endif
+    return NULL;
+}
+
+void NativePin_Reset(Flint &flint) {
+    ((void)flint);
+    for(uint8_t i = 0; (SOC_GPIO_VALID_GPIO_MASK >> i); i++) {
+        if(NativePin_CheckPin(i) == NULL)
+            gpio_reset_pin((gpio_num_t)i);
+    }
+}
+
+static void checkPin(FlintExecution &execution, int32_t pin) {
+    const char *msg = NativePin_CheckPin(pin);
+    if(msg) {
+        FlintString &strObj = execution.flint.newString(msg, strlen(msg));
+        throw &execution.flint.newIOException(strObj);
+    }
+}
 
 static void nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
@@ -59,7 +74,10 @@ static void nativeSetMode(FlintExecution &execution) {
             io_conf.mode = GPIO_MODE_DISABLE;
             break;
     }
-    gpio_config(&io_conf);
+    if(gpio_config(&io_conf) != ESP_OK) {
+        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Error while configuring the pin"));
+        throw &execution.flint.newIOException(strObj);
+    }
 }
 
 static void nativeReadPin(FlintExecution &execution) {

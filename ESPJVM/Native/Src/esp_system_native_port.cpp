@@ -5,29 +5,19 @@
 #include "soc/gpio_reg.h"
 #include "driver/gpio.h"
 #include "flint_system_api.h"
+#include "esp_system_native_pin.h"
 #include "esp_system_native_port.h"
 
-#if CONFIG_IDF_TARGET_ESP32
 static void checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
-        uint8_t pin = pins[i];
-        if((pin == 1) || (pin == 3)) {
-            const char *msg[] = {"Pin number ", (pin == 1) ? "1" : "3", " is used for debugger, you cannot use this pin"};
-            FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
-            throw &execution.flint.newIOException(strObj);
-        }
-        else if((6 <= pin) && (pin <= 11)) {
-            FlintString &strObj = execution.flint.newString(STR_AND_SIZE("You cannot use these pins from 6 to 11"));
+        const char *msg = NativePin_CheckPin(pins[i]);
+        if(msg) {
+            FlintString &strObj = execution.flint.newString(msg, strlen(msg));
             throw &execution.flint.newIOException(strObj);
         }
     }
 }
-#else
-static void checkPin(FlintExecution &execution, FlintObject *pinsObj, uint32_t arrayLength) {
-    // TODO
-}
-#endif
 
 static void checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
     if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
@@ -83,7 +73,10 @@ static void nativeSetMode(FlintExecution &execution) {
             io_conf.mode = GPIO_MODE_DISABLE;
             break;
     }
-    gpio_config(&io_conf);
+    if(gpio_config(&io_conf) != ESP_OK) {
+        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Error while configuring the pin"));
+        throw &execution.flint.newIOException(strObj);
+    }
 }
 
 static void nativeReadPort(FlintExecution &execution) {

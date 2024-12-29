@@ -8,6 +8,29 @@
 
 static spi_device_handle_t spiHandle[2] = {0};
 
+static int32_t NativeSPI_GetID(spi_device_handle_t handle) {
+    for(uint32_t i = 0; i < LENGTH(spiHandle); i++) {
+        if(handle == spiHandle[i])
+            return i + 1;
+    }
+    return -1;
+}
+
+static void NativeSPI_Close(spi_device_handle_t handle) {
+    int32_t spiId = NativeSPI_GetID(handle);
+    spi_bus_remove_device(handle);
+    spi_bus_free((spi_host_device_t)spiId);
+    spiHandle[spiId - 1] = 0;
+}
+
+void NativeSPI_Reset(Flint &flint) {
+    ((void)flint);
+    for(uint8_t i = 0; i < LENGTH(spiHandle); i++) {
+        if(spiHandle[i])
+            NativeSPI_Close(spiHandle[i]);
+    }
+}
+
 static void checkError(FlintExecution &execution, esp_err_t err, const char *msg) {
     if(err != ESP_OK) {
         FlintString &strObj = execution.flint.newString(msg, strlen(msg));
@@ -28,10 +51,9 @@ static void checkSpiId(FlintExecution &execution, int32_t spiId) {
 }
 
 static int32_t checkSpiHandle(FlintExecution &execution, int32_t handle) {
-    for(uint32_t i = 0; i < LENGTH(spiHandle); i++) {
-        if(handle == (int32_t)spiHandle[i])
-            return i + 1;
-    }
+    int32_t spiId = NativeSPI_GetID((spi_device_handle_t)handle);
+    if(spiId >= 0)
+        return spiId;
     FlintString &strObj = execution.flint.newString(STR_AND_SIZE("handle is invalue"));
     throw &execution.flint.newIOException(strObj);
 }
@@ -132,9 +154,7 @@ static void nativeWrite(FlintExecution &execution) {
 static void nativeClose(FlintExecution &execution) {
     int32_t handle = execution.stackPopInt32();
     int32_t spiId = checkSpiHandle(execution, handle);
-    spi_bus_remove_device((spi_device_handle_t)handle);
-    spi_bus_free((spi_host_device_t)spiId);
-    spiHandle[spiId - 1] = 0;
+    NativeSPI_Close((spi_device_handle_t)handle);
 }
 
 static const FlintNativeMethod methods[] = {
