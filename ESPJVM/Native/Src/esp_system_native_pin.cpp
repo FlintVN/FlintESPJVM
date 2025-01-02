@@ -36,7 +36,7 @@ static void checkPin(FlintExecution &execution, int32_t pin) {
     const char *msg = NativePin_CheckPin(pin);
     if(msg) {
         FlintString &strObj = execution.flint.newString(msg, strlen(msg));
-        throw &execution.flint.newIOException(strObj);
+        throw &execution.flint.newIOException(&strObj);
     }
 }
 
@@ -76,7 +76,7 @@ static void nativeSetMode(FlintExecution &execution) {
     }
     if(gpio_config(&io_conf) != ESP_OK) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Error while configuring the pin"));
-        throw &execution.flint.newIOException(strObj);
+        throw &execution.flint.newIOException(&strObj);
     }
 }
 

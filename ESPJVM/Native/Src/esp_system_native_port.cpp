@@ -14,7 +14,7 @@ static void checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_
         const char *msg = NativePin_CheckPin(pins[i]);
         if(msg) {
             FlintString &strObj = execution.flint.newString(msg, strlen(msg));
-            throw &execution.flint.newIOException(strObj);
+            throw &execution.flint.newIOException(&strObj);
         }
     }
 }
@@ -23,11 +23,11 @@ static void checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint
     if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
         if(pinsObj == NULL) {
             FlintString &strObj = execution.flint.newString(STR_AND_SIZE("pins array cannot be null object"));
-            throw &execution.flint.newNullPointerException(strObj);
+            throw &execution.flint.newNullPointerException(&strObj);
         }
         else {
             FlintString &strObj = execution.flint.newString(STR_AND_SIZE("The pin number must be from 1 to 32"));
-            throw &execution.flint.newIOException(strObj);
+            throw &execution.flint.newIOException(&strObj);
         }
     }
     checkPin(execution, pinsObj, arrayLength);
@@ -75,7 +75,7 @@ static void nativeSetMode(FlintExecution &execution) {
     }
     if(gpio_config(&io_conf) != ESP_OK) {
         FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Error while configuring the pin"));
-        throw &execution.flint.newIOException(strObj);
+        throw &execution.flint.newIOException(&strObj);
     }
 }
 
