@@ -4,8 +4,16 @@ This project implements [FlintJVM](https://github.com/FlintVN/FlintJVM) and is b
 - Supports most Java bytecode instructions.
 - Supports debugging with [FlintJVM Debug](https://marketplace.visualstudio.com/items?itemName=ElectricThanhTung.flintjvm-debugger) VS Code extension via serial port.
 ## How to use
-### 1. Hardware required
-- This project requires an ESP32 chip that supports USB protocol such as ESP32-S2 or ESP32-S3... and has integrated PSRAM.
+### 1. Boards are supported
+- Generic ESP32 Boards.
+- ESP32-C3FH4.
+- ESP32-C6FH4.
+- ESP32-C6FH8.
+- ESP32-S2FN4R2.
+- ESP32-S3FH4R2.
+- ESP32-S3N4RX.
+- ESP32-S3N8RX.
+- ESP32-S3N16RX.
 ### 2. Clone repository
 - Run the following command to clone this repository and include all dependent submodules:
 ```sh
