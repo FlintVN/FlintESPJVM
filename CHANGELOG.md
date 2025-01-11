@@ -1,4 +1,8 @@
 # Change Log
+## V0.0.5
+- Update FlintJVM to V1.1.1.
+- Support machine.spi.SPIMaster.
+- Implement FlintAPI::System::reset mehtod to support peripheral reset.
 ## V0.0.4
 - Support for boards:
   - ESP32-S3N4RX
