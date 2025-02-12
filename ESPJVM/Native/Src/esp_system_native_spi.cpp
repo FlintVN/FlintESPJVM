@@ -33,7 +33,7 @@ void NativeSPI_Reset(Flint &flint) {
 
 static void checkError(FlintExecution &execution, esp_err_t err, const char *msg) {
     if(err != ESP_OK) {
-        FlintString &strObj = execution.flint.newString(msg, strlen(msg));
+        FlintJavaString &strObj = execution.flint.newString(msg, strlen(msg));
         throw &execution.flint.newIOException(&strObj);
     }
 }
@@ -46,7 +46,7 @@ static void checkSpiId(FlintExecution &execution, int32_t spiId) {
         msg = "spiId value is invalid";
     else
         return;
-    FlintString &strObj = execution.flint.newString(msg, strlen(msg));
+    FlintJavaString &strObj = execution.flint.newString(msg, strlen(msg));
     throw &execution.flint.newIOException(&strObj);
 }
 
@@ -54,7 +54,7 @@ static int32_t checkSpiHandle(FlintExecution &execution, int32_t handle) {
     int32_t spiId = NativeSPI_GetID((spi_device_handle_t)handle);
     if(spiId >= 0)
         return spiId;
-    FlintString &strObj = execution.flint.newString(STR_AND_SIZE("handle is invalue"));
+    FlintJavaString &strObj = execution.flint.newString(STR_AND_SIZE("handle is invalue"));
     throw &execution.flint.newIOException(&strObj);
 }
 

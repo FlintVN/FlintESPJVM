@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "sdkconfig.h"
 #include "esp_timer.h"
-#include "flint_string.h"
+#include "flint_java_string.h"
 #include "esp_heap_caps.h"
 #include "flint_system_api.h"
 
@@ -24,7 +24,7 @@ void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
         while(length) {
             uint32_t count = 0;
             while(length && ((count + 2) <= sizeof(buff))) {
-                count += FlintString::utf8Encode((uint8_t)*text, &buff[count]);
+                count += FlintJavaString::utf8Encode((uint8_t)*text, &buff[count]);
                 text++;
                 length--;
             }
@@ -35,7 +35,7 @@ void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
         while(length) {
             uint32_t count = 0;
             while(length && ((count + 3) <= sizeof(buff))) {
-                count += FlintString::utf8Encode(*(uint16_t *)text, &buff[count]);
+                count += FlintJavaString::utf8Encode(*(uint16_t *)text, &buff[count]);
                 text += 2;
                 length--;
             }

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "esp_wifi.h"
 #include "sdkconfig.h"
-#include "flint_string.h"
+#include "flint_java_string.h"
 #include "flint_system_api.h"
 #include "esp_system_native_wifi.h"
 
@@ -26,14 +26,14 @@ static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_DPP,
 };
 
-static void checkParams(FlintExecution &execution, FlintString *ssid, FlintString *password, uint32_t authMode) {
+static void checkParams(FlintExecution &execution, FlintJavaString *ssid, FlintJavaString *password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList)) {
-        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("Authentication mode is invalid"));
+        FlintJavaString &strObj = execution.flint.newString(STR_AND_SIZE("Authentication mode is invalid"));
         throw &execution.flint.newIOException(&strObj);
     }
     if((ssid == NULL) || ((password == NULL) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
         const char *msg[] = {(ssid == NULL) ? "ssid" : "password", " cannot be null object"};
-        FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
+        FlintJavaString &strObj = execution.flint.newString(msg, LENGTH(msg));
         throw &execution.flint.newNullPointerException(&strObj);
     }
 
@@ -41,14 +41,14 @@ static void checkParams(FlintExecution &execution, FlintString *ssid, FlintStrin
     uint32_t passwordLen = password ? password->getLength() : 0;
     if((ssidLen > 32) || (passwordLen > 64)) {
         const char *msg[] = {(ssidLen > 32) ? "ssid" : "password", " value is invalid"};
-        FlintString &strObj = execution.flint.newString(msg, LENGTH(msg));
+        FlintJavaString &strObj = execution.flint.newString(msg, LENGTH(msg));
         throw &execution.flint.newIOException(&strObj);
     }
 }
 
 static void checkReturn(FlintExecution &execution, esp_err_t value) {
     if(value != ESP_OK) {
-        FlintString &strObj = execution.flint.newString(STR_AND_SIZE("An error occurred while connecting to wifi"));
+        FlintJavaString &strObj = execution.flint.newString(STR_AND_SIZE("An error occurred while connecting to wifi"));
         throw &execution.flint.newIOException(&strObj);
     }
 }
@@ -59,8 +59,8 @@ static void nativeIsSupported(FlintExecution &execution) {
 
 static void nativeConnect(FlintExecution &execution) {
     uint32_t authMode = execution.stackPopInt32();
-    FlintString *password = (FlintString *)execution.stackPopObject();
-    FlintString *ssid = (FlintString *)execution.stackPopObject();
+    FlintJavaString *password = (FlintJavaString *)execution.stackPopObject();
+    FlintJavaString *ssid = (FlintJavaString *)execution.stackPopObject();
 
     checkParams(execution, ssid, password, authMode);
 
@@ -94,8 +94,8 @@ static void nativeIsConnected(FlintExecution &execution) {
     execution.stackPushInt32((ret == ESP_OK) ? 1 : 0);
 }
 
-static FlintObject &createAccessPointRecordObj(FlintExecution &execution, FlintConstUtf8 &className, wifi_ap_record_t &apRecord) {
-    FlintObject &obj = execution.flint.newObject(className);
+static FlintJavaObject &createAccessPointRecordObj(FlintExecution &execution, FlintConstUtf8 &className, wifi_ap_record_t &apRecord) {
+    FlintJavaObject &obj = execution.flint.newObject(className);
 
     /* mac array */
     FlintInt8Array &macArray = execution.flint.newByteArray(6);
@@ -128,8 +128,8 @@ static void nativeSoftAP(FlintExecution &execution) {
     uint32_t maxConnection = execution.stackPopInt32();
     uint32_t channel = execution.stackPopInt32();
     uint32_t authMode = execution.stackPopInt32();
-    FlintString *password = (FlintString *)execution.stackPopObject();
-    FlintString *ssid = (FlintString *)execution.stackPopObject();
+    FlintJavaString *password = (FlintJavaString *)execution.stackPopObject();
+    FlintJavaString *ssid = (FlintJavaString *)execution.stackPopObject();
 
     checkParams(execution, ssid, password, authMode);
 
@@ -187,7 +187,7 @@ static void nativeGetScanResult(FlintExecution &execution) {
     try {
         FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
         FlintObjectArray &arrayObj = execution.flint.newObjectArray(className, count);
-        FlintObject **data = arrayObj.getData();
+        FlintJavaObject **data = arrayObj.getData();
         arrayObj.clearData();
         for(uint16_t i = 0; i < count; i++) {
             wifi_ap_record_t apRecords;
