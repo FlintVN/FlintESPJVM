@@ -1,4 +1,9 @@
 # Change Log
+## V0.0.6
+- Update FlintJVM to V1.1.2.
+  - Fix bugs and implement more native methods for the java base library.
+- Update FlintJDK to V0.0.4.
+  - Add some necessary classes and methods to the java base library.
 ## V0.0.5
 - Update FlintJVM to V1.1.1.
 - Support machine.spi.SPIMaster.
