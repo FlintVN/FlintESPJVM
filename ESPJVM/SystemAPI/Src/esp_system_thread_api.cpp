@@ -42,7 +42,7 @@ void FlintAPI::Thread::unlock(FlintAPI::Thread::LockHandle *lockHandle) {
 
 void *FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
     TaskHandle_t xHandle = NULL;
-    xTaskCreate(task, "FlintJavaThread", stackSize ? stackSize : 4096, param, tskIDLE_PRIORITY + 1, &xHandle);
+    xTaskCreate(task, "FlintJavaThread", stackSize ? stackSize : 5120, param, tskIDLE_PRIORITY + 1, &xHandle);
     return (void *)xHandle;
 }
 
