@@ -72,6 +72,8 @@ idf_component_register(
     PRIV_REQUIRES "${priv_requires}"
 )
 
+add_compile_definitions(MULTI_HEAP_FREERTOS)
+
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-volatile)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-uninitialized)
