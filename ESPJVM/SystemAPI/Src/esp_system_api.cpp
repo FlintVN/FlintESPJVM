@@ -4,6 +4,7 @@
 #include "esp_timer.h"
 #include "flint_java_string.h"
 #include "esp_heap_caps.h"
+#include "../heap_private.h"
 #include "flint_system_api.h"
 
 void *FlintAPI::System::malloc(uint32_t size) {
@@ -16,6 +17,10 @@ void *FlintAPI::System::realloc(void *p, uint32_t size) {
 
 void FlintAPI::System::free(void *p) {
     ::free(p);
+}
+
+bool FlintAPI::System::isInHeapRegion(void *addr) {
+    return find_containing_heap(addr) != NULL;
 }
 
 void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {

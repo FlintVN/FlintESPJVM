@@ -94,7 +94,7 @@ static void nativeIsConnected(FlintExecution &execution) {
     execution.stackPushInt32((ret == ESP_OK) ? 1 : 0);
 }
 
-static FlintJavaObject &createAccessPointRecordObj(FlintExecution &execution, FlintConstUtf8 &className, wifi_ap_record_t &apRecord) {
+static FlintJavaObject &createAccessPointRecordObj(FlintExecution &execution, const FlintConstUtf8 &className, wifi_ap_record_t &apRecord) {
     FlintJavaObject &obj = execution.flint.newObject(className);
 
     /* mac array */
