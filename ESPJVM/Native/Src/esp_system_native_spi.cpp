@@ -153,7 +153,7 @@ static void nativeWrite(FlintExecution &execution) {
 
 static void nativeClose(FlintExecution &execution) {
     int32_t handle = execution.stackPopInt32();
-    int32_t spiId = checkSpiHandle(execution, handle);
+    checkSpiHandle(execution, handle);
     NativeSPI_Close((spi_device_handle_t)handle);
 }
 

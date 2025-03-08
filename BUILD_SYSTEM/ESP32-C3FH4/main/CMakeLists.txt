@@ -29,6 +29,10 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_method_info.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_array_object.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_out_of_memory.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_const_utf8_binary_tree.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_string_binary_tree.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_class_binary_tree.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_class_data_binary_tree.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_object.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_thread.cpp"
@@ -66,6 +70,8 @@ idf_component_register(
 
     PRIV_REQUIRES "${priv_requires}"
 )
+
+add_compile_definitions(MULTI_HEAP_FREERTOS)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-volatile)
