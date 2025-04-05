@@ -1,8 +1,13 @@
 # Change Log
+## V0.0.7
+- Update FlintJVM to [V1.1.3](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.3).
+- Update FlintJDK to [V0.0.5](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.5).
+- Increase default stack size to 4KB.
+- Update memory partitions (increased from 1MB to 1.5MB for FlintESPJVM).
 ## V0.0.6
-- Update FlintJVM to V1.1.2.
+- Update FlintJVM to [V1.1.2](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.2).
   - Fix bugs and implement more native methods for the java base library.
-- Update FlintJDK to V0.0.4.
+- Update FlintJDK to [V0.0.4](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.4).
   - Add some necessary classes and methods to the java base library.
 ## V0.0.5
 - Update FlintJVM to V1.1.1.
