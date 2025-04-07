@@ -1,12 +1,13 @@
 ## FlintESPJVM
-This project implements [FlintJVM](https://github.com/FlintVN/FlintJVM) and is based on the ESP-IDF framework, It supports running and debugging java code on ESP32.
+FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This allows you to run and debug Java applications directly on ESP32 hardware.
 
 ![demo](images/demo1.avif)
-## Features
+## Key Features
 - Supports most Java bytecode instructions.
 - Supports debugging with [FlintJVM Debug](https://marketplace.visualstudio.com/items?itemName=ElectricThanhTung.flintjvm-debugger) VS Code extension via serial port.
 ## How to use
-### 1. Boards are supported
+### 1. Supported Boards
+FlintESPJVM is compatible with a variety of ESP32 boards, including:
 - Generic ESP32 Boards.
 - ESP32-C3FH4.
 - ESP32-C6FH4.
@@ -16,15 +17,20 @@ This project implements [FlintJVM](https://github.com/FlintVN/FlintJVM) and is b
 - ESP32-S3N4RX.
 - ESP32-S3N8RX.
 - ESP32-S3N16RX.
-### 2. Flash
-- Visit [https://esp.flint.vn](https://esp.flint.vn) (ESP web tool) to quickly flash the FlintESPJVM firmware onto your board and try it out.
-- You can also use ESP-IDF to build this project yourself and flash it to your board.
-### 3. Build java project to run on FlintESPJVM
-- To build a java project for FlintESPJVM you need to build your project with the FlintJDK module to be able to use the base java libraries compatible with FlintJVM and FlintESPJDK module if you want to access the peripherals/features of ESP32.
-- To be able to run debugging for your java project. You need to install [FlintJVM Debug](https://marketplace.visualstudio.com/items?itemName=ElectricThanhTung.flintjvm-debugger) extension on VS Code and then use the [FlintUartServer](https://github.com/FlintVN/FlintUARTServer) tool as a converter between serial port and TCP/IP.
-- Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) for a FlintJVM java project basic example.
-### 4. Clone repository
+### 2. Flashing the Firmware
+To get FlintESPJVM up and running on your board:
+- Quick Flash: Use the [ESP Web Tool](https://esp.flint.vn) for an easy, browser-based flashing experience.
+- Manual Build: Prefer building it yourself? Utilize the ESP-IDF framework to compile and flash the project manually.
+### 3. Building Java Projects for FlintESPJVM
+To develop Java applications for FlintESPJVM:
+- Project Setup: Use the [FlintJDK](https://github.com/FlintVN/FlintJDK) module to access core Java libraries compatible with FlintJVM. For ESP32-specific peripherals and features, add the [FlintESPJDK](https://github.com/FlintVN/FlintESPJDK) module.
+- Debugging: Install the FlintJVM Debug extension in VS Code.
+
+Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, which provides a simple and clear template to help you get started with building Java apps for FlintJVM.
+### 4. Cloning the Repository
 - Run the following command to clone this repository and include all dependent submodules:
 ```sh
 > git clone --recurse-submodules https://github.com/FlintVN/FlintESPJVM.git
 ```
+---
+*Elevate your ESP32 projects by harnessing the robustness of Java with FlintESPJVM.*
