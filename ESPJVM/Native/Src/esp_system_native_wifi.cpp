@@ -113,7 +113,7 @@ static void nativeGetAPinfo(FlintExecution &execution) {
     wifi_ap_record_t apInfo;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apInfo);
     if(ret == ESP_OK) {
-        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
+        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("esp/network/AccessPointRecord"));
         execution.stackPushObject(&createAccessPointRecordObj(execution, className, apInfo));
     }
     else
@@ -185,7 +185,7 @@ static void nativeGetScanResult(FlintExecution &execution) {
 
     execution.flint.lock();
     try {
-        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("network/AccessPointRecord"));
+        FlintConstUtf8 &className = execution.flint.getConstUtf8(STR_AND_SIZE("esp/network/AccessPointRecord"));
         FlintObjectArray &arrayObj = execution.flint.newObjectArray(className, count);
         FlintJavaObject **data = arrayObj.getData();
         arrayObj.clearData();
@@ -215,15 +215,15 @@ static const FlintNativeMethod methods[] = {
 
     NATIVE_METHOD("\x07\x00\x73\x4F""connect",          "\x28\x00\x84\x65""(Ljava/lang/String;Ljava/lang/String;I)V",   nativeConnect),
     NATIVE_METHOD("\x0B\x00\x07\x5C""isConnected",      "\x03\x00\x91\x9C""()Z",                                        nativeIsConnected),
-    NATIVE_METHOD("\x09\x00\x51\xFD""getAPinfo",        "\x1D\x00\x50\xDF""()Lnetwork/AccessPointRecord;",              nativeGetAPinfo),
+    NATIVE_METHOD("\x09\x00\x51\xFD""getAPinfo",        "\x21\x00\x53\x56""()Lesp/network/AccessPointRecord;",          nativeGetAPinfo),
     NATIVE_METHOD("\x0A\x00\xDF\x40""disconnect",       "\x03\x00\x91\x99""()V",                                        nativeDisconnect),
 
     NATIVE_METHOD("\x06\x00\x4E\x10""softAP",           "\x2A\x00\xED\x0C""(Ljava/lang/String;Ljava/lang/String;III)V", nativeSoftAP),
     NATIVE_METHOD("\x10\x00\x71\xA1""softAPdisconnect", "\x03\x00\x91\x99""()V",                                        nativeSoftAPdisconnect),
 
     NATIVE_METHOD("\x09\x00\x01\xD3""startScan",        "\x04\x00\x49\xC6""(Z)V",                                       nativeStartScan),
-    NATIVE_METHOD("\x0E\x00\x13\x81""getScanResults",   "\x1E\x00\x79\x2F""()[Lnetwork/AccessPointRecord;",             nativeGetScanResult),
+    NATIVE_METHOD("\x0E\x00\x13\x81""getScanResults",   "\x22\x00\x5B\x39""()[Lesp/network/AccessPointRecord;",         nativeGetScanResult),
     NATIVE_METHOD("\x08\x00\xCD\x70""stopScan",         "\x03\x00\x91\x99""()V",                                        nativeStopScan),
 };
 
-const FlintNativeClass WIFI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x0C\x00\xE6\x3F""network/WiFi", methods);
+const FlintNativeClass WIFI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\xFE\x4C""esp/network/WiFi", methods);

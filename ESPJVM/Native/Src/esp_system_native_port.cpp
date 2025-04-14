@@ -146,4 +146,4 @@ static const FlintNativeMethod methods[] = {
     NATIVE_METHOD("\x09\x00\x8A\x20""writePort", "\x06\x00\xC6\x01""([BI)V", nativeWritePort),
 };
 
-const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x11\x00\x12\x81""machine/gpio/Port", methods);
+const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\xB8\x7E""esp/machine/Port", methods);

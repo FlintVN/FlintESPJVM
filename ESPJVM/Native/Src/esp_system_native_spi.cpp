@@ -168,4 +168,4 @@ static const FlintNativeMethod methods[] = {
     NATIVE_METHOD("\x05\x00\xD7\xA1""close",             "\x04\x00\xB8\x03""(I)V",        nativeClose),
 };
 
-const FlintNativeClass SPI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x15\x00\x16\x6C""machine/spi/SPIMaster", methods);
+const FlintNativeClass SPI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x15\x00\xF7\xE1""esp/machine/SPIMaster", methods);
