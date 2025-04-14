@@ -1,4 +1,11 @@
 # Change Log
+## V0.0.8
+- Update FlintJVM to [V1.1.4](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.4) (Fix bug when handling finally block in exception).
+- Update FlintJDK to [V0.0.6](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.6).
+  - Implement the following functions for java.util.Arrays: sort, equals, deepEquals, compare, mismatch.
+  - Support java.util.ArrayList, java.util.Vector and java.util.LinkedList.
+- Update FlintESPJDK to [V0.0.4](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.4) (Reorganize packages (machine.* -> esp.machine and network -> esp.network)).
+- Update native method to be compatibility with FlintESPJDK V0.0.4.
 ## V0.0.7
 - Update FlintJVM to [V1.1.3](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.3).
 - Update FlintJDK to [V0.0.5](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.5).
