@@ -1,5 +1,5 @@
 ## FlintESPJVM
-FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This allows you to run and debug Java applications directly on ESP32 hardware.
+FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This allows you to run and debug Java programs directly on the ESP32 hardware.
 
 ![demo](images/demo1.avif)
 ## Key Features
