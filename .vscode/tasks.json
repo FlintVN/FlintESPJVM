@@ -14,22 +14,33 @@
             "group": "build",
             "type": "shell",
             "dependsOrder": "sequence",
-            "dependsOn": ["Clean", "Make Dir"],
+            "dependsOn": ["Clean"],
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
             "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
             "windows": {
                 "command": [
                     "${env:IDF_PATH}/export.bat", "&&",
-                    "cd ESP32", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S2FN4R2", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3FH4R2", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N4RX", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N8RX", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-S3N16RX", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-C3FH4", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-C6FH4", "&&", "idf.py build", "&&",
-                    "cd ../ESP32-C6FH8", "&&", "idf.py build"
+                    "cd ESP32 && idf.py build", "&&",
+                    "cd ../ESP32-S2FN4R2 && idf.py build", "&&",
+                    "cd ../ESP32-S3FH4R2 && idf.py build", "&&",
+                    "cd ../ESP32-S3N4RX && idf.py build", "&&",
+                    "cd ../ESP32-S3N8RX && idf.py build", "&&",
+                    "cd ../ESP32-S3N16RX && idf.py build", "&&",
+                    "cd ../ESP32-C3FH4 && idf.py build", "&&",
+                    "cd ../ESP32-C6FH4 && idf.py build", "&&",
+                    "cd ../ESP32-C6FH8 && idf.py build"
                 ],
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            }
+        },
+        {
+            "label": "Build for generic only",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
                 "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
             }
         }
