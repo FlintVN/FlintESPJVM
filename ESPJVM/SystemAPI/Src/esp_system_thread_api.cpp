@@ -7,6 +7,8 @@
 FlintAPI::Thread::LockHandle *FlintAPI::Thread::createLockHandle(void) {
     FlintAPI::Thread::LockHandle *lockHandle;
     lockHandle = (FlintAPI::Thread::LockHandle *)FlintAPI::System::malloc(sizeof(FlintAPI::Thread::LockHandle));
+    if(!lockHandle)
+        return NULL;
     lockHandle->mutexHandle = (void *)xSemaphoreCreateMutex();
     lockHandle->lockThreadId = 0;
     lockHandle->lockNest = 0;

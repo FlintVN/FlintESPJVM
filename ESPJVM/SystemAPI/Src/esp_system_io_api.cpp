@@ -4,11 +4,37 @@
 #include "flint_common.h"
 #include "flint_system_api.h"
 
+static FlintFileResult convertFileResult(FRESULT ret) {
+    static const FlintFileResult map[] = {
+        [FR_OK] = FILE_RESULT_OK,
+        [FR_DISK_ERR] = FILE_RESULT_ERR,
+        [FR_INT_ERR] = FILE_RESULT_ERR,
+        [FR_NOT_READY] = FILE_RESULT_ERR,
+        [FR_NO_FILE] = FILE_RESULT_NO_PATH,
+        [FR_NO_PATH] = FILE_RESULT_NO_PATH,
+        [FR_INVALID_NAME] = FILE_RESULT_NO_PATH,
+        [FR_DENIED] = FILE_RESULT_DENIED,
+        [FR_EXIST] = FILE_RESULT_ERR,
+        [FR_INVALID_OBJECT] = FILE_RESULT_ERR,
+        [FR_WRITE_PROTECTED] = FILE_RESULT_WRITE_PROTECTED,
+        [FR_INVALID_DRIVE] = FILE_RESULT_ERR,
+        [FR_NOT_ENABLED] = FILE_RESULT_ERR,
+        [FR_NO_FILESYSTEM] = FILE_RESULT_ERR,
+        [FR_MKFS_ABORTED] = FILE_RESULT_ERR,
+        [FR_TIMEOUT] = FILE_RESULT_ERR,
+        [FR_LOCKED]= FILE_RESULT_ERR,
+        [FR_NOT_ENOUGH_CORE] = FILE_RESULT_ERR,
+        [FR_TOO_MANY_OPEN_FILES] = FILE_RESULT_ERR,
+        [FR_INVALID_PARAMETER] = FILE_RESULT_ERR,
+    };
+    return map[ret];
+}
+
 FlintFileResult FlintAPI::IO::finfo(const char *fileName, uint32_t *size, int64_t *time) {
     FRESULT ret;
     if(size || time) {
         FILINFO fno;
-        ret = ::f_stat(fileName, &fno);
+        ret = f_stat(fileName, &fno);
         if(ret == FR_OK) {
             if(size)
                 *size = fno.fsize;
@@ -24,17 +50,8 @@ FlintFileResult FlintAPI::IO::finfo(const char *fileName, uint32_t *size, int64_
         }
     }
     else
-        ret = ::f_stat(fileName, NULL);
-    if(ret == FR_OK)
-        return FILE_RESULT_OK;
-    else if((ret == FR_NO_PATH) || (ret == FR_NO_FILE) || (ret == FR_INVALID_NAME))
-        return FILE_RESULT_NO_PATH;
-    else if(ret == FR_DENIED)
-        return FILE_RESULT_DENIED;
-    else if(ret == FR_WRITE_PROTECTED)
-        return FILE_RESULT_WRITE_PROTECTED;
-    else
-        return FILE_RESULT_ERR;
+        ret = f_stat(fileName, NULL);
+    return convertFileResult(ret);
 }
 
 void *FlintAPI::IO::fopen(const char *fileName, FlintFileMode mode) {
@@ -97,17 +114,7 @@ FlintFileResult FlintAPI::IO::fclose(void *handle) {
 }
 
 FlintFileResult FlintAPI::IO::fremove(const char *fileName) {
-    FRESULT ret = f_unlink(fileName);
-    if(ret == FR_OK)
-        return FILE_RESULT_OK;
-    else if((ret == FR_NO_PATH) || (ret == FR_NO_FILE) || (ret == FR_INVALID_NAME))
-        return FILE_RESULT_NO_PATH;
-    else if(ret == FR_DENIED)
-        return FILE_RESULT_DENIED;
-    else if(ret == FR_WRITE_PROTECTED)
-        return FILE_RESULT_WRITE_PROTECTED;
-    else
-        return FILE_RESULT_ERR;
+    return convertFileResult(f_unlink(fileName));
 }
 
 void *FlintAPI::IO::opendir(const char *dirName) {
@@ -117,7 +124,7 @@ void *FlintAPI::IO::opendir(const char *dirName) {
         return (void *)dir;
     else {
         FlintAPI::System::free(dir);
-        return 0;
+        return NULL;
     }
 }
 
@@ -144,30 +151,16 @@ FlintFileResult FlintAPI::IO::readdir(void *handle, uint8_t *attribute, char *na
                 return FILE_RESULT_ERR;
         }
         nameBuff[index] = 0;
-        return FILE_RESULT_OK;
     }
-    else if((ret == FR_NO_PATH) || (ret == FR_NO_FILE) || (ret == FR_INVALID_NAME))
-        return FILE_RESULT_NO_PATH;
-    else if(ret == FR_DENIED)
-        return FILE_RESULT_DENIED;
-    else
-        return FILE_RESULT_ERR;
+    return convertFileResult(ret);
 }
 
 FlintFileResult FlintAPI::IO::closedir(void *handle) {
     FRESULT ret = f_closedir((FF_DIR *)handle);
     FlintAPI::System::free(handle);
-    return (ret == FR_OK) ? FILE_RESULT_OK : FILE_RESULT_ERR;
+    return convertFileResult(ret);
 }
 
 FlintFileResult FlintAPI::IO::mkdir(const char *path) {
-    FRESULT ret = f_mkdir(path);
-    if(ret == FR_OK)
-        return FILE_RESULT_OK;
-    else if(ret == FR_DENIED)
-        return FILE_RESULT_DENIED;
-    else if(ret == FR_WRITE_PROTECTED)
-        return FILE_RESULT_WRITE_PROTECTED;
-    else
-        return FILE_RESULT_ERR;
+    return convertFileResult(f_mkdir(path));
 }
