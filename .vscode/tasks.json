@@ -3,11 +3,11 @@
     "tasks": [
         {
             "label": "Clean",
-            "group": "none",
+            "group": "build",
             "type": "shell",
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "linux": {"command": "rm -rf build/* */build */sdkconfig */.vscode */dependencies.lock */managed_components"},
-            "windows": {"command": "Tools/rm -rf build/* */build */sdkconfig */.vscode */dependencies.lock */managed_components"}
+            "linux": {"command": "rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"},
+            "windows": {"command": "Tools/rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"}
         },
         {
             "label": "Build Release",
@@ -42,7 +42,9 @@
             "windows": {
                 "command": "${env:IDF_PATH}/export.bat && idf.py build",
                 "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
-            }
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
         }
     ]
 }

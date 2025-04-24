@@ -27,7 +27,7 @@
     #error "Unknown ESP32 target"
 #endif
 
-#define FILE_NAME_BUFF_SIZE         256
+#define FILE_NAME_BUFF_SIZE         128
 
 #define DEFAULT_STACK_SIZE          KILO_BYTE(10)
 #define OBJECT_SIZE_TO_GC           KILO_BYTE(10)

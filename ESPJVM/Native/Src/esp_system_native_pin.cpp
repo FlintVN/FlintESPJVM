@@ -6,6 +6,7 @@
 #include "driver/gpio.h"
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
+#include "flint_throw_support.h"
 
 const char *NativePin_CheckPin(int32_t pin) {
     if((1ULL << pin) & ~SOC_GPIO_VALID_GPIO_MASK)
@@ -32,19 +33,18 @@ void NativePin_Reset(Flint &flint) {
     }
 }
 
-static void checkPin(FlintExecution &execution, int32_t pin) {
+static FlintError checkPin(FlintExecution &execution, int32_t pin) {
     const char *msg = NativePin_CheckPin(pin);
-    if(msg) {
-        FlintJavaString &strObj = execution.flint.newString(msg, strlen(msg));
-        throw &execution.flint.newIOException(&strObj);
-    }
+    if(msg)
+        return throwIOException(execution, msg);
+    return ERR_OK;
 }
 
-static void nativeSetMode(FlintExecution &execution) {
+static FlintError nativeSetMode(FlintExecution &execution) {
     int32_t mode = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
-    checkPin(execution, pin);
+    RETURN_IF_ERR(checkPin(execution, pin));
 
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -74,13 +74,12 @@ static void nativeSetMode(FlintExecution &execution) {
             io_conf.mode = GPIO_MODE_DISABLE;
             break;
     }
-    if(gpio_config(&io_conf) != ESP_OK) {
-        FlintJavaString &strObj = execution.flint.newString(STR_AND_SIZE("Error while configuring the pin"));
-        throw &execution.flint.newIOException(&strObj);
-    }
+    if(gpio_config(&io_conf) != ESP_OK)
+        return throwIOException(execution, "Error while configuring the pin");
+    return ERR_OK;
 }
 
-static void nativeReadPin(FlintExecution &execution) {
+static FlintError nativeReadPin(FlintExecution &execution) {
     int32_t pin = execution.stackPopInt32();
 
     #ifdef GPIO_IN1_REG
@@ -95,9 +94,10 @@ static void nativeReadPin(FlintExecution &execution) {
         execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
     }
     #endif
+    return ERR_OK;
 }
 
-static void nativeWritePin(FlintExecution &execution) {
+static FlintError nativeWritePin(FlintExecution &execution) {
     int32_t level = execution.stackPopInt32();
     int32_t pin = execution.stackPopInt32();
 
@@ -124,6 +124,7 @@ static void nativeWritePin(FlintExecution &execution) {
             REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
     }
     #endif
+    return ERR_OK;
 }
 
 static const FlintNativeMethod methods[] = {

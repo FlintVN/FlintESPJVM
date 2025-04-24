@@ -90,11 +90,9 @@ FlintFileResult FlintAPI::IO::fwrite(void *handle, void *buff, uint32_t btw, uin
 
 uint32_t FlintAPI::IO::fsize(void *handle) {
     uint32_t temp = ::ftell((FILE *)handle);
-    if(::fseek((FILE *)handle, 0, SEEK_END) != 0)
-        throw "error while getting file size";
+    ::fseek((FILE *)handle, 0, SEEK_END);
     uint32_t length = ::ftell((FILE *)handle);
-    if(::fseek((FILE *)handle, temp, SEEK_SET) != 0)
-        throw "error while getting file size";
+    ::fseek((FILE *)handle, temp, SEEK_SET);
     return length;
 }
 
