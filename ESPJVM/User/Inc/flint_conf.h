@@ -29,7 +29,7 @@
 
 #define FILE_NAME_BUFF_SIZE         128
 
-#define DEFAULT_STACK_SIZE          KILO_BYTE(10)
+#define DEFAULT_STACK_SIZE          KILO_BYTE(5)
 #define OBJECT_SIZE_TO_GC           KILO_BYTE(10)
 
 #define MAX_OF_BREAK_POINT          20
