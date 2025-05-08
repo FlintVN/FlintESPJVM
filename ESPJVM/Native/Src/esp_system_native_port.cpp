@@ -74,8 +74,9 @@ static FlintError nativeSetMode(FlintExecution &execution) {
     return ERR_OK;
 }
 
-static FlintError nativeReadPort(FlintExecution &execution) {
-    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+static FlintError nativeRead(FlintExecution &execution) {
+    FlintJavaObject *obj = execution.stackPopObject();
+    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
     if(!pinsObj) {
         execution.stackPushInt32(0);
         return ERR_OK;
@@ -102,9 +103,10 @@ static FlintError nativeReadPort(FlintExecution &execution) {
     return ERR_OK;
 }
 
-static FlintError nativeWritePort(FlintExecution &execution) {
+static FlintError nativeWrite(FlintExecution &execution) {
     uint32_t value = execution.stackPopInt32();
-    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+    FlintJavaObject *obj = execution.stackPopObject();
+    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
     if(!pinsObj)
         return ERR_OK;
     uint32_t arrayLength = pinsObj->getLength();
@@ -141,10 +143,37 @@ static FlintError nativeWritePort(FlintExecution &execution) {
     return ERR_OK;
 }
 
+static FlintError nativeReset(FlintExecution &execution) {
+    FlintJavaObject *obj = execution.stackPopObject();
+    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
+    if(!pinsObj)
+        return ERR_OK;
+    uint32_t arrayLength = pinsObj->getLength();
+    uint8_t *pins = (uint8_t *)pinsObj->getData();
+    #ifdef GPIO_OUT1_W1TC_REG
+    {
+        uint64_t clearMask = 0;
+        for(uint8_t i = 0; i < arrayLength; i++)
+            clearMask |= (uint64_t)1 << pins[i];
+        REG_WRITE(GPIO_OUT_W1TC_REG, (uint32_t)clearMask);
+        REG_WRITE(GPIO_OUT1_W1TC_REG, (uint32_t)(clearMask >> 32));
+    }
+    #else
+    {
+        uint32_t clearMask = 0;
+        for(uint8_t i = 0; i < arrayLength; i++)
+            clearMask |= 1 << pins[i];
+        REG_WRITE(GPIO_OUT_W1TC_REG, clearMask);
+    }
+    #endif
+    return ERR_OK;
+}
+
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode",   "\x06\x00\xC6\x01""([BI)V", nativeSetMode),
-    NATIVE_METHOD("\x08\x00\x70\x2C""readPort",  "\x05\x00\xD6\xAF""([B)I",  nativeReadPort),
-    NATIVE_METHOD("\x09\x00\x8A\x20""writePort", "\x06\x00\xC6\x01""([BI)V", nativeWritePort),
+    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode", "\x06\x00\xC6\x01""([BI)V", nativeSetMode),
+    NATIVE_METHOD("\x04\x00\xDC\xC7""read",    "\x03\x00\xD0\x51""()I",    nativeRead),
+    NATIVE_METHOD("\x05\x00\x03\xBB""write",   "\x04\x00\xB8\x03""(I)V",   nativeWrite),
+    NATIVE_METHOD("\x05\x00\x27\x94""reset",   "\x03\x00\x91\x99""()V",    nativeReset),
 };
 
 const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\xB8\x7E""esp/machine/Port", methods);

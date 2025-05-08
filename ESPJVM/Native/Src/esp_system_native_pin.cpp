@@ -79,8 +79,9 @@ static FlintError nativeSetMode(FlintExecution &execution) {
     return ERR_OK;
 }
 
-static FlintError nativeReadPin(FlintExecution &execution) {
-    int32_t pin = execution.stackPopInt32();
+static FlintError nativeRead(FlintExecution &execution) {
+    FlintJavaObject *obj = execution.stackPopObject();
+    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
 
     #ifdef GPIO_IN1_REG
     {
@@ -97,9 +98,10 @@ static FlintError nativeReadPin(FlintExecution &execution) {
     return ERR_OK;
 }
 
-static FlintError nativeWritePin(FlintExecution &execution) {
+static FlintError nativeWrite(FlintExecution &execution) {
     int32_t level = execution.stackPopInt32();
-    int32_t pin = execution.stackPopInt32();
+    FlintJavaObject *obj = execution.stackPopObject();
+    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -127,10 +129,50 @@ static FlintError nativeWritePin(FlintExecution &execution) {
     return ERR_OK;
 }
 
+static FlintError nativeSet(FlintExecution &execution) {
+    FlintJavaObject *obj = execution.stackPopObject();
+    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+
+    #ifdef GPIO_OUT1_W1TC_REG
+    {
+        if(pin < 32)
+            REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+        else
+            REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
+    }
+    #else
+    {
+        REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+    }
+    #endif
+    return ERR_OK;
+}
+
+static FlintError nativeReset(FlintExecution &execution) {
+    FlintJavaObject *obj = execution.stackPopObject();
+    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+
+    #ifdef GPIO_OUT1_W1TC_REG
+    {
+        if(pin < 32)
+            REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+        else
+            REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
+    }
+    #else
+    {
+        REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+    }
+    #endif
+    return ERR_OK;
+}
+
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode",  "\x05\x00\xE3\xDD""(II)V", nativeSetMode),
-    NATIVE_METHOD("\x07\x00\xB2\x58""readPin",  "\x04\x00\xB8\x06""(I)Z",  nativeReadPin),
-    NATIVE_METHOD("\x08\x00\xA3\x62""writePin", "\x05\x00\x12\x18""(IZ)V", nativeWritePin),
+    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode", "\x05\x00\xE3\xDD""(II)V", nativeSetMode),
+    NATIVE_METHOD("\x04\x00\xDC\xC7""read",    "\x03\x00\x91\x9C""()Z",   nativeRead),
+    NATIVE_METHOD("\x05\x00\x03\xBB""write",   "\x04\x00\x49\xC6""(Z)V",  nativeWrite),
+    NATIVE_METHOD("\x03\x00\x54\x93""set",     "\x03\x00\x91\x99""()V",   nativeSet),
+    NATIVE_METHOD("\x05\x00\x27\x94""reset",   "\x03\x00\x91\x99""()V",   nativeReset),
 };
 
 const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x0F\x00\x74\x10""esp/machine/Pin", methods);
