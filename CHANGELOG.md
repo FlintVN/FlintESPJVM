@@ -1,4 +1,18 @@
 # Change Log
+## V0.0.9
+- Update FlintJVM to [V1.1.5](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.5)
+  - Fix method not found in invokeInterface (bridge method).
+  - Support lazy loading for method code (Reduce RAM consumption).
+  - Fix java.lang.reflect.Array.get returning short instead of character with character input array.
+  - Fix crash when class file contains long ConstUtf8 string.
+  - Eliminate the impact of breakpoints on performance when debugging.
+  - Temporarily dropping support for java.math.BigInteger for future changes and improvements.
+  - Reduce RAM consumption.
+- Reduce DEFAULT_STACK_SIZE from 10KB to 5KB.
+- Update esp.machine.Pin and esp.machine.Port to increase performance.
+- Update memory partitions (reduce from 1.5MB to 1MB for FlintESPJVM).
+- Check the reset cause to decide whether to run into the main java code or not.
+- Update FlintESPJDK to [V0.0.5](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.5).
 ## V0.0.8
 - Update FlintJVM to [V1.1.4](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.4) (Fix bug when handling finally block in exception).
 - Update FlintJDK to [V0.0.6](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.6).
