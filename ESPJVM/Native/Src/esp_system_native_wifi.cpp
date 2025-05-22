@@ -112,7 +112,7 @@ static FlintError createAccessPointRecordObj(FlintExecution &execution, const Fl
     fileds.getFieldObject("mac")->object = macArray;
     FlintJavaString *ssid;
     err = execution.flint.newString((char *)apRecord.ssid, ssid);
-    if(err == ERR_OK) {
+    if(err != ERR_OK) {
         execution.flint.freeObject(*macArray);
         return checkAndThrowForFlintError(execution, err, (FlintConstUtf8 *)ssid);
     }
