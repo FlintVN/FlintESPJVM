@@ -7,30 +7,78 @@
 #include "esp_system_native_spi.h"
 #include "flint_throw_support.h"
 
-static spi_device_handle_t spiHandle[2] = {0};
-
-static int32_t NativeSPI_GetID(spi_device_handle_t handle) {
-    for(uint32_t i = 0; i < LENGTH(spiHandle); i++) {
-        if(handle == spiHandle[i])
-            return i + 1;
+class EspSpiObject : public FlintJavaObject {
+public:
+    int32_t spiId() {
+        return getFields().getFieldData32ByIndex(0)->value;
     }
-    return -1;
+
+    int32_t &mode() {
+        return getFields().getFieldData32ByIndex(1)->value;
+    }
+
+    int32_t &speed() {
+        return getFields().getFieldData32ByIndex(2)->value;
+    }
+
+    int32_t &maxTransferSize() {
+        return getFields().getFieldData32ByIndex(3)->value;
+    }
+
+    int32_t &mosiPin() {
+        return getFields().getFieldData32ByIndex(4)->value;
+    }
+
+    int32_t &misoPin() {
+        return getFields().getFieldData32ByIndex(5)->value;
+    }
+
+    int32_t &clkPin() {
+        return getFields().getFieldData32ByIndex(6)->value;
+    }
+
+    int32_t &csPin() {
+        return getFields().getFieldData32ByIndex(7)->value;
+    }
+};
+
+typedef struct {
+    spi_device_handle_t handle;
+    EspSpiObject *spiObj;
+} EspSpiHandle;
+
+static EspSpiHandle espSpiHandle[2] = {
+    {0, 0}, {0, 0}
+};
+
+static bool NativeSPI_IsOpen(int32_t spiId) {
+    return espSpiHandle[spiId - 1].handle ? true : false;
 }
 
-static FlintError NativeSPI_Close(spi_device_handle_t handle) {
-    int32_t spiId = NativeSPI_GetID(handle);
-    spi_bus_remove_device(handle);
-    spi_bus_free((spi_host_device_t)spiId);
-    spiHandle[spiId - 1] = 0;
-    return ERR_OK;
+static esp_err_t NativeSPI_Transfer(int32_t spiId, FlintInt8Array *txBuff, int32_t txOff, FlintInt8Array *rxBuff, int32_t rxOff, int32_t length) {
+    spi_transaction_t t = {};
+    int8_t *txData = txBuff ? &txBuff->getData()[txOff] : NULL;
+    int8_t *rxData = rxBuff ? &rxBuff->getData()[rxOff] : NULL;
+    t.length = length * 8;
+    t.tx_buffer = txData;
+    t.rx_buffer = rxData;
+    return spi_device_transmit(espSpiHandle[spiId - 1].handle, &t);
+}
+
+static void NativeSPI_Close(int32_t spiId) {
+    if(NativeSPI_IsOpen(spiId)) {
+        int32_t index = spiId - 1;
+        spi_bus_remove_device(espSpiHandle[index].handle);
+        spi_bus_free((spi_host_device_t)spiId);
+        espSpiHandle[index].handle = 0;
+        espSpiHandle[index].spiObj = 0;
+    }
 }
 
 void NativeSPI_Reset(Flint &flint) {
     ((void)flint);
-    for(uint8_t i = 0; i < LENGTH(spiHandle); i++) {
-        if(spiHandle[i])
-            NativeSPI_Close(spiHandle[i]);
-    }
+    for(uint8_t i = 0; i < LENGTH(espSpiHandle); i++)
+        NativeSPI_Close(i + 1);
 }
 
 static FlintError checkSpiId(FlintExecution &execution, int32_t spiId) {
@@ -44,133 +92,145 @@ static FlintError checkSpiId(FlintExecution &execution, int32_t spiId) {
     return throwIOException(execution, msg);
 }
 
-static FlintError checkSpiHandle(FlintExecution &execution, int32_t handle) {
-    int32_t spiId = NativeSPI_GetID((spi_device_handle_t)handle);
-    if(spiId >= 0)
-        return ERR_OK;
-    return throwIOException(execution, "handle is invalue");
+static FlintError checkSpiTransferCondition(FlintExecution &execution, EspSpiObject *spiObj) {
+    int32_t spiId = spiObj->spiId();
+    RETURN_IF_ERR(checkSpiId(execution, spiId));
+    if(!NativeSPI_IsOpen(spiId))
+        return throwIOException(execution, "SPI has not been opened yet");
+    else if(espSpiHandle[spiId - 1].spiObj != spiObj)
+        return throwIOException(execution, "Access is denied");
+    return ERR_OK;
 }
 
-static int32_t getDefaultMosiPin(int32_t spiId) {
-    static const uint8_t spiMosi[] = {23, 13};
-    return spiMosi[spiId - 1];
+static FlintError checkSpiInputParam(FlintExecution &execution, FlintInt8Array *buff, int32_t offset, int32_t count) {
+    if(buff) {
+        if(offset < 0)
+            return throwArrayIndexOutOfBoundsException(execution, offset, buff->getLength());
+        else if((offset + count) > buff->getLength())
+            return throwArrayIndexOutOfBoundsException(execution, buff->getLength(), buff->getLength());
+    }
+    return ERR_OK;
 }
 
-static int32_t getDefaultMisoPin(int32_t spiId) {
-    static const uint8_t spiMiso[] = {19, 12};
-    return spiMiso[spiId - 1];
-}
+static FlintError nativeInitInstance(FlintExecution &execution) {
+    static const uint8_t spiMosiPin[] = {23, 13};
+    static const uint8_t spiMisoPin[] = {19, 12};
+    static const uint8_t spiClkPin[] = {18, 14};
 
-static int32_t getDefaultClkPin(int32_t spiId) {
-    static const uint8_t spiClk[] = {18, 14};
-    return spiClk[spiId - 1];
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+    int32_t spiId = spiObj->spiId();
+    RETURN_IF_ERR(checkSpiId(execution, spiId));
+
+    spiObj->mode() = 0;
+    spiObj->speed() = 5000000;
+    spiObj->maxTransferSize() = 4096;
+    spiObj->mosiPin() = spiMosiPin[spiId - 1];
+    spiObj->misoPin() = spiMisoPin[spiId - 1];
+    spiObj->clkPin() = spiClkPin[spiId - 1];
+    spiObj->csPin() = -1;
+
+    return ERR_OK;
 }
 
 static FlintError nativeOpen(FlintExecution &execution) {
-    int8_t csLevel = (int8_t)execution.stackPopInt32();
-    int8_t isLsb = (int8_t)execution.stackPopInt32();
-    int8_t mode = (int8_t)execution.stackPopInt32();
-    FlintInt8Array *pins = (FlintInt8Array *)execution.stackPopObject();
-    int32_t maxTranferSize = execution.stackPopInt32();
-    int32_t speed = execution.stackPopInt32();
-    int8_t spiId = (int8_t)execution.stackPopInt32();
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+    int32_t spiId = spiObj->spiId();
     RETURN_IF_ERR(checkSpiId(execution, spiId));
 
+    if(NativeSPI_IsOpen(spiId)) {
+        if(espSpiHandle[spiId - 1].spiObj != spiObj)
+            return throwIOException(execution, "Access is denied");
+        return throwIOException(execution, "SPI is already open");
+    }
+
+    int32_t mode = spiObj->mode();
+
     spi_bus_config_t buscfg = {};
-    buscfg.mosi_io_num = pins->getData()[0];
-    buscfg.miso_io_num = pins->getData()[1];
-    buscfg.sclk_io_num = pins->getData()[2];
+    buscfg.mosi_io_num = spiObj->mosiPin();
+    buscfg.miso_io_num = spiObj->misoPin();
+    buscfg.sclk_io_num = spiObj->clkPin();
     buscfg.quadwp_io_num = -1;
     buscfg.quadhd_io_num = -1;
-    buscfg.max_transfer_sz = maxTranferSize;
+    buscfg.max_transfer_sz = spiObj->maxTransferSize();
 
     spi_device_interface_config_t devcfg = {};
-    devcfg.clock_speed_hz = speed;
-    devcfg.mode = mode;
-    devcfg.spics_io_num = pins->getData()[3];
+    devcfg.clock_speed_hz = spiObj->speed();
+    devcfg.mode = (mode & 0x03);
+    devcfg.spics_io_num = spiObj->csPin();
     devcfg.queue_size = 1;
-    devcfg.flags |= isLsb ? SPI_DEVICE_BIT_LSBFIRST : 0;
-    devcfg.flags |= csLevel ? SPI_DEVICE_POSITIVE_CS : 0;
+    devcfg.flags |= (mode & 0x04) ? SPI_DEVICE_BIT_LSBFIRST : 0;
+    devcfg.flags |= (mode & 0x08) ? SPI_DEVICE_POSITIVE_CS : 0;
 
     if(spi_bus_initialize((spi_host_device_t)spiId, &buscfg, SPI_DMA_CH_AUTO) != ESP_OK)
         return throwIOException(execution, "Error while initializing bus");
-    if(spi_bus_add_device((spi_host_device_t)spiId, &devcfg, &spiHandle[spiId - 1]) != ESP_OK)
+    if(spi_bus_add_device((spi_host_device_t)spiId, &devcfg, &espSpiHandle[spiId - 1].handle) != ESP_OK)
         return throwIOException(execution, "Error while adding device");
 
-    execution.stackPushInt32((int32_t)spiHandle[spiId - 1]);
-    return ERR_OK;
-}
-
-static FlintError nativeGetActualSpeed(FlintExecution &execution) {
-    int32_t handle = execution.stackPopInt32();
-    int32_t ret = 0;
-    RETURN_IF_ERR(checkSpiHandle(execution, handle));
-    if(spi_device_get_actual_freq((spi_device_handle_t)handle, (int *)&ret) != ESP_OK)
-        return throwIOException(execution, "Error get actual spi speed");
-    execution.stackPushInt32(ret * 1000);
-    return ERR_OK;
-}
-
-static FlintError nativeGetDefaultMosiPin(FlintExecution &execution) {
-    int32_t spiId = execution.stackPopInt32();
-    RETURN_IF_ERR(checkSpiId(execution, spiId));
-    execution.stackPushInt32(getDefaultMosiPin(spiId));
-    return ERR_OK;
-}
-
-static FlintError nativeGetDefaultMisoPin(FlintExecution &execution) {
-    int32_t spiId = execution.stackPopInt32();
-    RETURN_IF_ERR(checkSpiId(execution, spiId));
-    execution.stackPushInt32(getDefaultMisoPin(spiId));
-    return ERR_OK;
-}
-
-static FlintError nativeGetDefaultClkPin(FlintExecution &execution) {
-    int32_t spiId = execution.stackPopInt32();
-    RETURN_IF_ERR(checkSpiId(execution, spiId));
-    execution.stackPushInt32(getDefaultClkPin(spiId));
     return ERR_OK;
 }
 
 static FlintError nativeIsOpen(FlintExecution &execution) {
-    int32_t spiId = execution.stackPopInt32();
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+    int32_t spiId = spiObj->spiId();
     RETURN_IF_ERR(checkSpiId(execution, spiId));
-    execution.stackPushInt32(spiHandle[spiId - 1] ? 1 : 0);
+    if(NativeSPI_IsOpen(spiId))
+        execution.stackPushInt32((espSpiHandle[spiId - 1].spiObj == spiObj) ? 1 : 0);
+    else
+        execution.stackPushInt32(0);
     return ERR_OK;
 }
 
-static FlintError nativeWrite(FlintExecution &execution) {
+static FlintError nativeGetSpeed(FlintExecution &execution) {
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+    int32_t spiId = spiObj->spiId();
+    RETURN_IF_ERR(checkSpiId(execution, spiId));
+
+    if(NativeSPI_IsOpen(spiId)) {
+        int32_t ret = 0;
+        if(spi_device_get_actual_freq(espSpiHandle[spiId - 1].handle, (int *)&ret) != ESP_OK)
+            return throwIOException(execution, "Error get actual spi speed");
+        execution.stackPushInt32(ret * 1000);
+    }
+    else
+        execution.stackPushInt32(spiObj->speed());
+    return ERR_OK;
+}
+
+static FlintError nativeReadWrite(FlintExecution &execution) {
     int32_t length = execution.stackPopInt32();
-    int32_t rxOffset = execution.stackPopInt32();
+    int32_t rxOff = execution.stackPopInt32();
     FlintInt8Array *rxBuff = (FlintInt8Array *)execution.stackPopObject();
-    int32_t txOffset = execution.stackPopInt32();
+    int32_t txOff = execution.stackPopInt32();
     FlintInt8Array *txBuff = (FlintInt8Array *)execution.stackPopObject();
-    int32_t handle = execution.stackPopInt32();
-    RETURN_IF_ERR(checkSpiHandle(execution, handle));
-    spi_transaction_t t = {};
-    t.length = length * 8;
-    t.tx_buffer = txBuff ? &txBuff->getData()[txOffset] : NULL;
-    t.rx_buffer = rxBuff ? &rxBuff->getData()[rxOffset] : NULL;
-    execution.stackPushInt32((spi_device_transmit((spi_device_handle_t)handle, &t) == ESP_OK) ? 1 : 0);
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+
+    RETURN_IF_ERR(checkSpiTransferCondition(execution, spiObj));
+    if((txBuff == NULL) && (rxBuff == NULL))
+        return throwIllegalArgumentException(execution);
+    RETURN_IF_ERR(checkSpiInputParam(execution, txBuff, txOff, length));
+    RETURN_IF_ERR(checkSpiInputParam(execution, rxBuff, rxOff, length));
+    if(NativeSPI_Transfer(spiObj->spiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK)
+        return throwIOException(execution, "Error while transmitting data");
+
+    execution.stackPushInt32(rxBuff ? length : 0);
     return ERR_OK;
 }
 
 static FlintError nativeClose(FlintExecution &execution) {
-    int32_t handle = execution.stackPopInt32();
-    RETURN_IF_ERR(checkSpiHandle(execution, handle));
-    NativeSPI_Close((spi_device_handle_t)handle);
+    EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
+    int32_t spiId = spiObj->spiId();
+    RETURN_IF_ERR(checkSpiId(execution, spiId));
+    NativeSPI_Close(spiId);
     return ERR_OK;
 }
 
 static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x04\x00\x49\xA8""open",              "\x0B\x00\xE1\x0D""(III[BIZZ)I", nativeOpen),
-    NATIVE_METHOD("\x0E\x00\xE0\x1B""getActualSpeed",    "\x04\x00\xF9\xCB""(I)I",        nativeGetActualSpeed),
-    NATIVE_METHOD("\x11\x00\xFB\x27""getDefaultMosiPin", "\x04\x00\xF9\xCB""(I)I",        nativeGetDefaultMosiPin),
-    NATIVE_METHOD("\x11\x00\xFB\xC9""getDefaultMisoPin", "\x04\x00\xF9\xCB""(I)I",        nativeGetDefaultMisoPin),
-    NATIVE_METHOD("\x10\x00\x71\xEB""getDefaultClkPin",  "\x04\x00\xF9\xCB""(I)I",        nativeGetDefaultClkPin),
-    NATIVE_METHOD("\x06\x00\x4E\xA5""isOpen",            "\x04\x00\xB8\x06""(I)Z",        nativeIsOpen),
-    NATIVE_METHOD("\x05\x00\x03\xBB""write",             "\x0B\x00\x55\x5B""(I[BI[BII)Z", nativeWrite),
-    NATIVE_METHOD("\x05\x00\xD7\xA1""close",             "\x04\x00\xB8\x03""(I)V",        nativeClose),
+    NATIVE_METHOD("\x0C\x00\x2F\x75""initInstance", "\x03\x00\x91\x99""()V",        nativeInitInstance),
+    NATIVE_METHOD("\x04\x00\x49\xA8""open",         "\x03\x00\x91\x99""()V",        nativeOpen),
+    NATIVE_METHOD("\x06\x00\x4E\xA5""isOpen",       "\x03\x00\x91\x9C""()Z",        nativeIsOpen),
+    NATIVE_METHOD("\x08\x00\x63\xE0""getSpeed",     "\x03\x00\xD0\x51""()I",        nativeGetSpeed),
+    NATIVE_METHOD("\x09\x00\x6E\xDB""readWrite",    "\x0A\x00\xB1\xAE""([BI[BII)I", nativeReadWrite),
+    NATIVE_METHOD("\x05\x00\xD7\xA1""close",        "\x03\x00\x91\x99""()V",        nativeClose),
 };
 
-const FlintNativeClass SPI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x15\x00\xF7\xE1""esp/machine/SPIMaster", methods);
+const FlintNativeClass SPI_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x15\x00\xD4\x3B""esp/machine/SpiMaster", methods);
