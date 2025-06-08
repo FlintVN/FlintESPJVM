@@ -166,6 +166,8 @@ static FlintError nativeOpen(FlintExecution &execution) {
     if(spi_bus_add_device((spi_host_device_t)spiId, &devcfg, &espSpiHandle[spiId - 1].handle) != ESP_OK)
         return throwIOException(execution, "Error while adding device");
 
+    espSpiHandle[spiId - 1].spiObj = spiObj;
+
     return ERR_OK;
 }
 
