@@ -15,12 +15,20 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if((pin == 1) || (pin == 3))
         return "Pin 1 and 3 have been used for debugging";
     else if((6 <= pin) && (pin <= 11))
-        return "You cannot use these pins from 6 to 11";
+        return "Pins 6 to 11 have been used for SPI Flash";
 #elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
     else if(pin == 0)
         return "Pin 0 was used to select USB mode";
     else if((pin == 19) || (pin == 20))
         return "Pin 19 and 20 have been used for debugging (USB CDC)";
+    else if((26 <= pin) && (pin <= 32))
+        return "Pins 26 to 32 have been used for SPI Flash and PSRAM";
+#elif CONFIG_IDF_TARGET_ESP32C3
+    else if((12 <= pin) && (pin <= 17))
+        return "Pins 12 to 17 have been used for SPI Flash";
+#elif CONFIG_IDF_TARGET_ESP32C6
+    else if(((24 <= pin) && (pin <= 26)) || ((28 << pin) && (pin <= 30))
+        return "Pins 24, 25, 26, 28, 29 and 30 have been used for SPI Flash";
 #endif
     return NULL;
 }

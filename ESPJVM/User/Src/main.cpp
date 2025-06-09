@@ -22,7 +22,7 @@ extern "C" void app_main() {
 
     Flint &flint = Flint::getInstance();
     EspDebugger &dbg = EspDebugger::getInstance(flint);
-    
+
     if(esp_reset_reason() != ESP_RST_PANIC) {
         if(FlintAPI::IO::finfo("main.class", NULL, NULL) == FILE_RESULT_OK)
             flint.runToMain("main");
