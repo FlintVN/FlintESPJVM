@@ -4,6 +4,7 @@
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "flint_system_api.h"
+#include "esp_system_native_pin.h"
 #include "esp_system_native_spi.h"
 #include "flint_throw_support.h"
 
@@ -92,6 +93,29 @@ static FlintError checkSpiId(FlintExecution &execution, int32_t spiId) {
     return throwIOException(execution, msg);
 }
 
+static FlintError checkSpiPin(FlintExecution &execution, EspSpiObject *spiObj) {
+    int32_t mosi = spiObj->mosiPin();
+    int32_t miso= spiObj->misoPin();
+    int32_t sclk = spiObj->clkPin();
+    int32_t cs = spiObj->csPin();
+    const char *msg;
+    if(mosi < 0)
+        return throwIOException(execution, "MOSI pin value cannot be -1 when in SPI Master mode");
+    if(miso >= 0) {
+        if((msg = NativePin_CheckPin(miso)) != NULL)
+            return throwIOException(execution, msg);
+    }
+    if(sclk < 0)
+        return throwIOException(execution, "CLK pin value cannot be -1 when in SPI Master mode");
+    if((msg = NativePin_CheckPin(sclk)) != NULL)
+        return throwIOException(execution, msg);
+    if(cs >= 0) {
+        if((msg = NativePin_CheckPin(cs)) != NULL)
+            return throwIOException(execution, msg);
+    }
+    return ERR_OK;
+}
+
 static FlintError checkSpiTransferCondition(FlintExecution &execution, EspSpiObject *spiObj) {
     int32_t spiId = spiObj->spiId();
     RETURN_IF_ERR(checkSpiId(execution, spiId));
@@ -142,6 +166,8 @@ static FlintError nativeOpen(FlintExecution &execution) {
             return throwIOException(execution, "Access is denied");
         return throwIOException(execution, "SPI is already open");
     }
+
+    RETURN_IF_ERR(checkSpiPin(execution, spiObj));
 
     int32_t mode = spiObj->mode();
 
