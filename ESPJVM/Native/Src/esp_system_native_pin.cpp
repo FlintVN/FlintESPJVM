@@ -27,7 +27,7 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if((12 <= pin) && (pin <= 17))
         return "Pins 12 to 17 have been used for SPI Flash";
 #elif CONFIG_IDF_TARGET_ESP32C6
-    else if(((24 <= pin) && (pin <= 26)) || ((28 << pin) && (pin <= 30))
+    else if(((24 <= pin) && (pin <= 26)) || ((28 <= pin) && (pin <= 30)))
         return "Pins 24, 25, 26, 28, 29 and 30 have been used for SPI Flash";
 #endif
     return NULL;
