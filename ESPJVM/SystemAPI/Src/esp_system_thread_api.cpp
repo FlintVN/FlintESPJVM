@@ -53,7 +53,8 @@ void FlintAPI::Thread::terminate(void *threadHandle) {
 }
 
 void FlintAPI::Thread::sleep(uint32_t ms) {
-    vTaskDelay(ms / portTICK_PERIOD_MS);
+    TickType_t tick = pdMS_TO_TICKS(ms);
+    vTaskDelay((tick < 1) ? 1 : tick);
 }
 
 void FlintAPI::Thread::yield(void) {
