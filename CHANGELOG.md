@@ -1,7 +1,12 @@
 # Change Log
 ## V0.0.10
-- Update FlintJVM to [V1.1.6](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.6)
-  
+- Update to [FlintJVM V1.1.6](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.6)
+  - Fix VM crash when native method not found.
+  - Fix stack trace with wrong PC address when debugging.
+  - Fix stuck at Flint::terminate for single core chips.
+  - Fixed VM throwing wrong type for some exceptions or not displaying messages.
+- Update to [FlintJDK V0.0.8](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.8).
+- Update to [FlintESPJDK V0.0.6](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.6).
 - Fix WiFi.getAPinfo native method returning wrong value.
 - Update native method for esp.machine.SpiMaster to match with new FlintESPJDK and check validity for SPI Pin.
 - Implement esp.machine.Pin validity check when Pin.setMode is called.
