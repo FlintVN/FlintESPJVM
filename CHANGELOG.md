@@ -1,4 +1,11 @@
 # Change Log
+## V0.0.10
+- Update FlintJVM to [V1.1.6](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.6)
+  
+- Fix WiFi.getAPinfo native method returning wrong value.
+- Update native method for esp.machine.SpiMaster to match with new FlintESPJDK and check validity for SPI Pin.
+- Implement esp.machine.Pin validity check when Pin.setMode is called.
+- Fix bug not working on ESP32-C6.
 ## V0.0.9
 - Update FlintJVM to [V1.1.5](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.5)
   - Fix method not found in invokeInterface (bridge method).
