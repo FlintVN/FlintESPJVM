@@ -2,8 +2,8 @@ set(priv_requires fatfs console esp_timer nvs_flash driver wear_levelling esp_pa
 
 idf_component_register(
     SRCS "../../../ESPJVM/User/Src/main.cpp"
-    SRCS "../../../ESPJVM/User/Src/esp_board_esp32.cpp"
-    SRCS "../../../ESPJVM/User/Src/esp_uart_debugger.cpp"
+    SRCS "../../../ESPJVM/User/Src/esp_board_esp32_c6.cpp"
+    SRCS "../../../ESPJVM/User/Src/esp_usb_serial_jtag_debugger.cpp"
 
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_api.cpp"
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_io_api.cpp"
