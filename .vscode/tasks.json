@@ -10,31 +10,7 @@
             "windows": {"command": "Tools/rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"}
         },
         {
-            "label": "Build Release",
-            "group": "build",
-            "type": "shell",
-            "dependsOrder": "sequence",
-            "dependsOn": ["Clean"],
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
-            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
-            "windows": {
-                "command": [
-                    "${env:IDF_PATH}/export.bat", "&&",
-                    "cd ESP32 && idf.py build", "&&",
-                    "cd ../ESP32-S2FN4R2 && idf.py build", "&&",
-                    "cd ../ESP32-S3FH4R2 && idf.py build", "&&",
-                    "cd ../ESP32-S3N4RX && idf.py build", "&&",
-                    "cd ../ESP32-S3N8RX && idf.py build", "&&",
-                    "cd ../ESP32-S3N16RX && idf.py build", "&&",
-                    "cd ../ESP32-C3FH4 && idf.py build", "&&",
-                    "cd ../ESP32-C6FH4 && idf.py build", "&&",
-                    "cd ../ESP32-C6FH8 && idf.py build"
-                ],
-                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
-            }
-        },
-        {
-            "label": "Build for generic only",
+            "label": "Build ESP32",
             "group": "build",
             "type": "shell",
             "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32"},
@@ -45,6 +21,128 @@
             },
             "presentation": {"reveal": "always", "clear": true},
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-C3FH4",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C3FH4"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-C6FH4",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C6FH4"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-C6FH8",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C6FH8"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-S2FN4R2",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S2FN4R2"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-S3FH4R2",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3FH4R2"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-S3N4RX",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N4RX"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-S3N8RX",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N8RX"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ESP32-S3N16RX",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N16RX"},
+            "command": ". ${env:IDF_PATH}/export.sh && idf.py build",
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py build",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build All",
+            "group": "build",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean",
+                "Build ESP32",
+                "Build ESP32-C3FH4",
+                "Build ESP32-C6FH4",
+                "Build ESP32-C6FH8",
+                "Build ESP32-S2FN4R2",
+                "Build ESP32-S3FH4R2",
+                "Build ESP32-S3N4RX",
+                "Build ESP32-S3N8RX",
+                "Build ESP32-S3N16RX"
+            ]
         }
     ]
 }
