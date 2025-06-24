@@ -24,6 +24,8 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if((26 <= pin) && (pin <= 32))
         return "Pins 26 to 32 have been used for SPI Flash and PSRAM";
 #elif CONFIG_IDF_TARGET_ESP32C3
+    else if(pin == 18 || pin == 19)
+        return "Pin 18 and 19 have been used for debugging (USB-JTAG)";
     else if((12 <= pin) && (pin <= 17))
         return "Pins 12 to 17 have been used for SPI Flash";
 #elif CONFIG_IDF_TARGET_ESP32C6
