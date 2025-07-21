@@ -49,6 +49,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_long.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_double.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_mutex.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_throw_support.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_character_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_class_class.cpp"
