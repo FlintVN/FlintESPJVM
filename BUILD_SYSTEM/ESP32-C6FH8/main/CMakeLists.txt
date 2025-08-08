@@ -58,7 +58,6 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_print_stream_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_string_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_system_class.cpp"
-    SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_biginteger_class.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_array_class.cpp"
 
     INCLUDE_DIRS "../../../ESPJVM/User/Inc"
