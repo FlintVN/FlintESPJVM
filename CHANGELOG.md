@@ -1,6 +1,7 @@
 # Change Log
 ## V0.0.11
 - Fix bug not working on ESP32-C3.
+- Support esp.machine.Pin.toggle().
 ## V0.0.10
 - Update to [FlintJVM V1.1.6](https://github.com/FlintVN/FlintJVM/releases/tag/V1.1.6)
   - Fix VM crash when native method not found.
