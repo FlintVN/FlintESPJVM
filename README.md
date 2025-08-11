@@ -27,7 +27,8 @@ To develop Java applications for FlintESPJVM:
 - Debugging: Install the FlintJVM Debug extension in VS Code.
 
 Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, which provides a simple and clear template to help you get started with building Java apps for FlintJVM.
-### 4. Cloning the Repository
+### 4. Dependencies and Cloning
+- This project requires ESP-IDF v5.5.0 or later to build.
 - Run the following command to clone this repository and include all dependent submodules:
 ```sh
 > git clone --recurse-submodules https://github.com/FlintVN/FlintESPJVM.git
