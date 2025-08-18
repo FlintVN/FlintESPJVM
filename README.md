@@ -33,5 +33,19 @@ Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, wh
 ```sh
 > git clone --recurse-submodules https://github.com/FlintVN/FlintESPJVM.git
 ```
+### 5. Benchmark
+Below are the performance benchmarks of several different programming languages on the ESP32, focusing on.
+- Execution time of 10 million iterations using `for` and `while` loops.
+- Maximum toggling frequency of GPIO when driven by the CPU.
+
+  | Platform                     | `for` loop (10M) | `while` loop (10M) | GPIO toggle frequency |
+  | ---------------------------- | ---------------- | ------------------ | --------------------- |
+  | **C/IDF v5.5.0**             | 375 ms           | 375 ms             | 2.2 MHz               |
+  | **Java/FlintESPJVM v0.0.11** | 9254 ms          | 9254 ms            | 295 KHz               |
+  | **MicroPython v1.26.0**      | 43677 ms         | 79582 ms           | 107 KHz               |
+  | **C#/NanoFramework v1.12.4** | 77656 ms         | 77660 ms           | 2.4 KHz               |
+
+The source code of this test can be viewed at [ESP32-Perfomance](https://github.com/FlintVN/ESP32-Perfomance).
+
 ---
 *Elevate your ESP32 projects by harnessing the robustness of Java with FlintESPJVM.*
