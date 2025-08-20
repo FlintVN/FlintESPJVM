@@ -34,13 +34,13 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if(((24 <= pin) && (pin <= 26)) || ((28 <= pin) && (pin <= 30)))
         return "Pins 24, 25, 26, 28, 29 and 30 have been used for SPI Flash";
 #endif
-    return NULL;
+    return NULL_PTR;
 }
 
 void NativePin_Reset(Flint &flint) {
     ((void)flint);
     for(uint8_t i = 0; (SOC_GPIO_VALID_GPIO_MASK >> i); i++) {
-        if(NativePin_CheckPin(i) == NULL)
+        if(NativePin_CheckPin(i) == NULL_PTR)
             gpio_reset_pin((gpio_num_t)i);
     }
 }

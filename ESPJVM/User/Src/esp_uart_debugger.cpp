@@ -5,7 +5,7 @@
 #include "driver/uart.h"
 #include "esp_debugger.h"
 
-EspDebugger *EspDebugger::espDbgInstance = 0;
+EspDebugger *EspDebugger::espDbgInstance = NULL_PTR;
 
 EspDebugger::EspDebugger(Flint &flint) : FlintDebugger(flint) {
 

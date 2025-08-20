@@ -5,7 +5,7 @@
 #include "flint_system_api.h"
 
 void *FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
-    TaskHandle_t xHandle = NULL;
+    TaskHandle_t xHandle = NULL_PTR;
     xTaskCreate(task, "FlintJavaThread", stackSize ? stackSize : 5120, param, tskIDLE_PRIORITY + 1, &xHandle);
     return (void *)xHandle;
 }

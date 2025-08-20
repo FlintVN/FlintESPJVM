@@ -20,8 +20,8 @@ static FlintError checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, u
 }
 
 static FlintError checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
-    if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
-        if(pinsObj == NULL)
+    if((pinsObj == NULL_PTR) || (arrayLength < 1) || (arrayLength > 32)) {
+        if(pinsObj == NULL_PTR)
             return throwNullPointerException(execution, "pins array cannot be null object");
         else
             return throwIOException(execution, "The pin number must be from 1 to 32");

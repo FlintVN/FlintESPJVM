@@ -58,8 +58,8 @@ static bool NativeSPI_IsOpen(int32_t spiId) {
 
 static esp_err_t NativeSPI_Transfer(int32_t spiId, FlintInt8Array *txBuff, int32_t txOff, FlintInt8Array *rxBuff, int32_t rxOff, int32_t length) {
     spi_transaction_t t = {};
-    int8_t *txData = txBuff ? &txBuff->getData()[txOff] : NULL;
-    int8_t *rxData = rxBuff ? &rxBuff->getData()[rxOff] : NULL;
+    int8_t *txData = txBuff ? &txBuff->getData()[txOff] : NULL_PTR;
+    int8_t *rxData = rxBuff ? &rxBuff->getData()[rxOff] : NULL_PTR;
     t.length = length * 8;
     t.tx_buffer = txData;
     t.rx_buffer = rxData;
@@ -71,8 +71,8 @@ static void NativeSPI_Close(int32_t spiId) {
         int32_t index = spiId - 1;
         spi_bus_remove_device(espSpiHandle[index].handle);
         spi_bus_free((spi_host_device_t)spiId);
-        espSpiHandle[index].handle = 0;
-        espSpiHandle[index].spiObj = 0;
+        espSpiHandle[index].handle = NULL_PTR;
+        espSpiHandle[index].spiObj = NULL_PTR;
     }
 }
 
@@ -102,15 +102,15 @@ static FlintError checkSpiPin(FlintExecution &execution, EspSpiObject *spiObj) {
     if(mosi < 0)
         return throwIOException(execution, "MOSI pin value cannot be -1 when in SPI Master mode");
     if(miso >= 0) {
-        if((msg = NativePin_CheckPin(miso)) != NULL)
+        if((msg = NativePin_CheckPin(miso)) != NULL_PTR)
             return throwIOException(execution, msg);
     }
     if(sclk < 0)
         return throwIOException(execution, "CLK pin value cannot be -1 when in SPI Master mode");
-    if((msg = NativePin_CheckPin(sclk)) != NULL)
+    if((msg = NativePin_CheckPin(sclk)) != NULL_PTR)
         return throwIOException(execution, msg);
     if(cs >= 0) {
-        if((msg = NativePin_CheckPin(cs)) != NULL)
+        if((msg = NativePin_CheckPin(cs)) != NULL_PTR)
             return throwIOException(execution, msg);
     }
     return ERR_OK;
@@ -233,7 +233,7 @@ static FlintError nativeReadWrite(FlintExecution &execution) {
     EspSpiObject *spiObj = (EspSpiObject *)execution.stackPopObject();
 
     RETURN_IF_ERR(checkSpiTransferCondition(execution, spiObj));
-    if((txBuff == NULL) && (rxBuff == NULL))
+    if((txBuff == NULL_PTR) && (rxBuff == NULL_PTR))
         return throwIllegalArgumentException(execution);
     RETURN_IF_ERR(checkSpiInputParam(execution, txBuff, txOff, length));
     RETURN_IF_ERR(checkSpiInputParam(execution, rxBuff, rxOff, length));

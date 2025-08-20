@@ -20,7 +20,7 @@ void FlintAPI::System::free(void *p) {
 }
 
 bool FlintAPI::System::isInHeapRegion(void *addr) {
-    return find_containing_heap(addr) != NULL;
+    return find_containing_heap(addr) != NULL_PTR;
 }
 
 void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {

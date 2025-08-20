@@ -30,8 +30,8 @@ static const wifi_auth_mode_t authValueList[] = {
 static FlintError checkParams(FlintExecution &execution, FlintJavaString *ssid, FlintJavaString *password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList))
         return throwIOException(execution, "Authentication mode is invalid");
-    if((ssid == NULL) || ((password == NULL) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
-        if(ssid == NULL)
+    if((ssid == NULL_PTR) || ((password == NULL_PTR) && (authValueList[authMode] != WIFI_AUTH_OPEN))) {
+        if(ssid == NULL_PTR)
             return throwNullPointerException(execution, "ssid cannot be null object");
         else
             return throwNullPointerException(execution, "password cannot be null object");
@@ -133,7 +133,7 @@ static FlintError nativeGetAPinfo(FlintExecution &execution) {
         execution.stackPushObject(obj);
     }
     else
-        execution.stackPushObject(0);
+        execution.stackPushObject(NULL_PTR);
     return ERR_OK;
 }
 
@@ -186,7 +186,7 @@ static FlintError nativeSoftAPdisconnect(FlintExecution &execution) {
 static FlintError nativeStartScan(FlintExecution &execution) {
     int32_t block = execution.stackPopInt32();
     execution.flint.lock();
-    esp_err_t ret = esp_wifi_scan_start(NULL, block ? true : false);
+    esp_err_t ret = esp_wifi_scan_start(NULL_PTR, block ? true : false);
     execution.flint.unlock();
 
     return checkReturn(execution, ret);
@@ -199,7 +199,7 @@ static FlintError nativeGetScanResult(FlintExecution &execution) {
     RETURN_IF_ERR(checkReturn(execution, ret));
     
     if(count == 0) {
-        execution.stackPushObject(NULL);
+        execution.stackPushObject(NULL_PTR);
         return ERR_OK;
     }
 

@@ -78,7 +78,7 @@ void Board_Init(void) {
     USB_DeviceInit(usbMode);
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
     if(usbMode == USB_CDC_MSC)
-        vTaskDelete(NULL);
+        vTaskDelete(NULL_PTR);
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     WiFi_Init();
 }

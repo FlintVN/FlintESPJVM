@@ -50,7 +50,7 @@ FlintFileResult FlintAPI::IO::finfo(const char *fileName, uint32_t *size, int64_
         }
     }
     else
-        ret = f_stat(fileName, NULL);
+        ret = f_stat(fileName, NULL_PTR);
     return convertFileResult(ret);
 }
 
@@ -122,7 +122,7 @@ void *FlintAPI::IO::opendir(const char *dirName) {
         return (void *)dir;
     else {
         FlintAPI::System::free(dir);
-        return NULL;
+        return NULL_PTR;
     }
 }
 

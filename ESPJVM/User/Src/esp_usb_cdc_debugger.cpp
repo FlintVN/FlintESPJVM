@@ -6,9 +6,9 @@
 #include <freertos/task.h>
 #include "esp_debugger.h"
 
-static SemaphoreHandle_t cdcRxSemaphore = NULL;
+static SemaphoreHandle_t cdcRxSemaphore = NULL_PTR;
 
-EspDebugger *EspDebugger::espDbgInstance = 0;
+EspDebugger *EspDebugger::espDbgInstance = NULL_PTR;
 
 EspDebugger::EspDebugger(Flint &flint) : FlintDebugger(flint) {
 
@@ -34,7 +34,7 @@ bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
 }
 
 static void cdcRxCallback(int itf, cdcacm_event_t *event) {
-    xSemaphoreGiveFromISR(cdcRxSemaphore, NULL);
+    xSemaphoreGiveFromISR(cdcRxSemaphore, NULL_PTR);
 }
 
 void EspDebugger::receiveTask(void) {
@@ -43,7 +43,7 @@ void EspDebugger::receiveTask(void) {
     uint32_t rxDataLengthReceived = 0;
     TickType_t startTick = xTaskGetTickCount();
 
-    if(cdcRxSemaphore == NULL)
+    if(cdcRxSemaphore == NULL_PTR)
         cdcRxSemaphore = xSemaphoreCreateBinary();
 
     tinyusb_cdcacm_register_callback(TINYUSB_CDC_ACM_0, CDC_EVENT_RX, &cdcRxCallback);

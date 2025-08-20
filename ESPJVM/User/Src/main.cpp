@@ -24,10 +24,10 @@ extern "C" void app_main() {
     EspDebugger &dbg = EspDebugger::getInstance(flint);
 
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo("main.class", NULL, NULL) == FILE_RESULT_OK)
+        if(FlintAPI::IO::finfo("main.class", NULL_PTR, NULL_PTR) == FILE_RESULT_OK)
             flint.runToMain("main");
     }
 
-    vTaskPrioritySet(NULL, 2);
+    vTaskPrioritySet(NULL_PTR, 2);
     dbg.receiveTask();
 }
