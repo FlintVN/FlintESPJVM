@@ -1,12 +1,11 @@
 
 #include <string.h>
-#include "flint.h"
 #include "sdkconfig.h"
 #include "soc/gpio_reg.h"
 #include "driver/gpio.h"
+#include "flint_java_object.h"
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
-#include "flint_throw_support.h"
 
 const char *NativePin_CheckPin(int32_t pin) {
     if((1ULL << pin) & ~SOC_GPIO_VALID_GPIO_MASK)
@@ -34,29 +33,27 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if(((24 <= pin) && (pin <= 26)) || ((28 <= pin) && (pin <= 30)))
         return "Pins 24, 25, 26, 28, 29 and 30 have been used for SPI Flash";
 #endif
-    return NULL_PTR;
+    return NULL;
 }
 
-void NativePin_Reset(Flint &flint) {
-    ((void)flint);
+void NativePin_Reset(void) {
     for(uint8_t i = 0; (SOC_GPIO_VALID_GPIO_MASK >> i); i++) {
-        if(NativePin_CheckPin(i) == NULL_PTR)
+        if(NativePin_CheckPin(i) == NULL)
             gpio_reset_pin((gpio_num_t)i);
     }
 }
 
-static FlintError checkPin(FlintExecution &execution, int32_t pin) {
+static bool checkPin(FNIEnv *env, int32_t pin) {
     const char *msg = NativePin_CheckPin(pin);
-    if(msg)
-        return throwIOException(execution, msg);
-    return ERR_OK;
+    if(msg) {
+        env->throwNew(env->findClass("java/io/IOException"), msg);
+        return false;
+    }
+    return true;
 }
 
-static FlintError nativeSetMode(FlintExecution &execution) {
-    int32_t mode = execution.stackPopInt32();
-    int32_t pin = execution.stackPopInt32();
-
-    RETURN_IF_ERR(checkPin(execution, pin));
+jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
+    if(!checkPin(env, pin)) return;
 
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;
@@ -87,33 +84,28 @@ static FlintError nativeSetMode(FlintExecution &execution) {
             break;
     }
     if(gpio_config(&io_conf) != ESP_OK)
-        return throwIOException(execution, "Error while configuring the pin");
-    return ERR_OK;
+        env->throwNew(env->findClass("java/io/IOException"));
 }
 
-static FlintError nativeRead(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+jbool nativePinRead(FNIEnv *env, jobject obj) {
+    int32_t pin = obj->getField32ByIndex(0)->value;
 
     #ifdef GPIO_IN1_REG
     {
         if(pin < 32)
-            execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
+            return (REG_READ(GPIO_IN_REG) & (1 << pin)) ? true : false;
         else
-            execution.stackPushInt32(REG_READ(GPIO_IN1_REG) & (1 << (pin - 32)) ? 1 : 0);
+            return (REG_READ(GPIO_IN1_REG) & (1 << (pin - 32))) ? true : false;
     }
     #else
     {
-        execution.stackPushInt32(REG_READ(GPIO_IN_REG) & (1 << pin) ? 1 : 0);
+        return (REG_READ(GPIO_IN_REG) & (1 << pin)) ? true : false;
     }
     #endif
-    return ERR_OK;
 }
 
-static FlintError nativeWrite(FlintExecution &execution) {
-    int32_t level = execution.stackPopInt32();
-    FlintJavaObject *obj = execution.stackPopObject();
-    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
+    int32_t pin = obj->getField32ByIndex(0)->value;
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -138,12 +130,10 @@ static FlintError nativeWrite(FlintExecution &execution) {
             REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
     }
     #endif
-    return ERR_OK;
 }
 
-static FlintError nativeSet(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+jvoid nativePinSet(FNIEnv *env, jobject obj) {
+    int32_t pin = obj->getField32ByIndex(0)->value;
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -157,12 +147,10 @@ static FlintError nativeSet(FlintExecution &execution) {
         REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
     }
     #endif
-    return ERR_OK;
 }
 
-static FlintError nativeReset(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+jvoid nativePinReset(FNIEnv *env, jobject obj) {
+    int32_t pin = obj->getField32ByIndex(0)->value;
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -176,12 +164,10 @@ static FlintError nativeReset(FlintExecution &execution) {
         REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
     }
     #endif
-    return ERR_OK;
 }
 
-static FlintError nativeToggle(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    int32_t pin = obj->getFields().getFieldData32ByIndex(0)->value;
+jvoid nativePinToggle(FNIEnv *env, jobject obj) {
+    int32_t pin = obj->getField32ByIndex(0)->value;
 
     #ifdef GPIO_OUT1_REG
     {
@@ -209,16 +195,4 @@ static FlintError nativeToggle(FlintExecution &execution) {
             REG_WRITE(GPIO_OUT_W1TS_REG, mask);
     }
     #endif
-    return ERR_OK;
 }
-
-static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode", "\x05\x00\xE3\xDD""(II)V", nativeSetMode),
-    NATIVE_METHOD("\x04\x00\xDC\xC7""read",    "\x03\x00\x91\x9C""()Z",   nativeRead),
-    NATIVE_METHOD("\x05\x00\x03\xBB""write",   "\x04\x00\x49\xC6""(Z)V",  nativeWrite),
-    NATIVE_METHOD("\x03\x00\x54\x93""set",     "\x03\x00\x91\x99""()V",   nativeSet),
-    NATIVE_METHOD("\x05\x00\x27\x94""reset",   "\x03\x00\x91\x99""()V",   nativeReset),
-    NATIVE_METHOD("\x06\x00\x62\xD9""toggle",  "\x03\x00\x91\x99""()V",   nativeToggle),
-};
-
-const FlintNativeClass PIN_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x0F\x00\x74\x10""esp/machine/Pin", methods);

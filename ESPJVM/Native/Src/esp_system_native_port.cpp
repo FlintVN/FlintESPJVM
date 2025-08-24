@@ -7,34 +7,37 @@
 #include "flint_system_api.h"
 #include "esp_system_native_pin.h"
 #include "esp_system_native_port.h"
-#include "flint_throw_support.h"
 
-static FlintError checkPin(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
+static bool checkPin(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
         const char *msg = NativePin_CheckPin(pins[i]);
-        if(msg)
-            return throwIOException(execution, msg);
+        if(msg) {
+            env->throwNew(env->findClass("java/io/IOException"), msg);
+            return false;
+        }
     }
-    return ERR_OK;
+    return true;
 }
 
-static FlintError checkParams(FlintExecution &execution, FlintInt8Array *pinsObj, uint32_t arrayLength) {
-    if((pinsObj == NULL_PTR) || (arrayLength < 1) || (arrayLength > 32)) {
-        if(pinsObj == NULL_PTR)
-            return throwNullPointerException(execution, "pins array cannot be null object");
-        else
-            return throwIOException(execution, "The pin number must be from 1 to 32");
+static bool checkParams(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
+    if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
+        if(pinsObj == NULL) {
+            env->throwNew(env->findClass("java/lang/NullPointerException"), "pins array cannot be null object");
+            return false;
+        }
+        else {
+            env->throwNew(env->findClass("java/io/IOException"), "The pin number must be from 1 to 32");
+            return false;
+        }
     }
-    return checkPin(execution, pinsObj, arrayLength);
+    return checkPin(env, pinsObj, arrayLength);
 }
 
-static FlintError nativeSetMode(FlintExecution &execution) {
-    int32_t mode = execution.stackPopInt32();
-    FlintInt8Array *pinsObj = (FlintInt8Array *)execution.stackPopObject();
+jvoid nativePortSetMode(FNIEnv *env, jbyteArray pinsObj, jint mode) {
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    RETURN_IF_ERR(checkParams(execution, pinsObj, arrayLength));
+    if(!checkParams(env, pinsObj, arrayLength)) return;
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint64_t pinMask = 0;
@@ -70,17 +73,12 @@ static FlintError nativeSetMode(FlintExecution &execution) {
             break;
     }
     if(gpio_config(&io_conf) != ESP_OK)
-        return throwIOException(execution, "Error while configuring the pin");
-    return ERR_OK;
+        env->throwNew(env->findClass("java/io/IOException"), "Error while configuring the pin");
 }
 
-static FlintError nativeRead(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
-    if(!pinsObj) {
-        execution.stackPushInt32(0);
-        return ERR_OK;
-    }
+jint nativePortRead(FNIEnv *env, jobject obj) {
+    jbyteArray pinsObj = (jbyteArray)obj->getFieldObjByIndex(0)->value;
+    if(pinsObj == NULL) return 0;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint32_t value = 0;
@@ -99,16 +97,12 @@ static FlintError nativeRead(FlintExecution &execution) {
             value |= ((REG_READ(GPIO_IN_REG) & (1 << pins[i])) ? 1 : 0) << i;
     }
     #endif
-    execution.stackPushInt32(value);
-    return ERR_OK;
+    return value;
 }
 
-static FlintError nativeWrite(FlintExecution &execution) {
-    uint32_t value = execution.stackPopInt32();
-    FlintJavaObject *obj = execution.stackPopObject();
-    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
-    if(!pinsObj)
-        return ERR_OK;
+jvoid nativePortWrite(FNIEnv *env, jobject obj, jint value) {
+    JInt8Array *pinsObj = (JInt8Array *)obj->getFieldObjByIndex(0)->value;
+    if(pinsObj == NULL) return;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     #ifdef GPIO_OUT1_W1TC_REG
@@ -140,14 +134,11 @@ static FlintError nativeWrite(FlintExecution &execution) {
         REG_WRITE(GPIO_OUT_W1TS_REG, setMask);
     }
     #endif
-    return ERR_OK;
 }
 
-static FlintError nativeReset(FlintExecution &execution) {
-    FlintJavaObject *obj = execution.stackPopObject();
-    FlintInt8Array *pinsObj = (FlintInt8Array *)obj->getFields().getFieldObjectByIndex(0)->object;
-    if(!pinsObj)
-        return ERR_OK;
+jvoid nativePortReset(FNIEnv *env, jobject obj) {
+    jbyteArray pinsObj = (jbyteArray)obj->getFieldObjByIndex(0)->value;
+    if(!pinsObj) return;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     #ifdef GPIO_OUT1_W1TC_REG
@@ -166,14 +157,4 @@ static FlintError nativeReset(FlintExecution &execution) {
         REG_WRITE(GPIO_OUT_W1TC_REG, clearMask);
     }
     #endif
-    return ERR_OK;
 }
-
-static const FlintNativeMethod methods[] = {
-    NATIVE_METHOD("\x07\x00\xD2\x5C""setMode", "\x06\x00\xC6\x01""([BI)V", nativeSetMode),
-    NATIVE_METHOD("\x04\x00\xDC\xC7""read",    "\x03\x00\xD0\x51""()I",    nativeRead),
-    NATIVE_METHOD("\x05\x00\x03\xBB""write",   "\x04\x00\xB8\x03""(I)V",   nativeWrite),
-    NATIVE_METHOD("\x05\x00\x27\x94""reset",   "\x03\x00\x91\x99""()V",    nativeReset),
-};
-
-const FlintNativeClass PORT_CLASS = NATIVE_CLASS(*(const FlintConstUtf8 *)"\x10\x00\xB8\x7E""esp/machine/Port", methods);

@@ -3,23 +3,24 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include "driver/uart.h"
+#include "flint.h"
 #include "esp_debugger.h"
 
-EspDebugger *EspDebugger::espDbgInstance = NULL_PTR;
+EspDbg *EspDbg::espDbgInstance = NULL;
 
-EspDebugger::EspDebugger(Flint &flint) : FlintDebugger(flint) {
+EspDbg::EspDbg(void) : FDbg() {
 
 }
 
-EspDebugger &EspDebugger::getInstance(Flint &flint) {
+EspDbg *EspDbg::getInstance(void) {
     if(espDbgInstance == 0) {
-        espDbgInstance = (EspDebugger *)Flint::malloc(sizeof(EspDebugger));
-        new (espDbgInstance)EspDebugger(flint);
+        espDbgInstance = (EspDbg *)Flint::malloc(NULL, sizeof(EspDbg));
+        new (espDbgInstance)EspDbg();
     }
-    return *espDbgInstance;
+    return espDbgInstance;
 }
 
-bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
+bool EspDbg::sendData(uint8_t *data, uint32_t length) {
     while(length) {
         size_t byteSent = uart_write_bytes(UART_NUM_0, data, length);
         if(byteSent == 0)
@@ -30,7 +31,7 @@ bool EspDebugger::sendData(uint8_t *data, uint32_t length) {
     return true;
 }
 
-void EspDebugger::receiveTask(void) {
+void EspDbg::receiveTask(void) {
     static uint8_t rxData[1024 + 1];
     static QueueHandle_t uartQueue;
     uint32_t rxDataToltalLength = 0;
@@ -63,6 +64,6 @@ void EspDebugger::receiveTask(void) {
     }
 }
 
-EspDebugger::~EspDebugger(void) {
+EspDbg::~EspDbg(void) {
 
 }

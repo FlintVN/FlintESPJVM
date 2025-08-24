@@ -5,16 +5,16 @@
 #include "flint.h"
 #include "flint_system_api.h"
 
-class EspDebugger : public FlintDebugger {
+class EspDbg : public FDbg {
 private:
-    static EspDebugger *espDbgInstance;
-    EspDebugger(Flint &flint);
-    EspDebugger(const EspDebugger &) = delete;
-    void operator=(const EspDebugger &) = delete;
+    static EspDbg *espDbgInstance;
+    EspDbg(void);
+    EspDbg(const EspDbg &) = delete;
+    void operator=(const EspDbg &) = delete;
 
-    ~EspDebugger(void);
+    ~EspDbg(void);
 public:
-    static EspDebugger &getInstance(Flint &flint);
+    static EspDbg *getInstance(void);
     bool sendData(uint8_t *data, uint32_t length);
     void receiveTask(void);
 };

@@ -20,14 +20,12 @@ extern "C" void app_main() {
 
     ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
 
-    Flint &flint = Flint::getInstance();
-    EspDebugger &dbg = EspDebugger::getInstance(flint);
-
+    EspDbg *dbg = EspDbg::getInstance();
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo("main.class", NULL_PTR, NULL_PTR) == FILE_RESULT_OK)
-            flint.runToMain("main");
+        if(FlintAPI::IO::finfo("main.class", NULL, NULL) == FILE_RESULT_OK)
+            Flint::runToMain("main");
     }
 
-    vTaskPrioritySet(NULL_PTR, 2);
-    dbg.receiveTask();
+    vTaskPrioritySet(NULL, 2);
+    dbg->receiveTask();
 }

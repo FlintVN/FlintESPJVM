@@ -266,8 +266,8 @@ static void storage_mount_changed_cb(tinyusb_msc_event_t *event) {
 }
 
 static esp_err_t storage_init_spiflash(wl_handle_t *wl_handle) {
-    const esp_partition_t *data_partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, NULL_PTR);
-    if (data_partition == NULL_PTR)
+    const esp_partition_t *data_partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, NULL);
+    if (data_partition == NULL)
         return ESP_ERR_NOT_FOUND;
 
     return wl_mount(data_partition, wl_handle);
@@ -286,10 +286,10 @@ void USB_DeviceInit(USB_Mode mode) {
         .usb_dev = TINYUSB_USBDEV_0,
         .cdc_port = TINYUSB_CDC_ACM_0,
         .rx_unread_buf_sz = 64,
-        .callback_rx = NULL_PTR,
-        .callback_rx_wanted_char = NULL_PTR,
-        .callback_line_state_changed = NULL_PTR,
-        .callback_line_coding_changed = NULL_PTR
+        .callback_rx = NULL,
+        .callback_rx_wanted_char = NULL,
+        .callback_line_state_changed = NULL,
+        .callback_line_coding_changed = NULL
     };
     ESP_ERROR_CHECK(tusb_cdc_acm_init(&acmCfg));
 

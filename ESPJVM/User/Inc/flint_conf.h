@@ -5,6 +5,9 @@
 #include "sdkconfig.h"
 #include "flint_common.h"
 
+#define KILO_BYTE(_value)           ((_value) * 1024)
+#define MEGA_BYTE(_value)           ((_value) * KILO_BYTE(1024))
+
 #if CONFIG_IDF_TARGET_ESP32
     #define FLINT_VARIANT_NAME      "ESP32 FlintJVM"
 #elif CONFIG_IDF_TARGET_ESP32C2
@@ -30,7 +33,7 @@
 #define FILE_NAME_BUFF_SIZE         128
 
 #define DEFAULT_STACK_SIZE          KILO_BYTE(5)
-#define OBJECT_SIZE_TO_GC           KILO_BYTE(10)
+#define OBJECT_COUNT_TO_GC          10000
 
 #define MAX_OF_BREAK_POINT          20
 #define DBG_TX_BUFFER_SIZE          512
