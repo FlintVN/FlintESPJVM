@@ -1,4 +1,9 @@
 # Change Log
+## V0.0.12
+- Update to compatible with [FlintJVM V2.0.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.0.0).
+- Update FlintJDK to [V0.0.10](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.10).
+- Update FlintESPJDK to [V0.0.8](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.8).
+- Compatible with [FlintJVMDebug V2.0.0](https://github.com/FlintVN/FlintJVMDebug/releases/tag/V2.0.0).
 ## V0.0.11
 - Fix bug not working on ESP32-C3.
 - Support esp.machine.Pin.toggle().
