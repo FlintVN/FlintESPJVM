@@ -1,4 +1,10 @@
 # Change Log
+## V0.0.13
+- Update FlintJVM to V2.0.1 to fix the following bugs:
+  - Fix bug in FNIEnv::newObjectArray.
+  - Fix Class.initClassName native method do not assign a value to Class.name.
+  - Minor performance optimizations for invoke instructions.
+  - Check static initialization before executing invokevirtual and invokeinterface instructions.
 ## V0.0.12
 - Update to compatible with [FlintJVM V2.0.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.0.0).
 - Update FlintJDK to [V0.0.10](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.10).
