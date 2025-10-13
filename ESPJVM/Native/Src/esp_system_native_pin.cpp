@@ -88,7 +88,7 @@ jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
 }
 
 jbool nativePinRead(FNIEnv *env, jobject obj) {
-    int32_t pin = obj->getField32ByIndex(0)->value;
+    int32_t pin = obj->getFieldByIndex(0)->getInt32();
 
     #ifdef GPIO_IN1_REG
     {
@@ -105,7 +105,7 @@ jbool nativePinRead(FNIEnv *env, jobject obj) {
 }
 
 jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
-    int32_t pin = obj->getField32ByIndex(0)->value;
+    int32_t pin = obj->getFieldByIndex(0)->getInt32();
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -133,7 +133,7 @@ jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
 }
 
 jvoid nativePinSet(FNIEnv *env, jobject obj) {
-    int32_t pin = obj->getField32ByIndex(0)->value;
+    int32_t pin = obj->getFieldByIndex(0)->getInt32();
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -150,7 +150,7 @@ jvoid nativePinSet(FNIEnv *env, jobject obj) {
 }
 
 jvoid nativePinReset(FNIEnv *env, jobject obj) {
-    int32_t pin = obj->getField32ByIndex(0)->value;
+    int32_t pin = obj->getFieldByIndex(0)->getInt32();
 
     #ifdef GPIO_OUT1_W1TC_REG
     {
@@ -167,7 +167,7 @@ jvoid nativePinReset(FNIEnv *env, jobject obj) {
 }
 
 jvoid nativePinToggle(FNIEnv *env, jobject obj) {
-    int32_t pin = obj->getField32ByIndex(0)->value;
+    int32_t pin = obj->getFieldByIndex(0)->getInt32();
 
     #ifdef GPIO_OUT1_REG
     {

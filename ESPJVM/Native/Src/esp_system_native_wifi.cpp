@@ -112,15 +112,15 @@ static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecor
     if(macArray == NULL) return NULL;
     memcpy(macArray->getData(), apRecord->bssid, 6);
 
-    aprObj->getFieldObj(env->exec, "mac")->value = macArray;
+    aprObj->getField(env->exec, "mac")->setObj(macArray);
     jstring ssid = env->newString((char *)apRecord->ssid);
     if(ssid == NULL) {
         env->freeObject(macArray);
         return NULL;
     }
-    aprObj->getFieldObj(env->exec, "ssid")->value = ssid;
-    aprObj->getField32(env->exec, "rssi")->value = apRecord->rssi;
-    aprObj->getField32(env->exec, "authMode")->value = apRecord->authmode;
+    aprObj->getField(env->exec, "ssid")->setObj(ssid);
+    aprObj->getField(env->exec, "rssi")->setInt32(apRecord->rssi);
+    aprObj->getField(env->exec, "authMode")->setInt32(apRecord->authmode);
 
     return aprObj;
 }

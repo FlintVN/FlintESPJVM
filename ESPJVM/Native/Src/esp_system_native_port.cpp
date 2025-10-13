@@ -77,7 +77,7 @@ jvoid nativePortSetMode(FNIEnv *env, jbyteArray pinsObj, jint mode) {
 }
 
 jint nativePortRead(FNIEnv *env, jobject obj) {
-    jbyteArray pinsObj = (jbyteArray)obj->getFieldObjByIndex(0)->value;
+    jbyteArray pinsObj = (jbyteArray)obj->getFieldByIndex(0)->getObj();
     if(pinsObj == NULL) return 0;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
@@ -101,7 +101,7 @@ jint nativePortRead(FNIEnv *env, jobject obj) {
 }
 
 jvoid nativePortWrite(FNIEnv *env, jobject obj, jint value) {
-    JInt8Array *pinsObj = (JInt8Array *)obj->getFieldObjByIndex(0)->value;
+    JInt8Array *pinsObj = (JInt8Array *)obj->getFieldByIndex(0)->getObj();
     if(pinsObj == NULL) return;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
@@ -137,7 +137,7 @@ jvoid nativePortWrite(FNIEnv *env, jobject obj, jint value) {
 }
 
 jvoid nativePortReset(FNIEnv *env, jobject obj) {
-    jbyteArray pinsObj = (jbyteArray)obj->getFieldObjByIndex(0)->value;
+    jbyteArray pinsObj = (jbyteArray)obj->getFieldByIndex(0)->getObj();
     if(!pinsObj) return;
     uint32_t arrayLength = pinsObj->getLength();
     uint8_t *pins = (uint8_t *)pinsObj->getData();
