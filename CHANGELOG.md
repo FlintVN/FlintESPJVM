@@ -1,4 +1,15 @@
 # Change Log
+## V0.0.14
+- Update FlintJVM to V2.1.0:
+  - Support call to java method in native interface.
+  - Fix bug where existing values ​​could not be found in FDict.
+  - Fix memory leak.
+  - Class.isHidden return false instead of throwing exception.
+- Update FlintJDK to V0.0.11:
+  - Fix bug for Integer.toString() and Long.toString() with MIN_VALUE.
+  - Add support Integer.getChars, Long.getChars and StringUTF16.getChars methods.
+  - Add java.lang.IllegalMonitorStateException and java.lang.StackOverflowError.
+  - Fix bug in Class.descriptorString method with void type.
 ## V0.0.13
 - Update FlintJVM to V2.0.1 to fix the following bugs:
   - Fix bug in FNIEnv::newObjectArray.
