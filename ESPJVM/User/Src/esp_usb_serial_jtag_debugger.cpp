@@ -37,13 +37,13 @@ void EspDbg::receiveTask(void) {
     TickType_t startTick = xTaskGetTickCount();
 
     while(1) {
+        TickType_t tick = xTaskGetTickCount();
+        if(rxDataLengthReceived > 0 && (tick - startTick) >= pdMS_TO_TICKS(100)) {
+            rxDataToltalLength = 0;
+            rxDataLengthReceived = 0;
+        }
         uint32_t rxSize = usb_serial_jtag_read_bytes(&rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, portMAX_DELAY);
         if(rxSize > 0) {
-            TickType_t tick = xTaskGetTickCount();
-            if((tick - startTick) >= pdMS_TO_TICKS(100)) {
-                rxDataToltalLength = 0;
-                rxDataLengthReceived = 0;
-            }
             rxDataLengthReceived += rxSize;
             if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4)
                 rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
