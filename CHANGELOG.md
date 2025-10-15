@@ -1,11 +1,14 @@
 # Change Log
+## V0.0.15
+- Update FlintJVM to [V2.1.1](https://github.com/FlintVN/FlintJVM/releases/tag/V2.1.1):
+  - Fix stuck in FMutex::lock with 1 core chips.
 ## V0.0.14
-- Update FlintJVM to V2.1.0:
+- Update FlintJVM to [V2.1.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.1.0):
   - Support call to java method in native interface.
   - Fix bug where existing values ​​could not be found in FDict.
   - Fix memory leak.
   - Class.isHidden return false instead of throwing exception.
-- Update FlintJDK to V0.0.11:
+- Update FlintJDK to [V0.0.11](https://github.com/FlintVN/FlintJDK/releases/tag/V0.0.11):
   - Fix bug for Integer.toString() and Long.toString() with MIN_VALUE.
   - Add support Integer.getChars, Long.getChars and StringUTF16.getChars methods.
   - Add java.lang.IllegalMonitorStateException and java.lang.StackOverflowError.
