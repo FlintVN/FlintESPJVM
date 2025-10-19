@@ -4,6 +4,8 @@
 #include "flint_common.h"
 #include "flint_system_api.h"
 
+using namespace FlintAPI::IO;
+
 static FileResult convertFileResult(FRESULT ret) {
     static const FileResult map[] = {
         [FR_OK] = FILE_RESULT_OK,
@@ -30,23 +32,32 @@ static FileResult convertFileResult(FRESULT ret) {
     return map[ret];
 }
 
-FileResult FlintAPI::IO::finfo(const char *fileName, uint32_t *size, int64_t *time) {
+FileResult FlintAPI::IO::finfo(const char *fileName, FileInfo *fileInfo) {
     FRESULT ret;
-    if(size || time) {
+    if(fileInfo != NULL) {
         FILINFO fno;
         ret = f_stat(fileName, &fno);
         if(ret == FR_OK) {
-            if(size)
-                *size = fno.fsize;
-            if(time) {
-                uint16_t year = (fno.fdate >> 9) + 1980;
-                uint8_t month = (fno.fdate >> 5) & 0x0F;
-                uint8_t day = fno.fdate & 0x1F;
-                uint8_t hour = fno.ftime >> 11;
-                uint8_t minute = (fno.ftime >> 5) & 0x3F;
-                uint8_t second = (fno.ftime & 0x1F) * 2;
-                *time = UnixTime(year, month, day, hour, minute, second);
+            uint16_t index = 0;
+            uint16_t year = (fno.fdate >> 9) + 1980;
+            uint8_t month = (fno.fdate >> 5) & 0x0F;
+            uint8_t day = fno.fdate & 0x1F;
+            uint8_t hour = fno.ftime >> 11;
+            uint8_t minute = (fno.ftime >> 5) & 0x3F;
+            uint8_t second = (fno.ftime & 0x1F) * 2;
+
+            fileInfo->attribute = fno.fattrib;
+            fileInfo->size = fno.fsize;
+            fileInfo->time = UnixTime(year, month, day, hour, minute, second);
+            while(fno.fname[index] != 0) {
+                if(index < (sizeof(fileInfo->name) - 1)) {
+                    fileInfo->name[index] = fno.fname[index];
+                    index++;
+                }
+                else
+                    return FILE_RESULT_ERR;
             }
+            fileInfo->name[index] = 0;
         }
     }
     else
@@ -57,15 +68,15 @@ FileResult FlintAPI::IO::finfo(const char *fileName, uint32_t *size, int64_t *ti
 FileHandle FlintAPI::IO::fopen(const char *fileName, FileMode mode) {
     char buff[6];
     uint32_t index = 0;
-    if(mode & (FLINT_FILE_CREATE_ALWAYS | FLINT_FILE_CREATE_NEW)) {
+    if(mode & (FILE_MODE_CREATE_ALWAYS | FILE_MODE_CREATE_NEW)) {
         buff[index++] = 'w';
-        if(mode & FLINT_FILE_CREATE_NEW)
+        if(mode & FILE_MODE_CREATE_NEW)
             buff[index++] = 'x';
     }
     else
         buff[index++] = 'r';
     buff[index++] = 'b';
-    if((mode & (FLINT_FILE_READ | FLINT_FILE_WRITE)) == (FLINT_FILE_READ | FLINT_FILE_WRITE))
+    if((mode & (FILE_MODE_READ | FILE_MODE_WRITE)) == (FILE_MODE_READ | FILE_MODE_WRITE))
         buff[index++] = '+';
     buff[index] = 0;
 
@@ -107,6 +118,10 @@ FileResult FlintAPI::IO::fremove(const char *fileName) {
     return convertFileResult(f_unlink(fileName));
 }
 
+FileResult FlintAPI::IO::frename(const char *oldName, const char *newName) {
+    return convertFileResult(f_rename(oldName, newName));
+}
+
 DirHandle FlintAPI::IO::opendir(const char *dirName) {
     FF_DIR *dir = (FF_DIR *)FlintAPI::System::malloc(sizeof(FF_DIR));
     FRESULT ret = f_opendir(dir, dirName);
@@ -118,7 +133,7 @@ DirHandle FlintAPI::IO::opendir(const char *dirName) {
     }
 }
 
-FileResult FlintAPI::IO::readdir(DirHandle handle, uint8_t *attribute, char *nameBuff, uint32_t buffSize, uint32_t *size, int64_t *time) {
+FileResult FlintAPI::IO::readdir(DirHandle handle, FileInfo *fileInfo) {
     FILINFO fno;
     FRESULT ret = f_readdir((FF_DIR *)handle, &fno);
     if(ret == FR_OK && fno.fname[0]) {
@@ -129,18 +144,19 @@ FileResult FlintAPI::IO::readdir(DirHandle handle, uint8_t *attribute, char *nam
         uint8_t hour = fno.ftime >> 11;
         uint8_t minute = (fno.ftime >> 5) & 0x3F;
         uint8_t second = (fno.ftime & 0x1F) * 2;
-        *attribute = fno.fattrib;
-        *size = fno.fsize;
-        *time = UnixTime(year, month, day, hour, minute, second);
-        while(fno.fname[index]) {
-            if(index < buffSize) {
-                nameBuff[index] = fno.fname[index];
+
+        fileInfo->attribute = fno.fattrib;
+        fileInfo->size = fno.fsize;
+        fileInfo->time = UnixTime(year, month, day, hour, minute, second);
+        while(fno.fname[index] != 0) {
+            if(index < (sizeof(fileInfo->name) - 1)) {
+                fileInfo->name[index] = fno.fname[index];
                 index++;
             }
             else
                 return FILE_RESULT_ERR;
         }
-        nameBuff[index] = 0;
+        fileInfo->name[index] = 0;
     }
     return convertFileResult(ret);
 }

@@ -51,9 +51,12 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_string.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_system.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_thread.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_io_file.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_character.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_reflection.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_print_stream.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_io_file_input_stream.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_io_file_output_stream.cpp"
 
     INCLUDE_DIRS "../../../ESPJVM/User/Inc"
     INCLUDE_DIRS "../../../ESPJVM/Native/Inc"

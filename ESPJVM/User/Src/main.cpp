@@ -22,7 +22,7 @@ extern "C" void app_main() {
 
     EspDbg *dbg = EspDbg::getInstance();
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo("main.class", NULL, NULL) == FILE_RESULT_OK)
+        if(FlintAPI::IO::finfo("main.class", NULL) == FlintAPI::IO::FILE_RESULT_OK)
             Flint::runToMain("main");
     }
 
