@@ -1,4 +1,12 @@
 # Change Log
+## V0.1.0
+- Update FlintJVM to [V2.2.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.1.1) and FlintJDK to [V0.1.0](https://github.com/FlintVN/FlintJDK/releases/tag/V0.1.0):
+  - Rename Character.toLower to Character.toLowerCase and Character.toUpper to Charactor.toUpperCase (both FlintJDK and FlintJVM).
+  - Fix issue for DBG_CMD_READ_FIELD in debugger when field is array (FlintJVM).
+  - Support for java.io.File, java.io.FileOutputStream and java.io.FileImputStream classes (both FlintJDK and FlintJVM).
+  - Add missing methods to java.lang.Math class (FlintJDK).
+  - Add support for Map.of, Map.ofEntries and Map.copyOf methods (FlintJDK).
+  - Add support for String.compareToIgnoreCase method (FlintJDK).
 ## V0.0.15
 - Update FlintJVM to [V2.1.1](https://github.com/FlintVN/FlintJVM/releases/tag/V2.1.1):
   - Fix stuck in FMutex::lock with 1 core chips.
