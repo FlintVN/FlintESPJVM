@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include "flint.h"
 #include "esp_vfs_fat.h"
 #include "flint_common.h"
 #include "flint_system_api.h"
@@ -47,7 +48,7 @@ FileResult FlintAPI::IO::finfo(const char *fileName, FileInfo *fileInfo) {
             uint8_t second = (fno.ftime & 0x1F) * 2;
 
             fileInfo->attribute = fno.fattrib;
-            fileInfo->size = fno.fsize;
+            fileInfo->size = (fileInfo->directory) ? 0 : fno.fsize;
             fileInfo->time = UnixTime(year, month, day, hour, minute, second);
             while(fno.fname[index] != 0) {
                 if(index < (sizeof(fileInfo->name) - 1)) {
@@ -66,51 +67,44 @@ FileResult FlintAPI::IO::finfo(const char *fileName, FileInfo *fileInfo) {
 }
 
 FileHandle FlintAPI::IO::fopen(const char *fileName, FileMode mode) {
-    char buff[6];
-    uint32_t index = 0;
-    if(mode & (FILE_MODE_CREATE_ALWAYS | FILE_MODE_CREATE_NEW)) {
-        buff[index++] = 'w';
-        if(mode & FILE_MODE_CREATE_NEW)
-            buff[index++] = 'x';
-    }
-    else
-        buff[index++] = 'r';
-    buff[index++] = 'b';
-    if((mode & (FILE_MODE_READ | FILE_MODE_WRITE)) == (FILE_MODE_READ | FILE_MODE_WRITE))
-        buff[index++] = '+';
-    buff[index] = 0;
-
-    return ::fopen(fileName, buff);
+    FIL *fp = (FIL *)Flint::malloc(NULL, sizeof(FIL));
+    if(fp == NULL) return NULL;
+    if(f_open(fp, fileName, (BYTE)mode) != FR_OK) return NULL;
+    return fp;
 }
 
 FileResult FlintAPI::IO::fread(FileHandle handle, void *buff, uint32_t btr, uint32_t *br) {
-    uint32_t temp = ::fread(buff, 1, btr, (FILE *)handle);
-    *br = temp;
-    if(temp != btr)
-        return FILE_RESULT_ERR;
-    return FILE_RESULT_OK;
+    UINT tmp;
+    FileResult ret = convertFileResult(f_read((FIL *)handle, buff, btr, &tmp));
+    *br = tmp;
+    return ret;
 }
 
 FileResult FlintAPI::IO::fwrite(FileHandle handle, void *buff, uint32_t btw, uint32_t *bw) {
-    uint32_t temp = ::fwrite(buff , 1, btw, (FILE *)handle);
-    *bw = temp;
-    if(temp != btw)
-        return FILE_RESULT_ERR;
-    return FILE_RESULT_OK;
+    UINT tmp;
+    FileResult ret = convertFileResult(f_write((FIL *)handle, buff, btw, &tmp));
+    *bw = tmp;
+    return ret;
+}
+
+uint32_t FlintAPI::IO::fsize(FileHandle handle) {
+    return f_size((FIL *)handle);
 }
 
 uint32_t FlintAPI::IO::ftell(FileHandle handle) {
-    return ::ftell((FILE *)handle);
+    return f_tell((FIL *)handle);
 }
 
 FileResult FlintAPI::IO::fseek(FileHandle handle, uint32_t offset) {
-    return ::fseek((FILE *)handle, offset, SEEK_SET) != 0 ? FILE_RESULT_ERR : FILE_RESULT_OK;
+    return convertFileResult(f_lseek((FIL *)handle, offset));
 }
 
 FileResult FlintAPI::IO::fclose(FileHandle handle) {
-    if(handle != 0)
-        if(::fclose((FILE *)handle) != 0)
-            return FILE_RESULT_ERR;
+    if(handle != NULL) {
+        FileResult ret = convertFileResult(f_close((FIL *)handle));
+        Flint::free(handle);
+        return ret;
+    }
     return FILE_RESULT_OK;
 }
 
@@ -123,12 +117,12 @@ FileResult FlintAPI::IO::frename(const char *oldName, const char *newName) {
 }
 
 DirHandle FlintAPI::IO::opendir(const char *dirName) {
-    FF_DIR *dir = (FF_DIR *)FlintAPI::System::malloc(sizeof(FF_DIR));
+    FF_DIR *dir = (FF_DIR *)Flint::malloc(NULL, sizeof(FF_DIR));
     FRESULT ret = f_opendir(dir, dirName);
     if(ret == FR_OK)
         return (void *)dir;
     else {
-        FlintAPI::System::free(dir);
+        Flint::free(dir);
         return NULL;
     }
 }
@@ -136,7 +130,7 @@ DirHandle FlintAPI::IO::opendir(const char *dirName) {
 FileResult FlintAPI::IO::readdir(DirHandle handle, FileInfo *fileInfo) {
     FILINFO fno;
     FRESULT ret = f_readdir((FF_DIR *)handle, &fno);
-    if(ret == FR_OK && fno.fname[0]) {
+    if(ret == FR_OK) {
         uint16_t index = 0;
         uint16_t year = (fno.fdate >> 9) + 1980;
         uint8_t month = (fno.fdate >> 5) & 0x0F;
@@ -146,7 +140,7 @@ FileResult FlintAPI::IO::readdir(DirHandle handle, FileInfo *fileInfo) {
         uint8_t second = (fno.ftime & 0x1F) * 2;
 
         fileInfo->attribute = fno.fattrib;
-        fileInfo->size = fno.fsize;
+        fileInfo->size = (fileInfo->directory) ? 0 : fno.fsize;
         fileInfo->time = UnixTime(year, month, day, hour, minute, second);
         while(fno.fname[index] != 0) {
             if(index < (sizeof(fileInfo->name) - 1)) {
@@ -163,7 +157,7 @@ FileResult FlintAPI::IO::readdir(DirHandle handle, FileInfo *fileInfo) {
 
 FileResult FlintAPI::IO::closedir(DirHandle handle) {
     FRESULT ret = f_closedir((FF_DIR *)handle);
-    FlintAPI::System::free(handle);
+    Flint::free(handle);
     return convertFileResult(ret);
 }
 

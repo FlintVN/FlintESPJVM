@@ -137,7 +137,7 @@ static bool checkSpiInputParam(FNIEnv *env, jbyteArray buff, int32_t offset, int
             jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
             uint16_t len;
             const char *name = buff->getCompTypeName(&len);
-            env->throwNew(excpCls, "last index %d out of bounds for %.*s[%d]", offset + count, len, name, buff->getLength());
+            env->throwNew(excpCls, "last index %d out of bounds for %.*s[%d]", offset + count - 1, len, name, buff->getLength());
             return false;
         }
     }
