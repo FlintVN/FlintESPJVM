@@ -46,6 +46,6 @@ static void WiFi_Init(void) {
 void Board_Init(void ) {
     GPIO_Init();
     NVS_Init();
-    UART_Init(UART_NUM_0, 921600);
+    UART_Init(UART_NUM_0, 460800);
     WiFi_Init();
 }
