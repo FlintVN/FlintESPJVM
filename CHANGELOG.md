@@ -1,4 +1,7 @@
 # Change Log
+## V0.2.0
+- Update to be compatible with [FlintJDK V1.0.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.0.0) and [FlintESPJDK V0.0.9](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.9).
+- Base on [FlintJVM V2.3.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.0).
 ## V0.1.1
 - Change default UART baud rate from 921600 to 460800 to increase compatibility.
 ## V0.1.0
