@@ -19,30 +19,8 @@ void FlintAPI::System::free(void *p) {
     ::free(p);
 }
 
-void FlintAPI::System::print(const char *text, uint32_t length, uint8_t coder) {
-    char buff[64];
-    if(coder == 0) {
-        while(length) {
-            uint32_t count = 0;
-            while(length && ((count + 2) <= sizeof(buff))) {
-                count += Utf8EncodeOneChar((uint8_t)*text, &buff[count]);
-                text++;
-                length--;
-            }
-            fprintf(stdout, "%*.*s", (int)count, (int)count, buff);
-        }
-    }
-    else {
-        while(length) {
-            uint32_t count = 0;
-            while(length && ((count + 3) <= sizeof(buff))) {
-                count += Utf8EncodeOneChar(*(uint16_t *)text, &buff[count]);
-                text += 2;
-                length--;
-            }
-            fprintf(stdout, "%*.*s", (int)count, (int)count, buff);
-        }
-    }
+void FlintAPI::System::consoleWrite(uint8_t *utf8, uint32_t length) {
+    fprintf(stdout, "%.*s", (int)length, (char *)utf8);
 }
 
 uint64_t FlintAPI::System::getNanoTime(void) {
