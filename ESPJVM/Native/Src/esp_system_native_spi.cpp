@@ -41,13 +41,11 @@ static bool NativeSPI_IsOpen(int32_t spiId) {
     return espSpiHandle[spiId - 1].handle ? true : false;
 }
 
-static esp_err_t NativeSPI_Transfer(int32_t spiId, JInt8Array *txBuff, int32_t txOff, JInt8Array *rxBuff, int32_t rxOff, int32_t length) {
+static esp_err_t NativeSPI_Transfer(int32_t spiId, uint8_t *txBuff, int32_t txOff, uint8_t *rxBuff, int32_t rxOff, int32_t length) {
     spi_transaction_t t = {};
-    int8_t *txData = txBuff ? &txBuff->getData()[txOff] : NULL;
-    int8_t *rxData = rxBuff ? &rxBuff->getData()[rxOff] : NULL;
     t.length = length * 8;
-    t.tx_buffer = txData;
-    t.rx_buffer = rxData;
+    t.tx_buffer = txBuff;
+    t.rx_buffer = rxBuff;
     return spi_device_transmit(espSpiHandle[spiId - 1].handle, &t);
 }
 
@@ -232,20 +230,40 @@ jint nativeSpiGetSpeed(FNIEnv *env, jobject obj) {
     return spiObj->getSpeed();
 }
 
-jint nativeSpiReadWrite(FNIEnv *env, jobject obj, jbyteArray txBuff, jint txOff, jboolArray rxBuff, jint rxOff, jint length) {
+jint nativeSpiRead(FNIEnv *env, jobject obj) {
+    uint8_t buff;
     EspSpiObject spiObj = (EspSpiObject)obj;
     if(!checkSpiTransferCondition(env, spiObj)) return 0;
-    if((txBuff == NULL) && (rxBuff == NULL)) {
+    if(NativeSPI_Transfer(spiObj->getSpiId(), NULL, 0, &buff, 0, 1) != ESP_OK) {
+        env->throwNew(env->findClass("java/io/IOException"),"Error while transmitting data");
+        return 0;
+    }
+    return buff;
+}
+
+jvoid nativeSpiWrite(FNIEnv *env, jobject obj, jint b) {
+    uint8_t buff = b;
+    EspSpiObject spiObj = (EspSpiObject)obj;
+    if(!checkSpiTransferCondition(env, spiObj)) return;
+    if(NativeSPI_Transfer(spiObj->getSpiId(), &buff, 0, NULL, 0, 1) != ESP_OK)
+        env->throwNew(env->findClass("java/io/IOException"),"Error while transmitting data");
+}
+
+jint nativeSpiReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOff, jboolArray rx, jint rxOff, jint length) {
+    EspSpiObject spiObj = (EspSpiObject)obj;
+    if(!checkSpiTransferCondition(env, spiObj)) return 0;
+    if((tx == NULL) && (rx == NULL)) {
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return 0;
     }
-    if(!checkSpiInputParam(env, txBuff, txOff, length)) return 0;
-    if(!checkSpiInputParam(env, rxBuff, rxOff, length)) return 0;
+    if(!checkSpiInputParam(env, tx, txOff, length)) return 0;
+    if(!checkSpiInputParam(env, rx, rxOff, length)) return 0;
+    uint8_t *txBuff = tx != NULL ? (uint8_t *)tx->getData() : NULL;
+    uint8_t *rxBuff = rx != NULL ? (uint8_t *)rx->getData() : NULL;
     if(NativeSPI_Transfer(spiObj->getSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"),"Error while transmitting data");
         return 0;
     }
-
     return rxBuff ? length : 0;
 }
 
