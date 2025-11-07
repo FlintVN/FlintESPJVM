@@ -38,7 +38,9 @@ static EspSpiHandle espSpiHandle[2] = {
 };
 
 static bool NativeSPI_IsOpen(int32_t spiId) {
-    return espSpiHandle[spiId - 1].handle ? true : false;
+    if(spiId == 1 || spiId == 2)
+        return espSpiHandle[spiId - 1].handle ? true : false;
+    return false;
 }
 
 static esp_err_t NativeSPI_Transfer(int32_t spiId, uint8_t *txBuff, int32_t txOff, uint8_t *rxBuff, int32_t rxOff, int32_t length) {
@@ -46,7 +48,7 @@ static esp_err_t NativeSPI_Transfer(int32_t spiId, uint8_t *txBuff, int32_t txOf
     t.length = length * 8;
     t.tx_buffer = txBuff;
     t.rx_buffer = rxBuff;
-    return spi_device_transmit(espSpiHandle[spiId - 1].handle, &t);
+    return spi_device_polling_transmit(espSpiHandle[spiId - 1].handle, &t);
 }
 
 static void NativeSPI_Close(int32_t spiId) {
@@ -110,7 +112,6 @@ static bool checkSpiPin(FNIEnv *env, EspSpiObject spiObj) {
 
 static bool checkSpiTransferCondition(FNIEnv *env, EspSpiObject spiObj) {
     int32_t spiId = spiObj->getSpiId();
-    if(!checkSpiId(env, spiId)) return false;
     if(!NativeSPI_IsOpen(spiId)) {
         env->throwNew(env->findClass("java/io/IOException"), "SPI has not been opened yet");
         return false;
@@ -193,7 +194,7 @@ jvoid nativeSpiOpen(FNIEnv *env, jobject obj) {
     devcfg.flags |= (mode & 0x04) ? SPI_DEVICE_BIT_LSBFIRST : 0;
     devcfg.flags |= (mode & 0x08) ? SPI_DEVICE_POSITIVE_CS : 0;
 
-    if(spi_bus_initialize((spi_host_device_t)spiId, &buscfg, SPI_DMA_CH_AUTO) != ESP_OK) {
+    if(spi_bus_initialize((spi_host_device_t)spiId, &buscfg, SPI_DMA_DISABLED) != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while initializing bus");
         return;
     }
@@ -208,7 +209,6 @@ jvoid nativeSpiOpen(FNIEnv *env, jobject obj) {
 jbool nativeSpiIsOpen(FNIEnv *env, jobject obj) {
     EspSpiObject spiObj = (EspSpiObject)obj;
     int32_t spiId = spiObj->getSpiId();
-    if(!checkSpiId(env, spiId)) return false;
     if(NativeSPI_IsOpen(spiId))
         return (espSpiHandle[spiId - 1].spiObj == spiObj) ? true : false;
     return false;
@@ -217,8 +217,6 @@ jbool nativeSpiIsOpen(FNIEnv *env, jobject obj) {
 jint nativeSpiGetSpeed(FNIEnv *env, jobject obj) {
     EspSpiObject spiObj = (EspSpiObject)obj;
     int32_t spiId = spiObj->getSpiId();
-    if(!checkSpiId(env, spiId)) return 0;
-
     if(NativeSPI_IsOpen(spiId)) {
         int32_t ret = 0;
         if(spi_device_get_actual_freq(espSpiHandle[spiId - 1].handle, (int *)&ret) != ESP_OK) {
