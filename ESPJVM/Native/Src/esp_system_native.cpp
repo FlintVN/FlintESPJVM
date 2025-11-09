@@ -10,10 +10,10 @@
 #include "esp_system_native_wifi.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
-    NATIVE_CLASS("esp/machine/Pin",       pinMethods),
-    NATIVE_CLASS("esp/machine/Port",      portMethods),
-    NATIVE_CLASS("esp/machine/SpiMaster", spiMethods),
-    NATIVE_CLASS("esp/network/WiFi",      wifiMethods),
+    NATIVE_CLASS("flint/machine/Pin",       pinMethods),
+    NATIVE_CLASS("flint/machine/Port",      portMethods),
+    NATIVE_CLASS("flint/machine/SpiMaster", spiMethods),
+    NATIVE_CLASS("flint/network/WiFi",      wifiMethods),
 };
 
 void FlintAPI::System::reset(void) {
