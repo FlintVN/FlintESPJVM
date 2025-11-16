@@ -16,7 +16,7 @@ add_custom_command(
             --partition_size 0x6F0000
             --sector_size 512
             --long_name_support
-            ../../Resources/ESPJDK
+            ../../Resources
 )
 
 add_custom_command(
