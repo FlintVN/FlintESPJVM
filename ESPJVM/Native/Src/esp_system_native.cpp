@@ -5,20 +5,20 @@
 #include "flint_class_loader.h"
 #include "flint_native.h"
 #include "esp_system_native_pin.h"
-#include "esp_system_native_spi.h"
+#include "esp_system_native_spi_master.h"
 #include "esp_system_native_port.h"
 #include "esp_system_native_wifi.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/machine/Pin",       pinMethods),
     NATIVE_CLASS("flint/machine/Port",      portMethods),
-    NATIVE_CLASS("flint/machine/SpiMaster", spiMethods),
+    NATIVE_CLASS("flint/machine/SpiMaster", spiMasterMethods),
     NATIVE_CLASS("flint/network/WiFi",      wifiMethods),
 };
 
 void FlintAPI::System::reset(void) {
     NativePin_Reset();
-    NativeSPI_Reset();
+    NativeSpiMaster_Reset();
 }
 
 JNMPtr FlintAPI::System::findNativeMethod(MethodInfo *methodInfo) {
