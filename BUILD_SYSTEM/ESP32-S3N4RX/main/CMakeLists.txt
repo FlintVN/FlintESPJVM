@@ -1,4 +1,4 @@
-set(priv_requires fatfs console esp_timer nvs_flash esp_wifi)
+set(priv_requires fatfs console esp_timer nvs_flash driver esp_wifi)
 
 if(CONFIG_EXAMPLE_STORAGE_MEDIA_SPIFLASH)
     list(APPEND priv_requires wear_levelling esp_partition)
@@ -17,6 +17,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/Native/Src/esp_system_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_pin.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_spi_master.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_system_native_uart.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_port.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_wifi.cpp"
 

@@ -1,13 +1,11 @@
 
+#include "soc/uart_pins.h"
 #include "driver/gpio.h"
 #include "driver/uart.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "esp_wifi.h"
 #include "esp_board.h"
-
-#define TXD_PIN             1
-#define RXD_PIN             3
 
 static void GPIO_Init(void) {
 
@@ -26,11 +24,11 @@ static void UART_Init(uart_port_t uartNum, int32_t baudRate) {
     uart_config_t uartConfig = {};
     uartConfig.baud_rate = baudRate;
     uartConfig.data_bits = UART_DATA_8_BITS;
-    uartConfig.parity= UART_PARITY_DISABLE;
+    uartConfig.parity = UART_PARITY_DISABLE;
     uartConfig.stop_bits = UART_STOP_BITS_1;
     uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
     uart_param_config(uartNum, &uartConfig);
-    uart_set_pin(uartNum, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(uartNum, U0TXD_GPIO_NUM, U0RXD_GPIO_NUM, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
 static void WiFi_Init(void) {
