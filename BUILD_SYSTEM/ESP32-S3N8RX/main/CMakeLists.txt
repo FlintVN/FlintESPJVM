@@ -17,6 +17,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/Native/Src/esp_system_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_pin.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_spi_master.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_system_native_i2c_master.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_uart.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_port.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_system_native_wifi.cpp"
