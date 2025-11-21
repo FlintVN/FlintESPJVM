@@ -69,7 +69,7 @@ FileResult FlintAPI::IO::finfo(const char *fileName, FileInfo *fileInfo) {
 FileHandle FlintAPI::IO::fopen(const char *fileName, FileMode mode) {
     FIL *fp = (FIL *)Flint::malloc(NULL, sizeof(FIL));
     if(fp == NULL) return NULL;
-    if(f_open(fp, fileName, (BYTE)mode) != FR_OK) return NULL;
+    if(f_open(fp, fileName, (BYTE)mode) != FR_OK) { Flint::free(fp); return NULL; };
     return fp;
 }
 
