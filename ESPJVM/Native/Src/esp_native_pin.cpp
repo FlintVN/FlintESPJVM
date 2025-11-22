@@ -36,28 +36,10 @@ const char *NativePin_CheckPin(int32_t pin) {
     return NULL;
 }
 
-void NativePin_Reset(void) {
-    for(uint8_t i = 0; (SOC_GPIO_VALID_GPIO_MASK >> i); i++) {
-        if(NativePin_CheckPin(i) == NULL)
-            gpio_reset_pin((gpio_num_t)i);
-    }
-}
-
-static bool checkPin(FNIEnv *env, int32_t pin) {
-    const char *msg = NativePin_CheckPin(pin);
-    if(msg) {
-        env->throwNew(env->findClass("java/io/IOException"), msg);
-        return false;
-    }
-    return true;
-}
-
-jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
-    if(!checkPin(env, pin)) return;
-
+bool NativePin_SetPinMode(int32_t pinMask, uint32_t mode) {
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;
-    io_conf.pin_bit_mask = (uint64_t)1 << pin;
+    io_conf.pin_bit_mask = pinMask;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
 
@@ -83,7 +65,28 @@ jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
             io_conf.mode = GPIO_MODE_DISABLE;
             break;
     }
-    if(gpio_config(&io_conf) != ESP_OK)
+    return gpio_config(&io_conf) == ESP_OK;
+}
+
+void NativePin_Reset(void) {
+    for(uint8_t i = 0; (SOC_GPIO_VALID_GPIO_MASK >> i); i++) {
+        if(NativePin_CheckPin(i) == NULL)
+            gpio_reset_pin((gpio_num_t)i);
+    }
+}
+
+static bool checkPin(FNIEnv *env, int32_t pin) {
+    const char *msg = NativePin_CheckPin(pin);
+    if(msg) {
+        env->throwNew(env->findClass("java/io/IOException"), msg);
+        return false;
+    }
+    return true;
+}
+
+jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
+    if(!checkPin(env, pin)) return;
+    if(!NativePin_SetPinMode(1 << pin, mode))
         env->throwNew(env->findClass("java/io/IOException"));
 }
 
