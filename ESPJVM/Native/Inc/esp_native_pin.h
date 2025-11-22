@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_PIN_H
-#define __ESP_SYSTEM_NATIVE_PIN_H
+#ifndef __ESP_NATIVE_PIN_H
+#define __ESP_NATIVE_PIN_H
 
 #include "flint_native.h"
 
@@ -24,4 +24,4 @@ static constexpr NativeMethod pinMethods[] = {
     NATIVE_METHOD("toggle",  "()V",   nativePinToggle),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_PIN_H */
+#endif /* __ESP_NATIVE_PIN_H */

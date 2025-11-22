@@ -4,8 +4,8 @@
 #include "soc/uart_pins.h"
 #include "driver/uart.h"
 #include "flint_system_api.h"
-#include "esp_system_native_pin.h"
-#include "esp_system_native_uart.h"
+#include "esp_native_pin.h"
+#include "esp_native_uart.h"
 
 typedef class : public JObject {
 public:
@@ -146,7 +146,7 @@ static bool checkUartPrecondition(FNIEnv *env, SerialPortObject portObj) {
     return true;
 }
 
-static bool checkUartInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
+static bool checkInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
     if(buff == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return false;
@@ -236,7 +236,7 @@ jint nativeUartRead(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) 
     SerialPortObject portObj = (SerialPortObject)obj;
     int32_t portId = portObj->getPortId();
     if(!checkUartPrecondition(env, portObj)) return 0;
-    if(!checkUartInputParam(env, b, off, count)) return 0;
+    if(!checkInputParam(env, b, off, count)) return 0;
     while(!env->exec->hasTerminateRequest()) {
         int32_t rxSize = uart_read_bytes((uart_port_t)portId, &b->getData()[off], count, pdMS_TO_TICKS(10));
         if(rxSize != 0) return rxSize;
@@ -255,7 +255,7 @@ jvoid nativeUartWriteByte(FNIEnv *env, jobject obj, int b) {
 jvoid nativeUartWrite(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
     SerialPortObject portObj = (SerialPortObject)obj;
     if(!checkUartPrecondition(env, portObj)) return;
-    if(!checkUartInputParam(env, b, off, count)) return;
+    if(!checkInputParam(env, b, off, count)) return;
     int8_t *buff = &b->getData()[off];
     int32_t portId = portObj->getPortId();
     while(count) {

@@ -5,7 +5,7 @@
 #include "driver/gpio.h"
 #include "flint_java_object.h"
 #include "flint_system_api.h"
-#include "esp_system_native_pin.h"
+#include "esp_native_pin.h"
 
 const char *NativePin_CheckPin(int32_t pin) {
     if((1ULL << pin) & ~SOC_GPIO_VALID_GPIO_MASK)

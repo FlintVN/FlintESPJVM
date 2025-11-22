@@ -5,8 +5,8 @@
 #include "soc/gpio_reg.h"
 #include "driver/gpio.h"
 #include "flint_system_api.h"
-#include "esp_system_native_pin.h"
-#include "esp_system_native_port.h"
+#include "esp_native_pin.h"
+#include "esp_native_port.h"
 
 static bool checkPin(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();

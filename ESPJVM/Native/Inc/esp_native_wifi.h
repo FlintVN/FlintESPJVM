@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_WIFI_H
-#define __ESP_SYSTEM_NATIVE_WIFI_H
+#ifndef __ESP_NATIVE_WIFI_H
+#define __ESP_NATIVE_WIFI_H
 
 #include "flint_native.h"
 
@@ -32,4 +32,4 @@ static constexpr NativeMethod wifiMethods[] = {
     NATIVE_METHOD("stopScan",         "()V",                                        nativeWiFiStopScan),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_WIFI_H */
+#endif /* __ESP_NATIVE_WIFI_H */

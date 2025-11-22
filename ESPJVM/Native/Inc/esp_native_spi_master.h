@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_SPI_H
-#define __ESP_SYSTEM_NATIVE_SPI_H
+#ifndef __ESP_NATIVE_SPI_H
+#define __ESP_NATIVE_SPI_H
 
 #include "flint.h"
 #include "flint_native.h"
@@ -26,4 +26,4 @@ static constexpr NativeMethod spiMasterMethods[] = {
     NATIVE_METHOD("close",           "()V",                         nativeSpiMasterClose),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_SPI_H */
+#endif /* __ESP_NATIVE_SPI_H */

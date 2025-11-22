@@ -6,7 +6,7 @@
 #include "sdkconfig.h"
 #include "flint_java_string.h"
 #include "flint_system_api.h"
-#include "esp_system_native_wifi.h"
+#include "esp_native_wifi.h"
 
 static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_OPEN,

@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_PORT_H
-#define __ESP_SYSTEM_NATIVE_PORT_H
+#ifndef __ESP_NATIVE_PORT_H
+#define __ESP_NATIVE_PORT_H
 
 #include "flint_native.h"
 
@@ -17,4 +17,4 @@ static constexpr NativeMethod portMethods[] = {
     NATIVE_METHOD("reset",   "()V",    nativePortReset),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_PORT_H */
+#endif /* __ESP_NATIVE_PORT_H */

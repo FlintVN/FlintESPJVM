@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_UART_H
-#define __ESP_SYSTEM_NATIVE_UART_H
+#ifndef __ESP_NATIVE_UART_H
+#define __ESP_NATIVE_UART_H
 
 #include "flint.h"
 #include "flint_native.h"
@@ -28,4 +28,4 @@ static constexpr NativeMethod uartMethods[] = {
     NATIVE_METHOD("close",       "()V",                          nativeUartClose),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_UART_H */
+#endif /* __ESP_NATIVE_UART_H */

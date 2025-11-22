@@ -1,7 +1,7 @@
 
 
-#ifndef __ESP_SYSTEM_NATIVE_I2C_MASTER_H
-#define __ESP_SYSTEM_NATIVE_I2C_MASTER_H
+#ifndef __ESP_NATIVE_I2C_MASTER_H
+#define __ESP_NATIVE_I2C_MASTER_H
 
 #include "flint.h"
 #include "flint_native.h"
@@ -36,4 +36,4 @@ static constexpr NativeMethod i2cMasterMethods[] = {
     NATIVE_METHOD("close",    "()V",                         nativeI2cMasterClose),
 };
 
-#endif /* __ESP_SYSTEM_NATIVE_I2C_MASTER_H */
+#endif /* __ESP_NATIVE_I2C_MASTER_H */

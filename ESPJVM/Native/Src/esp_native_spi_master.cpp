@@ -4,8 +4,8 @@
 #include "soc/spi_pins.h"
 #include "driver/spi_master.h"
 #include "flint_system_api.h"
-#include "esp_system_native_pin.h"
-#include "esp_system_native_spi_master.h"
+#include "esp_native_pin.h"
+#include "esp_native_spi_master.h"
 
 typedef class : public JObject {
 public:
@@ -103,7 +103,7 @@ static bool checkSpiTransferCondition(FNIEnv *env, SpiMasterObject spiObj) {
     return true;
 }
 
-static bool checkSpiInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
+static bool checkInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
     if(buff != NULL) {
         if(off < 0) {
             jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
@@ -267,8 +267,8 @@ jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOf
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return 0;
     }
-    if(!checkSpiInputParam(env, tx, txOff, length)) return 0;
-    if(!checkSpiInputParam(env, rx, rxOff, length)) return 0;
+    if(!checkInputParam(env, tx, txOff, length)) return 0;
+    if(!checkInputParam(env, rx, rxOff, length)) return 0;
     uint8_t *txBuff = tx != NULL ? (uint8_t *)tx->getData() : NULL;
     uint8_t *rxBuff = rx != NULL ? (uint8_t *)rx->getData() : NULL;
     if(NativeSpiMaster_Transfer(spiObj->getSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {
