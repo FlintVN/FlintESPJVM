@@ -7,4 +7,7 @@
 
 bool CheckArrayIndexSize(FNIEnv *env, jarray arr, int32_t index, int32_t count);
 
+void EnterAtomicSection(void);
+void ExitAtomicSection(void);
+
 #endif /* __ESP_NATIVE_COMMON_H */
