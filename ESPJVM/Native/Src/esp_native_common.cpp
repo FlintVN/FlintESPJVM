@@ -1,6 +1,10 @@
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "flint_array_object.h"
 #include "esp_native_common.h"
+
+static portMUX_TYPE atomicMux = portMUX_INITIALIZER_UNLOCKED;
 
 bool CheckArrayIndexSize(FNIEnv *env, jarray arr, int32_t index, int32_t count) {
     if(arr == NULL) {
@@ -22,4 +26,12 @@ bool CheckArrayIndexSize(FNIEnv *env, jarray arr, int32_t index, int32_t count) 
         return false;
     }
     return true;
+}
+
+void EnterAtomicSection(void) {
+    portENTER_CRITICAL(&atomicMux);
+}
+
+void ExitAtomicSection(void) {
+    portEXIT_CRITICAL(&atomicMux);
 }
