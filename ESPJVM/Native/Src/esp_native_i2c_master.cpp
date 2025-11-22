@@ -3,6 +3,7 @@
 #include "flint.h"
 #include "driver/i2c.h"
 #include "flint_system_api.h"
+#include "esp_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_i2c_master.h"
 
@@ -98,28 +99,6 @@ static bool checkI2cMasterPrecondition(FNIEnv *env, I2cMasterObject i2cObj) {
     return true;
 }
 
-static bool checkInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
-    if(buff == NULL) {
-        env->throwNew(env->findClass("java/lang/NullPointerException"));
-        return false;
-    }
-    else if(off < 0) {
-        jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
-        uint16_t len;
-        const char *name = buff->getCompTypeName(&len);
-        env->throwNew(excpCls, "index %d out of bounds for %.*s[%d]", off, len, name, buff->getLength());
-        return false;
-    }
-    else if((off + count) > buff->getLength()) {
-        jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
-        uint16_t len;
-        const char *name = buff->getCompTypeName(&len);
-        env->throwNew(excpCls, "last index %d out of bounds for %.*s[%d]", off + count - 1, len, name, buff->getLength());
-        return false;
-    }
-    return true;
-}
-
 jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     int32_t i2cId = getI2cId(env, i2cObj->getI2cName());
@@ -182,7 +161,7 @@ jint nativeI2cMasterReadByte(FNIEnv *env, jobject obj) {
 jint nativeI2cMasterRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     if(!checkI2cMasterPrecondition(env, i2cObj)) return 0;
-    if(!checkInputParam(env, b, off, count)) return 0;
+    if(!CheckArrayIndexSize(env, b, off, count)) return 0;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);
@@ -214,7 +193,7 @@ jvoid nativeI2cMasterWriteByte(FNIEnv *env, jobject obj, jint b) {
 jvoid nativeI2cMasterWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     if(!checkI2cMasterPrecondition(env, i2cObj)) return;
-    if(!checkInputParam(env, b, off, count)) return;
+    if(!CheckArrayIndexSize(env, b, off, count)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);
@@ -250,7 +229,7 @@ jint nativeI2cMasterReadMemByte(FNIEnv *env, jobject obj, jint memAddr) {
 jint nativeI2cMasterReadMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     if(!checkI2cMasterPrecondition(env, i2cObj)) return 0;
-    if(!checkInputParam(env, b, off, count)) return 0;
+    if(!CheckArrayIndexSize(env, b, off, count)) return 0;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);
@@ -286,7 +265,7 @@ jvoid nativeI2cMasterWriteMemByte(FNIEnv *env, jobject obj, jint memAddr, jint b
 jvoid nativeI2cMasterWriteMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     if(!checkI2cMasterPrecondition(env, i2cObj)) return;
-    if(!checkInputParam(env, b, off, count)) return;
+    if(!CheckArrayIndexSize(env, b, off, count)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);

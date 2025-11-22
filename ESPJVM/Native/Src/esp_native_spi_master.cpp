@@ -4,6 +4,7 @@
 #include "soc/spi_pins.h"
 #include "driver/spi_master.h"
 #include "flint_system_api.h"
+#include "esp_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_spi_master.h"
 
@@ -99,26 +100,6 @@ static bool checkSpiTransferCondition(FNIEnv *env, SpiMasterObject spiObj) {
     else if(espSpiHandle[spiId - 1].spiObj != spiObj) {
         env->throwNew(env->findClass("java/io/IOException"), "Access is denied");
         return false;
-    }
-    return true;
-}
-
-static bool checkInputParam(FNIEnv *env, jbyteArray buff, int32_t off, int32_t count) {
-    if(buff != NULL) {
-        if(off < 0) {
-            jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
-            uint16_t len;
-            const char *name = buff->getCompTypeName(&len);
-            env->throwNew(excpCls, "index %d out of bounds for %.*s[%d]", off, len, name, buff->getLength());
-            return false;
-        }
-        else if((off + count) > buff->getLength()) {
-            jclass excpCls = env->findClass("java/lang/ArrayIndexOutOfBoundsException");
-            uint16_t len;
-            const char *name = buff->getCompTypeName(&len);
-            env->throwNew(excpCls, "last index %d out of bounds for %.*s[%d]", off + count - 1, len, name, buff->getLength());
-            return false;
-        }
     }
     return true;
 }
@@ -267,8 +248,8 @@ jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOf
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return 0;
     }
-    if(!checkInputParam(env, tx, txOff, length)) return 0;
-    if(!checkInputParam(env, rx, rxOff, length)) return 0;
+    if(!CheckArrayIndexSize(env, tx, txOff, length)) return 0;
+    if(!CheckArrayIndexSize(env, rx, rxOff, length)) return 0;
     uint8_t *txBuff = tx != NULL ? (uint8_t *)tx->getData() : NULL;
     uint8_t *rxBuff = rx != NULL ? (uint8_t *)rx->getData() : NULL;
     if(NativeSpiMaster_Transfer(spiObj->getSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {

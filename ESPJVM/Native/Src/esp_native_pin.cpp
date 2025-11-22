@@ -89,110 +89,85 @@ jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
 
 jbool nativePinRead(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
-
-    #ifdef GPIO_IN1_REG
-    {
-        if(pin < 32)
-            return (REG_READ(GPIO_IN_REG) & (1 << pin)) ? true : false;
-        else
-            return (REG_READ(GPIO_IN1_REG) & (1 << (pin - 32))) ? true : false;
-    }
-    #else
-    {
+#ifdef GPIO_IN1_REG
+    if(pin < 32)
         return (REG_READ(GPIO_IN_REG) & (1 << pin)) ? true : false;
-    }
-    #endif
+    else
+        return (REG_READ(GPIO_IN1_REG) & (1 << (pin - 32))) ? true : false;
+#else
+    return (REG_READ(GPIO_IN_REG) & (1 << pin)) ? true : false;
+#endif
 }
 
 jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
-
-    #ifdef GPIO_OUT1_W1TC_REG
-    {
-        if(pin < 32) {
-            if(level)
-                REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
-            else
-                REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
-        }
-        else {
-            if(level)
-                REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
-            else
-                REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
-        }
-    }
-    #else
-    {
+#ifdef GPIO_OUT1_W1TC_REG
+    if(pin < 32) {
         if(level)
             REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
         else
             REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
     }
-    #endif
+    else {
+        if(level)
+            REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
+        else
+            REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
+    }
+#else
+    if(level)
+        REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+    else
+        REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+#endif
 }
 
 jvoid nativePinSet(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
-
-    #ifdef GPIO_OUT1_W1TC_REG
-    {
-        if(pin < 32)
-            REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
-        else
-            REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
-    }
-    #else
-    {
+#ifdef GPIO_OUT1_W1TC_REG
+    if(pin < 32)
         REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
-    }
-    #endif
+    else
+        REG_WRITE(GPIO_OUT1_W1TS_REG, 1 << (pin - 32));
+#else
+    REG_WRITE(GPIO_OUT_W1TS_REG, 1 << pin);
+#endif
 }
 
 jvoid nativePinReset(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
-
-    #ifdef GPIO_OUT1_W1TC_REG
-    {
-        if(pin < 32)
-            REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
-        else
-            REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
-    }
-    #else
-    {
+#ifdef GPIO_OUT1_W1TC_REG
+    if(pin < 32)
         REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
-    }
-    #endif
+    else
+        REG_WRITE(GPIO_OUT1_W1TC_REG, 1 << (pin - 32));
+#else
+    REG_WRITE(GPIO_OUT_W1TC_REG, 1 << pin);
+#endif
 }
 
 jvoid nativePinToggle(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
-
-    #ifdef GPIO_OUT1_REG
-    {
-        if(pin < 32) {
-            uint32_t mask = 1 << pin;
-            if(REG_READ(GPIO_OUT_REG) & mask)
-                REG_WRITE(GPIO_OUT_W1TC_REG, mask);
-            else
-                REG_WRITE(GPIO_OUT_W1TS_REG, mask);
-        }
-        else {
-            uint32_t mask = 1 << (pin - 32);
-            if(REG_READ(GPIO_OUT1_REG) & mask)
-                REG_WRITE(GPIO_OUT1_W1TC_REG, mask);
-            else
-                REG_WRITE(GPIO_OUT1_W1TS_REG, mask);
-        }
-    }
-    #else
-    {
+#ifdef GPIO_OUT1_REG
+    if(pin < 32) {
         uint32_t mask = 1 << pin;
         if(REG_READ(GPIO_OUT_REG) & mask)
             REG_WRITE(GPIO_OUT_W1TC_REG, mask);
         else
             REG_WRITE(GPIO_OUT_W1TS_REG, mask);
     }
-    #endif
+    else {
+        uint32_t mask = 1 << (pin - 32);
+        if(REG_READ(GPIO_OUT1_REG) & mask)
+            REG_WRITE(GPIO_OUT1_W1TC_REG, mask);
+        else
+            REG_WRITE(GPIO_OUT1_W1TS_REG, mask);
+    }
+#else
+    uint32_t mask = 1 << pin;
+    if(REG_READ(GPIO_OUT_REG) & mask)
+        REG_WRITE(GPIO_OUT_W1TC_REG, mask);
+    else
+        REG_WRITE(GPIO_OUT_W1TS_REG, mask);
+#endif
 }
