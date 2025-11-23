@@ -48,7 +48,7 @@ bool NativePin_SetPinMode(int32_t pinMask, uint32_t mode) {
             io_conf.mode = GPIO_MODE_INPUT;
             break;
         case 1: /* OUTPUT */
-            io_conf.mode = GPIO_MODE_OUTPUT;
+            io_conf.mode = GPIO_MODE_INPUT_OUTPUT;
             break;
         case 2: /* INPUT_PULL_UP */
             io_conf.mode = GPIO_MODE_INPUT;
@@ -60,6 +60,10 @@ bool NativePin_SetPinMode(int32_t pinMask, uint32_t mode) {
             break;
         case 4: /* OUTPUT_OPEN_DRAIN */
             io_conf.mode = GPIO_MODE_OUTPUT_OD;
+            break;
+        case 5: /* OUTPUT_OPEN_DRAIN */
+            io_conf.mode = GPIO_MODE_INPUT_OUTPUT_OD;
+            io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
             break;
         default:
             io_conf.mode = GPIO_MODE_DISABLE;
