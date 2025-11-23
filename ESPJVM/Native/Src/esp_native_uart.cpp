@@ -134,7 +134,7 @@ static bool checkUartPin(FNIEnv *env, SerialPortObject portObj) {
     return true;
 }
 
-static bool checkUartPrecondition(FNIEnv *env, SerialPortObject portObj) {
+static bool checkPrecondition(FNIEnv *env, SerialPortObject portObj) {
     int32_t portId = portObj->getPortId();
     if(!NativeUart_IsOpen(portId)) {
         env->throwNew(env->findClass("java/io/IOException"), "UART has not been opened yet");
@@ -203,7 +203,7 @@ jint nativeUartReadByte(FNIEnv *env, jobject obj) {
     uint8_t buff;
     SerialPortObject portObj = (SerialPortObject)obj;
     int32_t portId = portObj->getPortId();
-    if(!checkUartPrecondition(env, portObj)) return -1;
+    if(!checkPrecondition(env, portObj)) return -1;
     while(!env->exec->hasTerminateRequest()) {
         if(uart_read_bytes((uart_port_t)portId, &buff, 1, pdMS_TO_TICKS(10)) == 1)
             return buff;
@@ -214,7 +214,7 @@ jint nativeUartReadByte(FNIEnv *env, jobject obj) {
 jint nativeUartRead(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
     SerialPortObject portObj = (SerialPortObject)obj;
     int32_t portId = portObj->getPortId();
-    if(!checkUartPrecondition(env, portObj)) return 0;
+    if(!checkPrecondition(env, portObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
     while(!env->exec->hasTerminateRequest()) {
         int32_t rxSize = uart_read_bytes((uart_port_t)portId, &b->getData()[off], count, pdMS_TO_TICKS(10));
@@ -226,14 +226,14 @@ jint nativeUartRead(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) 
 jvoid nativeUartWriteByte(FNIEnv *env, jobject obj, int b) {
     uint8_t buff = (uint8_t)b;
     SerialPortObject portObj = (SerialPortObject)obj;
-    if(!checkUartPrecondition(env, portObj)) return;
+    if(!checkPrecondition(env, portObj)) return;
     if(uart_write_bytes((uart_port_t)portObj->getPortId(), &buff, 1) != 1)
         env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
 jvoid nativeUartWrite(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    if(!checkUartPrecondition(env, portObj)) return;
+    if(!checkPrecondition(env, portObj)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
     int8_t *buff = &b->getData()[off];
     int32_t portId = portObj->getPortId();
