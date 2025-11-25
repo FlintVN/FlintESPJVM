@@ -248,8 +248,8 @@ jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOf
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return 0;
     }
-    if(!CheckArrayIndexSize(env, tx, txOff, length)) return 0;
-    if(!CheckArrayIndexSize(env, rx, rxOff, length)) return 0;
+    if(tx != NULL && !CheckArrayIndexSize(env, tx, txOff, length)) return 0;
+    if(rx != NULL && !CheckArrayIndexSize(env, rx, rxOff, length)) return 0;
     uint8_t *txBuff = tx != NULL ? (uint8_t *)tx->getData() : NULL;
     uint8_t *rxBuff = rx != NULL ? (uint8_t *)rx->getData() : NULL;
     if(NativeSpiMaster_Transfer(spiObj->getSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {
