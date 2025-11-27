@@ -24,8 +24,8 @@ extern "C" void app_main() {
     Flint::setClassPaths("/lib/java.base;/lib/flint.io;/lib/flint.net");
 
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo("main.class", NULL) == FlintAPI::IO::FILE_RESULT_OK)
-            Flint::runToMain("main");
+        if(FlintAPI::IO::finfo("Main.class", NULL) == FlintAPI::IO::FILE_RESULT_OK)
+            Flint::runToMain("Main");
     }
 
     vTaskPrioritySet(NULL, 2);
