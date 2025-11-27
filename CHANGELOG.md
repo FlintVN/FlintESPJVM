@@ -1,4 +1,16 @@
 # Change Log
+## V0.3.0
+- Compatible with [FlintJDK V1.1.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.1.0).
+- Update to [FlintJVM V2.3.1](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.1).
+  - Support for specifying class path.
+  - Fixed a critical bug related to Garbage Collection, objects that are still in use are deleted and objects that are no longer in use are not deleted.
+  - Fix memory leak in ClassLoader class.
+  - Fix the READ_EXCP_INFO command in the debugger, which returns an incorrect format when the exception message is null.
+- Improved performance for SpiMaster.write and SpiMaster.readWrite, significantly reducing overhead time.
+- Support flint.machine.SerialPort.
+- Support flint.machine.I2cMaster.
+- Support flint.machine.BitStream.
+- Support flint.machine.OneWire.
 ## V0.2.0
 - Update to be compatible with [FlintJDK V1.0.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.0.0) and [FlintESPJDK V0.0.9](https://github.com/FlintVN/FlintESPJDK/releases/tag/V0.0.9).
 - Base on [FlintJVM V2.3.0](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.0).
