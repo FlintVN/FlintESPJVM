@@ -20,6 +20,7 @@ extern "C" void app_main() {
 
     ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
 
+    Flint::println();
     Flint::setCwd("/");
     Flint::setClassPaths("/lib/java.base;/lib/flint.io;/lib/flint.net");
 
