@@ -185,7 +185,7 @@ jobjectArray nativeWiFiGetScanResult(FNIEnv *env) {
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
 
     if(!checkReturn(env, ret)) return NULL;
-    
+
     if(count == 0) return NULL;
 
     Flint::lock();
