@@ -23,7 +23,7 @@ To get FlintESPJVM up and running on your board:
 - Manual Build: Prefer building it yourself? Utilize the ESP-IDF framework to compile and flash the project manually.
 ### 3. Building Java Projects for FlintESPJVM
 To develop Java applications for FlintESPJVM:
-- Project Setup: Use the [FlintJDK](https://github.com/FlintVN/FlintJDK) module to access core Java libraries compatible with FlintJVM. For ESP32-specific peripherals and features, add the [FlintESPJDK](https://github.com/FlintVN/FlintESPJDK) module.
+- Project Setup: Use the [FlintJDK](https://github.com/FlintVN/FlintJDK) module to access core Java libraries compatible with FlintJVM.
 - Debugging: Install the FlintJVM Debug extension in VS Code.
 
 Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, which provides a simple and clear template to help you get started with building Java apps for FlintJVM.
@@ -33,7 +33,7 @@ Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, wh
 ```sh
 > git clone --recurse-submodules https://github.com/FlintVN/FlintESPJVM.git
 ```
-### 5. Benchmark
+## Benchmark
 Below are the performance benchmarks of several different programming languages on the ESP32, focusing on.
 - Execution time of 10 million iterations using `for` and `while` loops.
 - Maximum toggling frequency of GPIO when driven by the CPU.
