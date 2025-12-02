@@ -12,6 +12,7 @@
 #include "esp_native_bitstream.h"
 #include "esp_native_spi_master.h"
 #include "esp_native_i2c_master.h"
+#include "esp_native_i2s_master.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/machine/Pin",        pinMethods),
@@ -21,6 +22,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/machine/OneWire",    oneWireMethods),
     NATIVE_CLASS("flint/machine/SpiMaster",  spiMasterMethods),
     NATIVE_CLASS("flint/machine/I2cMaster",  i2cMasterMethods),
+    NATIVE_CLASS("flint/machine/I2sMaster",  i2sMasterMethods),
     NATIVE_CLASS("flint/machine/BitStream",  bitStreamMethods),
 };
 
@@ -29,6 +31,7 @@ void FlintAPI::System::reset(void) {
     NativeUart_Reset();
     NativeSpiMaster_Reset();
     NativeI2cMaster_Reset();
+    NativeI2sMaster_Reset();
 }
 
 JNMPtr FlintAPI::System::findNativeMethod(MethodInfo *methodInfo) {
