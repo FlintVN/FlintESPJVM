@@ -108,6 +108,11 @@ jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
     if(i2cObj->getScl() < 0) i2cObj->setScl(-1);
     if(i2cObj->getSpeed() < 0) i2cObj->setSpeed(400000);
 
+    if(NativeI2cMaster_IsOpen(i2cId)) {
+        const char *msg = (i2cHolder[i2cId] != i2cObj) ? "Access is denied" : "I2C is already open";
+        env->throwNew(env->findClass("java/io/IOException"), msg);
+        return obj;
+    }
     if(!checkI2cMasterPin(env, i2cObj)) return obj;
 
     i2c_config_t conf = {};

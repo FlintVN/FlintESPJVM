@@ -16,13 +16,15 @@ public:
     int32_t getStopBits() { return getFieldByIndex(3)->getInt32(); }
     int32_t getParity() { return getFieldByIndex(4)->getInt32(); }
     int32_t getDataBits() { return getFieldByIndex(5)->getInt32(); }
-    int32_t getTxPin() { return getFieldByIndex(6)->getInt32(); }
-    int32_t getRxPin() { return getFieldByIndex(7)->getInt32(); }
+    int32_t getBufSize() { return getFieldByIndex(6)->getInt32(); }
+    int32_t getTxPin() { return getFieldByIndex(7)->getInt32(); }
+    int32_t getRxPin() { return getFieldByIndex(8)->getInt32(); }
 
     void setPortId(int32_t val) { getFieldByIndex(1)->setInt32(val); }
     void setBaudrate(int32_t val) { getFieldByIndex(2)->setInt32(val); }
-    void setTxPin(int32_t val) { getFieldByIndex(6)->setInt32(val); }
-    void setRxPin(int32_t val) { getFieldByIndex(7)->setInt32(val); }
+    void setBufSize(int32_t val) { getFieldByIndex(6)->setInt32(val); }
+    void setTxPin(int32_t val) { getFieldByIndex(7)->setInt32(val); }
+    void setRxPin(int32_t val) { getFieldByIndex(8)->setInt32(val); }
 } *SerialPortObject;
 
 static jobject uartHolder[UART_NUM_MAX] = {};
@@ -109,8 +111,9 @@ static void initDefaultValues(SerialPortObject uartObj, int32_t uartId) {
 #endif
     };
 
-    if(uartObj->getTxPin() == -2) uartObj->setTxPin(defaultPins[uartId].txPin);
-    if(uartObj->getRxPin() == -2) uartObj->setRxPin(defaultPins[uartId].rxPin);
+    if(uartObj->getBufSize() < 0) uartObj->setBufSize(512);
+    if(uartObj->getTxPin() < -1) uartObj->setTxPin(defaultPins[uartId].txPin);
+    if(uartObj->getRxPin() < -1) uartObj->setRxPin(defaultPins[uartId].rxPin);
     if(uartObj->getBaudrate() < 0) uartObj->setBaudrate(9600);
 }
 
@@ -171,7 +174,7 @@ jobject nativeUartOpen(FNIEnv *env, jobject obj) {
     uartConfig.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
     esp_err_t err = uart_param_config((uart_port_t)uartId, &uartConfig);
     if(err == ESP_OK) err = uart_set_pin((uart_port_t)uartId, portObj->getTxPin(), portObj->getRxPin(), UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    if(err == ESP_OK) err = uart_driver_install((uart_port_t)uartId, 512 * 2, 0, 0, NULL, 0);
+    if(err == ESP_OK) err = uart_driver_install((uart_port_t)uartId, portObj->getBufSize(), 0, 0, NULL, 0);
     if(err == ESP_OK)
         uartHolder[uartId] = portObj;
     else {

@@ -148,10 +148,10 @@ static void initDefaultValues(SpiMasterObject spiObj, int32_t spiId) {
 #endif
 
     if(spiObj->getSpeed() < 0) spiObj->setSpeed(5000000);
-    if(spiObj->getMosi() == -2) spiObj->setMosi(spiMosiPin[spiId - 1]);
-    if(spiObj->getMiso() == -2) spiObj->setMiso(spiMisoPin[spiId - 1]);
-    if(spiObj->getClk() == -2) spiObj->setClk(spiClkPin[spiId - 1]);
-    if(spiObj->getCs() == -2) spiObj->setCs(-1);
+    if(spiObj->getMosi() < -1) spiObj->setMosi(spiMosiPin[spiId - 1]);
+    if(spiObj->getMiso() < -1) spiObj->setMiso(spiMisoPin[spiId - 1]);
+    if(spiObj->getClk() < -1) spiObj->setClk(spiClkPin[spiId - 1]);
+    if(spiObj->getCs() < -1) spiObj->setCs(-1);
 }
 
 jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj) {
