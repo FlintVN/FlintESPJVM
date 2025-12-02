@@ -109,7 +109,6 @@ static void initDefaultValues(SerialPortObject uartObj, int32_t uartId) {
 #endif
     };
 
-    uartObj->setPortId(uartId);
     if(uartObj->getTxPin() == -2) uartObj->setTxPin(defaultPins[uartId].txPin);
     if(uartObj->getRxPin() == -2) uartObj->setRxPin(defaultPins[uartId].rxPin);
     if(uartObj->getBaudrate() < 0) uartObj->setBaudrate(9600);
@@ -175,8 +174,12 @@ jobject nativeUartOpen(FNIEnv *env, jobject obj) {
     if(err == ESP_OK) err = uart_driver_install((uart_port_t)uartId, 512 * 2, 0, 0, NULL, 0);
     if(err == ESP_OK)
         uartHolder[uartId] = portObj;
-    else
+    else {
         env->throwNew(env->findClass("java/io/IOException"), "Error while opening UART port");
+        return obj;
+    }
+
+    portObj->setPortId(uartId);
     return obj;
 }
 

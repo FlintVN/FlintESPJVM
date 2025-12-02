@@ -104,7 +104,6 @@ jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
     int32_t i2cId = getI2cId(env, i2cObj->getI2cName());
     if(i2cId == -1) return obj;
 
-    i2cObj->setI2cId(i2cId);
     if(i2cObj->getSda() < 0) i2cObj->setSda(-1);
     if(i2cObj->getScl() < 0) i2cObj->setScl(-1);
     if(i2cObj->getSpeed() < 0) i2cObj->setSpeed(400000);
@@ -122,9 +121,12 @@ jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
     if(err == ESP_OK) err = i2c_driver_install((i2c_port_t)i2cId, conf.mode, 0, 0, 0);
     if(err == ESP_OK)
         i2cHolder[i2cId] = i2cObj;
-    else
+    else {
         env->throwNew(env->findClass("java/io/IOException"), "Error while opening I2C port");
+        return obj;
+    }
 
+    i2cObj->setI2cId(i2cId);
     return obj;
 }
 

@@ -30,9 +30,9 @@ public:
 typedef struct {
     spi_device_handle_t handle;
     SpiMasterObject spiObj;
-} EspSpiHandle;
+} SpiHandle;
 
-static EspSpiHandle espSpiHandle[SPI_HOST_MAX - 1] = {};
+static SpiHandle espSpiHandle[SPI_HOST_MAX - 1] = {};
 
 static bool NativeSpiMaster_IsOpen(int32_t spiId) {
     if(spiId == 1 || spiId == 2)
@@ -147,7 +147,6 @@ static void initDefaultValues(SpiMasterObject spiObj, int32_t spiId) {
     static const int8_t spiClkPin[]  = {SPI2_IOMUX_PIN_NUM_CLK,  -1};
 #endif
 
-    spiObj->setSpiId(spiId);
     if(spiObj->getSpeed() < 0) spiObj->setSpeed(5000000);
     if(spiObj->getMosi() == -2) spiObj->setMosi(spiMosiPin[spiId - 1]);
     if(spiObj->getMiso() == -2) spiObj->setMiso(spiMisoPin[spiId - 1]);
@@ -196,6 +195,7 @@ jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj) {
         return obj;
     }
 
+    spiObj->setSpiId(spiId);
     espSpiHandle[spiId - 1].spiObj = spiObj;
     return obj;
 }

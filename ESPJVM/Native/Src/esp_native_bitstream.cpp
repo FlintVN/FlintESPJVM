@@ -113,12 +113,11 @@ jobject nativeBitStreamOpen(FNIEnv *env, jobject obj) {
         env->throwNew(env->findClass("java/io/IOException"), msg);
         return obj;
     }
-
-    bitStream->setId(1);
     if(!NativePin_SetPinMode(1 << pin, 1)) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while opening");
         return obj;
     }
+    bitStream->setId(1);
     return obj;
 }
 
