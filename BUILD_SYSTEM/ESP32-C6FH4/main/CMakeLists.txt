@@ -1,4 +1,4 @@
-set(priv_requires fatfs console esp_timer nvs_flash driver wear_levelling esp_partition esp_wifi)
+set(priv_requires fatfs console esp_adc esp_timer nvs_flash driver wear_levelling esp_partition esp_wifi)
 
 idf_component_register(
     SRCS "../../../ESPJVM/User/Src/main.cpp"
@@ -11,6 +11,7 @@ idf_component_register(
 
     SRCS "../../../ESPJVM/Native/Src/esp_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_common.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_adc.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_pin.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_onewire.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_bitstream.cpp"

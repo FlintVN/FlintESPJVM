@@ -4,6 +4,7 @@
 #include "flint_system_api.h"
 #include "flint_class_loader.h"
 #include "flint_native.h"
+#include "esp_native_adc.h"
 #include "esp_native_pin.h"
 #include "esp_native_port.h"
 #include "esp_native_wifi.h"
@@ -15,6 +16,7 @@
 #include "esp_native_i2s_master.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
+    NATIVE_CLASS("flint/machine/Adc",        adcMethods),
     NATIVE_CLASS("flint/machine/Pin",        pinMethods),
     NATIVE_CLASS("flint/machine/Port",       portMethods),
     NATIVE_CLASS("flint/network/WiFi",       wifiMethods),
@@ -27,6 +29,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
 };
 
 void FlintAPI::System::reset(void) {
+    NativeAdc_Reset();
     NativePin_Reset();
     NativeUart_Reset();
     NativeSpiMaster_Reset();
