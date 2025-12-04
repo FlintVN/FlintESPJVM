@@ -26,7 +26,7 @@ static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_DPP,
 };
 
-static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
+static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList)) {
         env->throwNew(env->findClass("java/io/IOException"), "Authentication mode is invalid");
         return false;
@@ -58,7 +58,7 @@ static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
     return true;
 }
 
-static bool checkReturn(FNIEnv *env, esp_err_t value) {
+static bool CheckReturn(FNIEnv *env, esp_err_t value) {
     if(value != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"), "An error occurred while connecting to wifi");
         return false;
@@ -66,12 +66,12 @@ static bool checkReturn(FNIEnv *env, esp_err_t value) {
     return true;
 }
 
-jbool nativeWiFiIsSupported(FNIEnv *env) {
+jbool NativeWiFi_IsSupported(FNIEnv *env) {
     return true;
 }
 
-jvoid nativeWiFiConnect(FNIEnv *env, jstring ssid, jstring password, jint authMode) {
-    if(!checkParams(env, ssid, password, authMode)) return;
+jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authMode) {
+    if(!CheckParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -94,10 +94,10 @@ jvoid nativeWiFiConnect(FNIEnv *env, jstring ssid, jstring password, jint authMo
         ret = esp_wifi_connect();
     Flint::unlock();
 
-    checkReturn(env, ret);
+    CheckReturn(env, ret);
 }
 
-jbool nativeWiFiIsConnected(FNIEnv *env) {
+jbool NativeWiFi_IsConnected(FNIEnv *env) {
     wifi_ap_record_t ap_info;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&ap_info);
     return (ret == ESP_OK) ? true : false;
@@ -125,7 +125,7 @@ static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecor
     return aprObj;
 }
 
-jobject nativeWiFiGetAPinfo(FNIEnv *env) {
+jobject NativeWiFi_GetAPinfo(FNIEnv *env) {
     wifi_ap_record_t apInfo;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apInfo);
     if(ret == ESP_OK) {
@@ -136,12 +136,12 @@ jobject nativeWiFiGetAPinfo(FNIEnv *env) {
     return NULL;
 }
 
-jvoid nativeWiFiDisconnect(FNIEnv *env) {
+jvoid NativeWiFi_Disconnect(FNIEnv *env) {
     esp_wifi_disconnect();
 }
 
-jvoid nativeWiFiSoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMode, jint channel, jint maxConnection) {
-    if(!checkParams(env, ssid, password, authMode)) return;
+jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMode, jint channel, jint maxConnection) {
+    if(!CheckParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -166,25 +166,25 @@ jvoid nativeWiFiSoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMod
         ret = esp_wifi_start();
     Flint::unlock();
 
-    checkReturn(env, ret);
+    CheckReturn(env, ret);
 }
 
-jvoid nativeWiFiSoftAPdisconnect(FNIEnv *env) {
+jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
     esp_wifi_set_mode(WIFI_MODE_STA);
 }
 
-jvoid nativeWiFiStartScan(FNIEnv *env, jbool blocked) {
+jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
     Flint::lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, blocked ? true : false);
     Flint::unlock();
-    checkReturn(env, ret);
+    CheckReturn(env, ret);
 }
 
-jobjectArray nativeWiFiGetScanResult(FNIEnv *env) {
+jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     uint16_t count = 0;
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
 
-    if(!checkReturn(env, ret)) return NULL;
+    if(!CheckReturn(env, ret)) return NULL;
 
     if(count == 0) return NULL;
 
@@ -196,7 +196,7 @@ jobjectArray nativeWiFiGetScanResult(FNIEnv *env) {
     for(uint16_t i = 0; i < count; i++) {
         wifi_ap_record_t apRecords;
         ret = esp_wifi_scan_get_ap_record(&apRecords);
-        if(!checkReturn(env, ret)) {
+        if(!CheckReturn(env, ret)) {
             Flint::unlock();
             return NULL;
         }
@@ -214,6 +214,6 @@ jobjectArray nativeWiFiGetScanResult(FNIEnv *env) {
     return arrayObj;
 }
 
-jvoid nativeWiFiStopScan(FNIEnv *env) {
+jvoid NativeWiFi_StopScan(FNIEnv *env) {
     esp_wifi_scan_stop();
 }

@@ -79,7 +79,7 @@ void NativePin_Reset(void) {
     }
 }
 
-static bool checkPin(FNIEnv *env, int32_t pin) {
+static bool CheckPin(FNIEnv *env, int32_t pin) {
     const char *msg = NativePin_CheckPin(pin);
     if(msg) {
         env->throwNew(env->findClass("java/io/IOException"), msg);
@@ -88,13 +88,13 @@ static bool checkPin(FNIEnv *env, int32_t pin) {
     return true;
 }
 
-jvoid nativePinSetMode(FNIEnv *env, jint pin, jint mode) {
-    if(!checkPin(env, pin)) return;
+jvoid NativePin_SetMode(FNIEnv *env, jint pin, jint mode) {
+    if(!CheckPin(env, pin)) return;
     if(!NativePin_SetPinMode(1 << pin, mode))
         env->throwNew(env->findClass("java/io/IOException"));
 }
 
-jbool nativePinRead(FNIEnv *env, jobject obj) {
+jbool NativePin_Read(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
 #ifdef GPIO_IN1_REG
     if(pin < 32)
@@ -106,7 +106,7 @@ jbool nativePinRead(FNIEnv *env, jobject obj) {
 #endif
 }
 
-jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
+jvoid NativePin_Write(FNIEnv *env, jobject obj, jbool level) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
 #ifdef GPIO_OUT1_W1TC_REG
     if(pin < 32) {
@@ -129,7 +129,7 @@ jvoid nativePinWrite(FNIEnv *env, jobject obj, jbool level) {
 #endif
 }
 
-jvoid nativePinSet(FNIEnv *env, jobject obj) {
+jvoid NativePin_LogicSet(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
 #ifdef GPIO_OUT1_W1TC_REG
     if(pin < 32)
@@ -141,7 +141,7 @@ jvoid nativePinSet(FNIEnv *env, jobject obj) {
 #endif
 }
 
-jvoid nativePinReset(FNIEnv *env, jobject obj) {
+jvoid NativePin_LogicReset(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
 #ifdef GPIO_OUT1_W1TC_REG
     if(pin < 32)
@@ -153,7 +153,7 @@ jvoid nativePinReset(FNIEnv *env, jobject obj) {
 #endif
 }
 
-jvoid nativePinToggle(FNIEnv *env, jobject obj) {
+jvoid NativePin_Toggle(FNIEnv *env, jobject obj) {
     int32_t pin = obj->getFieldByIndex(0)->getInt32();
 #ifdef GPIO_OUT1_REG
     if(pin < 32) {

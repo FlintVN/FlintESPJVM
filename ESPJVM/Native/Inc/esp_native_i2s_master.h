@@ -8,22 +8,22 @@
 
 void NativeI2sMaster_Reset(void);
 
-jobject nativeI2sMasterOpen(FNIEnv *env, jobject obj);
-jbool nativeI2sMasterIsOpen(FNIEnv *env, jobject obj);
-jint nativeI2sMasterReadByte(FNIEnv *env, jobject obj);
-jint nativeI2sMasterRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count);
-jvoid nativeI2sMasterWriteByte(FNIEnv *env, jobject obj, jint b);
-jvoid nativeI2sMasterWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count);
-jvoid nativeI2sMasterClose(FNIEnv *env, jobject obj);
+jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj);
+jbool NativeI2sMaster_IsOpen(FNIEnv *env, jobject obj);
+jint NativeI2sMaster_ReadByte(FNIEnv *env, jobject obj);
+jint NativeI2sMaster_Read(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count);
+jvoid NativeI2sMaster_WriteByte(FNIEnv *env, jobject obj, jint b);
+jvoid NativeI2sMaster_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count);
+jvoid NativeI2sMaster_Close(FNIEnv *env, jobject obj);
 
 static constexpr NativeMethod i2sMasterMethods[] = {
-    NATIVE_METHOD("open",   "()Lflint/machine/I2sMaster;", nativeI2sMasterOpen),
-    NATIVE_METHOD("isOpen", "()Z",                         nativeI2sMasterIsOpen),
-    NATIVE_METHOD("read",   "()I",                         nativeI2sMasterReadByte),
-    NATIVE_METHOD("read",   "([BII)I",                     nativeI2sMasterRead),
-    NATIVE_METHOD("write",  "(I)V",                        nativeI2sMasterWriteByte),
-    NATIVE_METHOD("write",  "([BII)V",                     nativeI2sMasterWrite),
-    NATIVE_METHOD("close",  "()V",                         nativeI2sMasterClose),
+    NATIVE_METHOD("open",   "()Lflint/machine/I2sMaster;", NativeI2sMaster_Open),
+    NATIVE_METHOD("isOpen", "()Z",                         NativeI2sMaster_IsOpen),
+    NATIVE_METHOD("read",   "()I",                         NativeI2sMaster_ReadByte),
+    NATIVE_METHOD("read",   "([BII)I",                     NativeI2sMaster_Read),
+    NATIVE_METHOD("write",  "(I)V",                        NativeI2sMaster_WriteByte),
+    NATIVE_METHOD("write",  "([BII)V",                     NativeI2sMaster_Write),
+    NATIVE_METHOD("close",  "()V",                         NativeI2sMaster_Close),
 };
 
 #endif /* __ESP_NATIVE_I2S_MASTER_H */

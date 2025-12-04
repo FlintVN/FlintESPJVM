@@ -14,7 +14,7 @@
 typedef class : public JObject {
 public:
     jstring getI2sName() { return (jstring)getFieldByIndex(0)->getObj(); }
-    jint getI2sId() { return getFieldByIndex(1)->getInt32(); }
+    jint GetI2sId() { return getFieldByIndex(1)->getInt32(); }
     jint getMode() { return getFieldByIndex(2)->getInt32(); }
     jint getDataMode() { return getMode() & 0x01; }
     jint getDirection() { return (getMode() >> 1) & 0x01; }
@@ -89,7 +89,7 @@ void NativeI2sMaster_Reset(void) {
         NativeI2sMaster_Close(i);
 }
 
-static int32_t getI2sId(FNIEnv *env, jstring i2sName) {
+static int32_t GetI2sId(FNIEnv *env, jstring i2sName) {
     if(i2sName == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "I2S name cannot be null");
         return -1;
@@ -110,7 +110,7 @@ static int32_t getI2sId(FNIEnv *env, jstring i2sName) {
     }
 }
 
-static bool checkI2sMasterPin(FNIEnv *env, I2sMasterObject i2sObj) {
+static bool CheckI2sMasterPin(FNIEnv *env, I2sMasterObject i2sObj) {
     const char *msg;
     int32_t sck = i2sObj->getSck();
     int32_t ws = i2sObj->getWs();
@@ -141,8 +141,8 @@ static bool checkI2sMasterPin(FNIEnv *env, I2sMasterObject i2sObj) {
     return true;
 }
 
-static bool checkPrecondition(FNIEnv *env, I2sMasterObject i2sObj) {
-    int32_t i2sId = i2sObj->getI2sId();
+static bool CheckPrecondition(FNIEnv *env, I2sMasterObject i2sObj) {
+    int32_t i2sId = i2sObj->GetI2sId();
     if(!NativeI2sMaster_IsOpen(i2sId)) {
         env->throwNew(env->findClass("java/io/IOException"), "I2S has not been opened yet");
         return false;
@@ -154,9 +154,9 @@ static bool checkPrecondition(FNIEnv *env, I2sMasterObject i2sObj) {
     return true;
 }
 
-jobject nativeI2sMasterOpen(FNIEnv *env, jobject obj) {
+jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
-    int32_t i2sId = getI2sId(env, i2sObj->getI2sName());
+    int32_t i2sId = GetI2sId(env, i2sObj->getI2sName());
     uint32_t minBuff = (i2sObj->getDataBits() / 8 * (i2sObj->getDataMode() != 0 ? 2 : 1)) * BUF_LEN_IN_I2S_FRAMES * 2;
     if(i2sId == -1) return obj;
 
@@ -175,7 +175,7 @@ jobject nativeI2sMasterOpen(FNIEnv *env, jobject obj) {
         env->throwNew(env->findClass("java/io/IOException"), msg);
         return obj;
     }
-    if(!checkI2sMasterPin(env, i2sObj)) return obj;
+    if(!CheckI2sMasterPin(env, i2sObj)) return obj;
 
     i2s_chan_config_t channelCfg = I2S_CHANNEL_DEFAULT_CONFIG((i2s_port_t)i2sId, I2S_ROLE_MASTER);
     channelCfg.dma_desc_num = i2sObj->getBufferSize() / BUF_LEN_IN_I2S_FRAMES / (i2sObj->getDataBits() / 8 * (i2sObj->getDataMode() != 0 ? 2 : 1));
@@ -226,66 +226,66 @@ jobject nativeI2sMasterOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeI2sMasterIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeI2sMaster_IsOpen(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
-    int32_t i2sId = i2sObj->getI2sId();
+    int32_t i2sId = i2sObj->GetI2sId();
     if(NativeI2sMaster_IsOpen(i2sId))
         return (i2sHandle[i2sId].i2sObj == i2sObj) ? true : false;
     return false;
 }
 
-jint nativeI2sMasterReadByte(FNIEnv *env, jobject obj) {
+jint NativeI2sMaster_ReadByte(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     if(i2sObj->getDirection() != 1) {
         env->throwNew(env->findClass("java/io/IOException"), "Write operation is not available in TX mode");
         return -1;
     }
     int8_t buff;
-    int32_t i2sId = i2sObj->getI2sId();
-    if(!checkPrecondition(env, i2sObj)) return -1;
+    int32_t i2sId = i2sObj->GetI2sId();
+    if(!CheckPrecondition(env, i2sObj)) return -1;
     NativeI2sMaster_Read(env, i2sId, &buff, 1);
     return buff;
 }
 
-jint nativeI2sMasterRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jint NativeI2sMaster_Read(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     if(i2sObj->getDirection() != 1) {
         env->throwNew(env->findClass("java/io/IOException"), "Write operation is not available in TX mode");
         return 0;
     }
-    int32_t i2sId = i2sObj->getI2sId();
-    if(!checkPrecondition(env, i2sObj)) return 0;
+    int32_t i2sId = i2sObj->GetI2sId();
+    if(!CheckPrecondition(env, i2sObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
     return NativeI2sMaster_Read(env, i2sId, &b->getData()[off], count);
 }
 
-jvoid nativeI2sMasterWriteByte(FNIEnv *env, jobject obj, jint b) {
+jvoid NativeI2sMaster_WriteByte(FNIEnv *env, jobject obj, jint b) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     if(i2sObj->getDirection() != 0) {
         env->throwNew(env->findClass("java/io/IOException"), "Write operation is not available in RX mode");
         return;
     }
     int8_t buff = (uint8_t)b;
-    int32_t i2sId = i2sObj->getI2sId();
-    if(!checkPrecondition(env, i2sObj)) return;
+    int32_t i2sId = i2sObj->GetI2sId();
+    if(!CheckPrecondition(env, i2sObj)) return;
     NativeI2sMaster_Write(env, i2sId, &buff, 1);
 }
 
-jvoid nativeI2sMasterWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jvoid NativeI2sMaster_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     if(i2sObj->getDirection() != 0) {
         env->throwNew(env->findClass("java/io/IOException"), "Write operation is not available in RX mode");
         return;
     }
-    int32_t i2sId = i2sObj->getI2sId();
-    if(!checkPrecondition(env, i2sObj)) return;
+    int32_t i2sId = i2sObj->GetI2sId();
+    if(!CheckPrecondition(env, i2sObj)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
     NativeI2sMaster_Write(env, i2sId, &b->getData()[off], count);
 }
 
-jvoid nativeI2sMasterClose(FNIEnv *env, jobject obj) {
+jvoid NativeI2sMaster_Close(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
-    int32_t i2sId = i2sObj->getI2sId();
+    int32_t i2sId = i2sObj->GetI2sId();
     if(NativeI2sMaster_IsOpen(i2sId)) {
         if(i2sHandle[i2sId].i2sObj != i2sObj) {
             env->throwNew(env->findClass("java/io/IOException"), "Access is denied");

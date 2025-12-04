@@ -88,7 +88,7 @@ static void NativeBitStreamWrite(BitStreamObject bitStream, uint8_t *buf, uint32
     }
 }
 
-static bool checkPrecondition(FNIEnv *env, BitStreamObject bitStream) {
+static bool CheckPrecondition(FNIEnv *env, BitStreamObject bitStream) {
     int32_t id = bitStream->getId();
     if(!NativeBitStream_IsOpen(id)) {
         env->throwNew(env->findClass("java/io/IOException"), "BitStream has not been opened yet");
@@ -97,7 +97,7 @@ static bool checkPrecondition(FNIEnv *env, BitStreamObject bitStream) {
     return true;
 }
 
-jobject nativeBitStreamOpen(FNIEnv *env, jobject obj) {
+jobject NativeBitStream_Open(FNIEnv *env, jobject obj) {
     BitStreamObject bitStream = (BitStreamObject)obj;
 
     if(NativeBitStream_IsOpen(bitStream->getId())) {
@@ -121,27 +121,27 @@ jobject nativeBitStreamOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeBitStreamIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeBitStream_IsOpen(FNIEnv *env, jobject obj) {
     BitStreamObject bitStream = (BitStreamObject)obj;
     return NativeBitStream_IsOpen(bitStream->getId());
 }
 
-jvoid nativeBitStreamWriteByte(FNIEnv *env, jobject obj, jint b) {
+jvoid NativeBitStream_WriteByte(FNIEnv *env, jobject obj, jint b) {
     BitStreamObject bitStream = (BitStreamObject)obj;
     uint8_t buff = (uint8_t)b;
-    if(!checkPrecondition(env, bitStream)) return;
+    if(!CheckPrecondition(env, bitStream)) return;
     NativeBitStreamWrite(bitStream, &buff, 1);
 }
 
-jvoid nativeBitStreamWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jvoid NativeBitStream_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     BitStreamObject bitStream = (BitStreamObject)obj;
     uint8_t *buff = (uint8_t *)&b->getData()[off];
-    if(!checkPrecondition(env, bitStream)) return;
+    if(!CheckPrecondition(env, bitStream)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
     NativeBitStreamWrite(bitStream, buff, count);
 }
 
-jvoid nativeBitStreamClose(FNIEnv *env, jobject obj) {
+jvoid NativeBitStream_Close(FNIEnv *env, jobject obj) {
     BitStreamObject bitStream = (BitStreamObject)obj;
     bitStream->setId(-1);
 }

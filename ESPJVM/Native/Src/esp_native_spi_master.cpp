@@ -11,7 +11,7 @@
 typedef class : public JObject {
 public:
     jstring getSpiName() { return (jstring)getFieldByIndex(0)->getObj(); }
-    int32_t getSpiId() { return getFieldByIndex(1)->getInt32(); }
+    int32_t GetSpiId() { return getFieldByIndex(1)->getInt32(); }
     int32_t getMode() { return getFieldByIndex(2)->getInt32(); }
     int32_t getSpeed() { return getFieldByIndex(3)->getInt32(); }
     int32_t getMosi() { return getFieldByIndex(4)->getInt32(); }
@@ -63,7 +63,7 @@ void NativeSpiMaster_Reset(void) {
         NativeSpiMaster_Close(i + 1);
 }
 
-static bool checkSpiPin(FNIEnv *env, SpiMasterObject spiObj) {
+static bool CheckSpiPin(FNIEnv *env, SpiMasterObject spiObj) {
     const char *msg;
     if(spiObj->getMosi() < 0) {
         env->throwNew(env->findClass("java/io/IOException"), "MOSI pin value cannot be -1 when in SPI Master mode");
@@ -91,8 +91,8 @@ static bool checkSpiPin(FNIEnv *env, SpiMasterObject spiObj) {
     return true;
 }
 
-static bool checkSpiTransferCondition(FNIEnv *env, SpiMasterObject spiObj) {
-    int32_t spiId = spiObj->getSpiId();
+static bool CheckSpiTransferCondition(FNIEnv *env, SpiMasterObject spiObj) {
+    int32_t spiId = spiObj->GetSpiId();
     if(!NativeSpiMaster_IsOpen(spiId)) {
         env->throwNew(env->findClass("java/io/IOException"), "SPI has not been opened yet");
         return false;
@@ -104,7 +104,7 @@ static bool checkSpiTransferCondition(FNIEnv *env, SpiMasterObject spiObj) {
     return true;
 }
 
-static int32_t getSpiId(FNIEnv *env, jstring spiName) {
+static int32_t GetSpiId(FNIEnv *env, jstring spiName) {
     if(spiName == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "SPI name cannot be null");
         return -1;
@@ -136,7 +136,7 @@ static int32_t getSpiId(FNIEnv *env, jstring spiName) {
     }
 }
 
-static void initDefaultValues(SpiMasterObject spiObj, int32_t spiId) {
+static void InitDefaultValues(SpiMasterObject spiObj, int32_t spiId) {
 #ifdef SPI3_IOMUX_PIN_NUM_MOSI
     static const int8_t spiMosiPin[] = {SPI2_IOMUX_PIN_NUM_MOSI, SPI3_IOMUX_PIN_NUM_MOSI};
     static const int8_t spiMisoPin[] = {SPI2_IOMUX_PIN_NUM_MISO, SPI3_IOMUX_PIN_NUM_MISO};
@@ -154,12 +154,12 @@ static void initDefaultValues(SpiMasterObject spiObj, int32_t spiId) {
     if(spiObj->getCs() < -1) spiObj->setCs(-1);
 }
 
-jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj) {
+jobject NativeSpiMaster_Open(FNIEnv *env, jobject obj) {
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    int32_t spiId = getSpiId(env, spiObj->getSpiName());
+    int32_t spiId = GetSpiId(env, spiObj->getSpiName());
     if(spiId == -1) return obj;
 
-    initDefaultValues(spiObj, spiId);
+    InitDefaultValues(spiObj, spiId);
 
     if(NativeSpiMaster_IsOpen(spiId)) {
         const char *msg = (espSpiHandle[spiId - 1].spiObj != spiObj) ? "Access is denied" : "SPI is already open";
@@ -167,7 +167,7 @@ jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj) {
         return obj;
     }
 
-    if(!checkSpiPin(env, spiObj)) return obj;
+    if(!CheckSpiPin(env, spiObj)) return obj;
 
     int32_t mode = spiObj->getMode();
 
@@ -200,17 +200,17 @@ jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeSpiMasterIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeSpiMaster_IsOpen(FNIEnv *env, jobject obj) {
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    int32_t spiId = spiObj->getSpiId();
+    int32_t spiId = spiObj->GetSpiId();
     if(NativeSpiMaster_IsOpen(spiId))
         return (espSpiHandle[spiId - 1].spiObj == spiObj) ? true : false;
     return false;
 }
 
-jint nativeSpiMasterGetSpeed(FNIEnv *env, jobject obj) {
+jint NativeSpiMaster_GetSpeed(FNIEnv *env, jobject obj) {
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    int32_t spiId = spiObj->getSpiId();
+    int32_t spiId = spiObj->GetSpiId();
     if(NativeSpiMaster_IsOpen(spiId)) {
         int32_t ret = 0;
         if(spi_device_get_actual_freq(espSpiHandle[spiId - 1].handle, (int *)&ret) != ESP_OK) {
@@ -222,28 +222,28 @@ jint nativeSpiMasterGetSpeed(FNIEnv *env, jobject obj) {
     return spiObj->getSpeed();
 }
 
-jint nativeSpiMasterRead(FNIEnv *env, jobject obj) {
+jint NativeSpiMaster_Read(FNIEnv *env, jobject obj) {
     uint8_t buff;
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    if(!checkSpiTransferCondition(env, spiObj)) return -1;
-    if(NativeSpiMaster_Transfer(spiObj->getSpiId(), NULL, 0, &buff, 0, 1) != ESP_OK) {
+    if(!CheckSpiTransferCondition(env, spiObj)) return -1;
+    if(NativeSpiMaster_Transfer(spiObj->GetSpiId(), NULL, 0, &buff, 0, 1) != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while transmitting data");
         return -1;
     }
     return buff;
 }
 
-jvoid nativeSpiMasterWrite(FNIEnv *env, jobject obj, jint b) {
+jvoid NativeSpiMaster_Write(FNIEnv *env, jobject obj, jint b) {
     uint8_t buff = b;
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    if(!checkSpiTransferCondition(env, spiObj)) return;
-    if(NativeSpiMaster_Transfer(spiObj->getSpiId(), &buff, 0, NULL, 0, 1) != ESP_OK)
+    if(!CheckSpiTransferCondition(env, spiObj)) return;
+    if(NativeSpiMaster_Transfer(spiObj->GetSpiId(), &buff, 0, NULL, 0, 1) != ESP_OK)
         env->throwNew(env->findClass("java/io/IOException"), "Error while transmitting data");
 }
 
-jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOff, jboolArray rx, jint rxOff, jint length) {
+jint NativeSpiMaster_ReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOff, jboolArray rx, jint rxOff, jint length) {
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    if(!checkSpiTransferCondition(env, spiObj)) return 0;
+    if(!CheckSpiTransferCondition(env, spiObj)) return 0;
     if((tx == NULL) && (rx == NULL)) {
         env->throwNew(env->findClass("java/lang/NullPointerException"));
         return 0;
@@ -252,16 +252,16 @@ jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOf
     if(rx != NULL && !CheckArrayIndexSize(env, rx, rxOff, length)) return 0;
     uint8_t *txBuff = tx != NULL ? (uint8_t *)tx->getData() : NULL;
     uint8_t *rxBuff = rx != NULL ? (uint8_t *)rx->getData() : NULL;
-    if(NativeSpiMaster_Transfer(spiObj->getSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {
+    if(NativeSpiMaster_Transfer(spiObj->GetSpiId(), txBuff, txOff, rxBuff, rxOff, length) != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while transmitting data");
         return 0;
     }
     return rxBuff ? length : 0;
 }
 
-jvoid nativeSpiMasterClose(FNIEnv *env, jobject obj) {
+jvoid NativeSpiMaster_Close(FNIEnv *env, jobject obj) {
     SpiMasterObject spiObj = (SpiMasterObject)obj;
-    int32_t spiId = spiObj->getSpiId();
+    int32_t spiId = spiObj->GetSpiId();
     if(NativeSpiMaster_IsOpen(spiId)) {
         if(espSpiHandle[spiId - 1].spiObj != spiObj) {
             env->throwNew(env->findClass("java/io/IOException"), "Access is denied");

@@ -10,7 +10,7 @@
 typedef class : public JObject {
 public:
     jstring getI2cName() { return (jstring)getFieldByIndex(0)->getObj(); }
-    int32_t getI2cId() { return getFieldByIndex(1)->getInt32(); }
+    int32_t GetI2cId() { return getFieldByIndex(1)->getInt32(); }
     int32_t getSpeed() { return getFieldByIndex(2)->getInt32(); }
     int32_t getDevAddr() { return getFieldByIndex(3)->getInt32(); }
     int32_t getSda() { return getFieldByIndex(4)->getInt32(); }
@@ -40,7 +40,7 @@ void NativeI2cMaster_Reset(void) {
         NativeI2cMaster_Close(i);
 }
 
-static int32_t getI2cId(FNIEnv *env, jstring i2cName) {
+static int32_t GetI2cId(FNIEnv *env, jstring i2cName) {
     if(i2cName == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "I2C name cannot be null");
         return -1;
@@ -61,7 +61,7 @@ static int32_t getI2cId(FNIEnv *env, jstring i2cName) {
     }
 }
 
-static bool checkI2cMasterPin(FNIEnv *env, I2cMasterObject i2cObj) {
+static bool CheckI2cMasterPin(FNIEnv *env, I2cMasterObject i2cObj) {
     const char *msg;
     int32_t sda = i2cObj->getSda();
     int32_t scl = i2cObj->getScl();
@@ -81,8 +81,8 @@ static bool checkI2cMasterPin(FNIEnv *env, I2cMasterObject i2cObj) {
     return true;
 }
 
-static bool checkPrecondition(FNIEnv *env, I2cMasterObject i2cObj) {
-    int32_t i2cId = i2cObj->getI2cId();
+static bool CheckPrecondition(FNIEnv *env, I2cMasterObject i2cObj) {
+    int32_t i2cId = i2cObj->GetI2cId();
     if(!NativeI2cMaster_IsOpen(i2cId)) {
         env->throwNew(env->findClass("java/io/IOException"), "I2C has not been opened yet");
         return false;
@@ -99,9 +99,9 @@ static bool checkPrecondition(FNIEnv *env, I2cMasterObject i2cObj) {
     return true;
 }
 
-jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
+jobject NativeI2cMaster_Open(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    int32_t i2cId = getI2cId(env, i2cObj->getI2cName());
+    int32_t i2cId = GetI2cId(env, i2cObj->getI2cName());
     if(i2cId == -1) return obj;
 
     if(i2cObj->getSda() < 0) i2cObj->setSda(-1);
@@ -113,7 +113,7 @@ jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
         env->throwNew(env->findClass("java/io/IOException"), msg);
         return obj;
     }
-    if(!checkI2cMasterPin(env, i2cObj)) return obj;
+    if(!CheckI2cMasterPin(env, i2cObj)) return obj;
 
     i2c_config_t conf = {};
     conf.mode = I2C_MODE_MASTER;
@@ -135,22 +135,22 @@ jobject nativeI2cMasterOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeI2cMasterIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeI2cMaster_IsOpen(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    int32_t i2cId = i2cObj->getI2cId();
+    int32_t i2cId = i2cObj->GetI2cId();
     if(NativeI2cMaster_IsOpen(i2cId))
         return (i2cHolder[i2cId] == i2cObj) ? true : false;
     return false;
 }
 
-jint nativeI2cMasterGetSpeed(FNIEnv *env, jobject obj) {
+jint NativeI2cMaster_GetSpeed(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
     return i2cObj->getSpeed();
 }
 
-jint nativeI2cMasterReadByte(FNIEnv *env, jobject obj) {
+jint NativeI2cMaster_ReadByte(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return -1;
+    if(!CheckPrecondition(env, i2cObj)) return -1;
 
     uint8_t data;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -158,16 +158,16 @@ jint nativeI2cMasterReadByte(FNIEnv *env, jobject obj) {
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1) | I2C_MASTER_READ, true);
     if(err == ESP_OK) err = i2c_master_read_byte(cmd, &data, I2C_MASTER_NACK);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while reading data");
     return data;
 }
 
-jint nativeI2cMasterRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jint NativeI2cMaster_Read(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return 0;
+    if(!CheckPrecondition(env, i2cObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -175,31 +175,31 @@ jint nativeI2cMasterRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint 
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1) | I2C_MASTER_READ, true);
     if(err == ESP_OK) err = i2c_master_read(cmd, (uint8_t *)&b->getData()[off], count, I2C_MASTER_LAST_NACK);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while reading data");
     return count;
 }
 
-jvoid nativeI2cMasterWriteByte(FNIEnv *env, jobject obj, jint b) {
+jvoid NativeI2cMaster_WriteByte(FNIEnv *env, jobject obj, jint b) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return;
+    if(!CheckPrecondition(env, i2cObj)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1), true);
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (uint8_t)b, true);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
-jvoid nativeI2cMasterWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jvoid NativeI2cMaster_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return;
+    if(!CheckPrecondition(env, i2cObj)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -207,15 +207,15 @@ jvoid nativeI2cMasterWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jin
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1), true);
     if(err == ESP_OK) err = i2c_master_write(cmd, (uint8_t *)&b->getData()[off], count, true);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
-jint nativeI2cMasterReadMemByte(FNIEnv *env, jobject obj, jint memAddr) {
+jint NativeI2cMaster_ReadMemByte(FNIEnv *env, jobject obj, jint memAddr) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return -1;
+    if(!CheckPrecondition(env, i2cObj)) return -1;
 
     uint8_t data;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -226,16 +226,16 @@ jint nativeI2cMasterReadMemByte(FNIEnv *env, jobject obj, jint memAddr) {
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1) | I2C_MASTER_READ, true);
     if(err == ESP_OK) err = i2c_master_read_byte(cmd, &data, I2C_MASTER_NACK);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while reading data");
     return data;
 }
 
-jint nativeI2cMasterReadMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
+jint NativeI2cMaster_ReadMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return 0;
+    if(!CheckPrecondition(env, i2cObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -246,16 +246,16 @@ jint nativeI2cMasterReadMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (i2cObj->getDevAddr() << 1) | I2C_MASTER_READ, true);
     if(err == ESP_OK) err = i2c_master_read(cmd, (uint8_t *)&b->getData()[off], count, I2C_MASTER_LAST_NACK);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while reading data");
     return count;
 }
 
-jvoid nativeI2cMasterWriteMemByte(FNIEnv *env, jobject obj, jint memAddr, jint b) {
+jvoid NativeI2cMaster_WriteMemByte(FNIEnv *env, jobject obj, jint memAddr, jint b) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return;
+    if(!CheckPrecondition(env, i2cObj)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     esp_err_t err = i2c_master_start(cmd);
@@ -263,15 +263,15 @@ jvoid nativeI2cMasterWriteMemByte(FNIEnv *env, jobject obj, jint memAddr, jint b
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (uint8_t)memAddr, true);
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (uint8_t)b, true);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
-jvoid nativeI2cMasterWriteMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
+jvoid NativeI2cMaster_WriteMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray b, jint off, jint count) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    if(!checkPrecondition(env, i2cObj)) return;
+    if(!CheckPrecondition(env, i2cObj)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
 
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -280,15 +280,15 @@ jvoid nativeI2cMasterWriteMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray
     if(err == ESP_OK) err = i2c_master_write_byte(cmd, (uint8_t)memAddr, true);
     if(err == ESP_OK) err = i2c_master_write(cmd, (uint8_t *)&b->getData()[off], count, true);
     if(err == ESP_OK) err = i2c_master_stop(cmd);
-    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->getI2cId(), cmd, pdMS_TO_TICKS(20));
+    if(err == ESP_OK) err = i2c_master_cmd_begin((i2c_port_t)i2cObj->GetI2cId(), cmd, pdMS_TO_TICKS(20));
     i2c_cmd_link_delete(cmd);
 
     if(err != ESP_OK) env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
-jvoid nativeI2cMasterClose(FNIEnv *env, jobject obj) {
+jvoid NativeI2cMaster_Close(FNIEnv *env, jobject obj) {
     I2cMasterObject i2cObj = (I2cMasterObject)obj;
-    int32_t i2cId = i2cObj->getI2cId();
+    int32_t i2cId = i2cObj->GetI2cId();
     if(NativeI2cMaster_IsOpen(i2cId)) {
         if(i2cHolder[i2cId] != i2cObj) {
             env->throwNew(env->findClass("java/io/IOException"), "Access is denied");

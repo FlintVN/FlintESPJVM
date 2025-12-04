@@ -20,7 +20,7 @@ void NativeAdc_Reset(void) {
     }
 }
 
-static int32_t getAdcId(FNIEnv *env, jstring name) {
+static int32_t GetAdcId(FNIEnv *env, jstring name) {
     if(name == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "ADC name cannot be null");
         return -1;
@@ -35,9 +35,9 @@ static int32_t getAdcId(FNIEnv *env, jstring name) {
     }
 }
 
-jvoid nativeAdcInitAdc(FNIEnv *env, jobject obj) {
+jvoid NativeAdc_InitAdc(FNIEnv *env, jobject obj) {
     jstring name = (jstring)obj->getFieldByIndex(0)->getObj();
-    int32_t id = getAdcId(env, name);
+    int32_t id = GetAdcId(env, name);
     esp_err_t err = ESP_OK;
     if(id == -1) return;
 
@@ -71,7 +71,7 @@ jvoid nativeAdcInitAdc(FNIEnv *env, jobject obj) {
     obj->getFieldByIndex(1)->setInt32(id);
 }
 
-jint nativeAdcRead(FNIEnv *env, jobject obj) {
+jint NativeAdc_Read(FNIEnv *env, jobject obj) {
     int32_t id = obj->getFieldByIndex(1)->getInt32();
     int32_t channel = obj->getFieldByIndex(2)->getInt32();
     int val;

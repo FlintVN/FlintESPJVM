@@ -159,7 +159,7 @@ static bool NativeOneWire_Reset(int32_t pin, int32_t speedMode) {
     return ret == 2;
 }
 
-static bool checkPrecondition(FNIEnv *env, OneWireObject oneWire) {
+static bool CheckPrecondition(FNIEnv *env, OneWireObject oneWire) {
     int32_t id = oneWire->getId();
     if(!NativeOneWire_IsOpen(id)) {
         env->throwNew(env->findClass("java/io/IOException"), "BitStream has not been opened yet");
@@ -168,7 +168,7 @@ static bool checkPrecondition(FNIEnv *env, OneWireObject oneWire) {
     return true;
 }
 
-jobject nativeOneWireOpen(FNIEnv *env, jobject obj) {
+jobject NativeOneWire_Open(FNIEnv *env, jobject obj) {
     OneWireObject oneWire = (OneWireObject)obj;
 
     if(NativeOneWire_IsOpen(oneWire->getId())) {
@@ -200,51 +200,51 @@ jobject nativeOneWireOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeOneWireIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeOneWire_IsOpen(FNIEnv *env, jobject obj) {
     OneWireObject oneWire = (OneWireObject)obj;
     return NativeOneWire_IsOpen(oneWire->getId());
 }
 
-jvoid nativeOneWireReset(FNIEnv *env, jobject obj) {
+jvoid NativeOneWire_Reset(FNIEnv *env, jobject obj) {
     OneWireObject oneWire = (OneWireObject)obj;
-    if(!checkPrecondition(env, oneWire)) return;
+    if(!CheckPrecondition(env, oneWire)) return;
     if(!NativeOneWire_Reset(oneWire->getPin(), oneWire->getSpeedMode()))
         env->throwNew(env->findClass("java/io/IOException"), "No devices present");
 }
 
-jint nativeOneWireReadByte(FNIEnv *env, jobject obj) {
+jint NativeOneWire_ReadByte(FNIEnv *env, jobject obj) {
     OneWireObject oneWire = (OneWireObject)obj;
     uint8_t buff;
-    if(!checkPrecondition(env, oneWire)) return -1;
+    if(!CheckPrecondition(env, oneWire)) return -1;
     NativeOneWire_Read(oneWire->getPin(), oneWire->getSpeedMode(), &buff, 1);
     return buff;
 }
 
-jint nativeOneWireRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jint NativeOneWire_Read(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     OneWireObject oneWire = (OneWireObject)obj;
     uint8_t *buff = (uint8_t *)&b->getData()[off];
-    if(!checkPrecondition(env, oneWire)) return 0;
+    if(!CheckPrecondition(env, oneWire)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
     NativeOneWire_Read(oneWire->getPin(), oneWire->getSpeedMode(), buff, count);
     return count;
 }
 
-jvoid nativeOneWireWriteByte(FNIEnv *env, jobject obj, jint b) {
+jvoid NativeOneWire_WriteByte(FNIEnv *env, jobject obj, jint b) {
     OneWireObject oneWire = (OneWireObject)obj;
     uint8_t buff = (uint8_t)b;
-    if(!checkPrecondition(env, oneWire)) return;
+    if(!CheckPrecondition(env, oneWire)) return;
     NativeOneWire_Write(oneWire->getPin(), oneWire->getSpeedMode(), &buff, 1);
 }
 
-jvoid nativeOneWireWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
+jvoid NativeOneWire_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count) {
     OneWireObject oneWire = (OneWireObject)obj;
     uint8_t *buff = (uint8_t *)&b->getData()[off];
-    if(!checkPrecondition(env, oneWire)) return;
+    if(!CheckPrecondition(env, oneWire)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
     NativeOneWire_Write(oneWire->getPin(), oneWire->getSpeedMode(), buff, count);
 }
 
-jvoid nativeOneWireClose(FNIEnv *env, jobject obj) {
+jvoid NativeOneWire_Close(FNIEnv *env, jobject obj) {
     OneWireObject oneWire = (OneWireObject)obj;
     oneWire->setId(-1);
 }

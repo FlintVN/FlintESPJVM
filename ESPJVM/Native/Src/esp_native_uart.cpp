@@ -11,7 +11,7 @@
 typedef class : public JObject {
 public:
     jstring getPortName() { return (jstring)getFieldByIndex(0)->getObj(); }
-    int32_t getPortId() { return getFieldByIndex(1)->getInt32(); }
+    int32_t GetPortId() { return getFieldByIndex(1)->getInt32(); }
     int32_t getBaudrate() { return getFieldByIndex(2)->getInt32(); }
     int32_t getStopBits() { return getFieldByIndex(3)->getInt32(); }
     int32_t getParity() { return getFieldByIndex(4)->getInt32(); }
@@ -50,7 +50,7 @@ void NativeUart_Reset(void) {
 #endif
 }
 
-static int32_t getUartId(FNIEnv *env, jstring portName) {
+static int32_t GetUartId(FNIEnv *env, jstring portName) {
     if(portName == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "UART name cannot be null");
         return -1;
@@ -88,7 +88,7 @@ static int32_t getUartId(FNIEnv *env, jstring portName) {
     }
 }
 
-static void initDefaultValues(SerialPortObject uartObj, int32_t uartId) {
+static void InitDefaultValues(SerialPortObject uartObj, int32_t uartId) {
     typedef struct {
         int8_t txPin;
         int8_t rxPin;
@@ -117,7 +117,7 @@ static void initDefaultValues(SerialPortObject uartObj, int32_t uartId) {
     if(uartObj->getBaudrate() < 0) uartObj->setBaudrate(9600);
 }
 
-static bool checkUartPin(FNIEnv *env, SerialPortObject portObj) {
+static bool CheckUartPin(FNIEnv *env, SerialPortObject portObj) {
     const char *msg;
     int32_t txPin = portObj->getTxPin();
     int32_t rxPin = portObj->getRxPin();
@@ -136,8 +136,8 @@ static bool checkUartPin(FNIEnv *env, SerialPortObject portObj) {
     return true;
 }
 
-static bool checkPrecondition(FNIEnv *env, SerialPortObject portObj) {
-    int32_t portId = portObj->getPortId();
+static bool CheckPrecondition(FNIEnv *env, SerialPortObject portObj) {
+    int32_t portId = portObj->GetPortId();
     if(!NativeUart_IsOpen(portId)) {
         env->throwNew(env->findClass("java/io/IOException"), "UART has not been opened yet");
         return false;
@@ -149,12 +149,12 @@ static bool checkPrecondition(FNIEnv *env, SerialPortObject portObj) {
     return true;
 }
 
-jobject nativeUartOpen(FNIEnv *env, jobject obj) {
+jobject NativeUart_Open(FNIEnv *env, jobject obj) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t uartId = getUartId(env, portObj->getPortName());
+    int32_t uartId = GetUartId(env, portObj->getPortName());
     if(uartId == -1) return obj;
 
-    initDefaultValues(portObj, uartId);
+    InitDefaultValues(portObj, uartId);
 
     if(NativeUart_IsOpen(uartId)) {
         const char *msg = (uartHolder[uartId] != portObj) ? "Access is denied" : "UART is already open";
@@ -162,7 +162,7 @@ jobject nativeUartOpen(FNIEnv *env, jobject obj) {
         return obj;
     }
 
-    if(!checkUartPin(env, portObj)) return obj;
+    if(!CheckUartPin(env, portObj)) return obj;
 
     int32_t parity = portObj->getParity();
 
@@ -186,17 +186,17 @@ jobject nativeUartOpen(FNIEnv *env, jobject obj) {
     return obj;
 }
 
-jbool nativeUartIsOpen(FNIEnv *env, jobject obj) {
+jbool NativeUart_IsOpen(FNIEnv *env, jobject obj) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t uartId = portObj->getPortId();
+    int32_t uartId = portObj->GetPortId();
     if(NativeUart_IsOpen(uartId))
         return (uartHolder[uartId] == portObj) ? true : false;
     return false;
 }
 
-jint nativeUartGetBaudrate(FNIEnv *env, jobject obj) {
+jint NativeUart_GetBaudrate(FNIEnv *env, jobject obj) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t uartId = portObj->getPortId();
+    int32_t uartId = portObj->GetPortId();
     if(NativeUart_IsOpen(uartId)) {
         uint32_t ret;
         if(uart_get_baudrate((uart_port_t)uartId, &ret) == ESP_OK)
@@ -205,11 +205,11 @@ jint nativeUartGetBaudrate(FNIEnv *env, jobject obj) {
     return portObj->getBaudrate();
 }
 
-jint nativeUartReadByte(FNIEnv *env, jobject obj) {
+jint NativeUart_ReadByte(FNIEnv *env, jobject obj) {
     uint8_t buff;
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t portId = portObj->getPortId();
-    if(!checkPrecondition(env, portObj)) return -1;
+    int32_t portId = portObj->GetPortId();
+    if(!CheckPrecondition(env, portObj)) return -1;
     while(!env->exec->hasTerminateRequest()) {
         if(uart_read_bytes((uart_port_t)portId, &buff, 1, pdMS_TO_TICKS(10)) == 1)
             return buff;
@@ -217,10 +217,10 @@ jint nativeUartReadByte(FNIEnv *env, jobject obj) {
     return -1;
 }
 
-jint nativeUartRead(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
+jint NativeUart_Read(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t portId = portObj->getPortId();
-    if(!checkPrecondition(env, portObj)) return 0;
+    int32_t portId = portObj->GetPortId();
+    if(!CheckPrecondition(env, portObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
     while(!env->exec->hasTerminateRequest()) {
         int32_t rxSize = uart_read_bytes((uart_port_t)portId, &b->getData()[off], count, pdMS_TO_TICKS(10));
@@ -229,20 +229,20 @@ jint nativeUartRead(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) 
     return 0;
 }
 
-jvoid nativeUartWriteByte(FNIEnv *env, jobject obj, int b) {
+jvoid NativeUart_WriteByte(FNIEnv *env, jobject obj, int b) {
     uint8_t buff = (uint8_t)b;
     SerialPortObject portObj = (SerialPortObject)obj;
-    if(!checkPrecondition(env, portObj)) return;
-    if(uart_write_bytes((uart_port_t)portObj->getPortId(), &buff, 1) != 1)
+    if(!CheckPrecondition(env, portObj)) return;
+    if(uart_write_bytes((uart_port_t)portObj->GetPortId(), &buff, 1) != 1)
         env->throwNew(env->findClass("java/io/IOException"), "Error while writing data");
 }
 
-jvoid nativeUartWrite(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
+jvoid NativeUart_Write(FNIEnv *env, jobject obj, jbyteArray b, int off, int count) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    if(!checkPrecondition(env, portObj)) return;
+    if(!CheckPrecondition(env, portObj)) return;
     if(!CheckArrayIndexSize(env, b, off, count)) return;
     int8_t *buff = &b->getData()[off];
-    int32_t portId = portObj->getPortId();
+    int32_t portId = portObj->GetPortId();
     while(count) {
         size_t byteSent = uart_write_bytes((uart_port_t)portId, buff, count);
         if(byteSent == 0) {
@@ -254,9 +254,9 @@ jvoid nativeUartWrite(FNIEnv *env, jobject obj, jbyteArray b, int off, int count
     }
 }
 
-jvoid nativeUartClose(FNIEnv *env, jobject obj) {
+jvoid NativeUart_Close(FNIEnv *env, jobject obj) {
     SerialPortObject portObj = (SerialPortObject)obj;
-    int32_t uartId = portObj->getPortId();
+    int32_t uartId = portObj->GetPortId();
     if(NativeUart_IsOpen(uartId)) {
         if(uartHolder[uartId] != portObj) {
             env->throwNew(env->findClass("java/io/IOException"), "Access is denied");

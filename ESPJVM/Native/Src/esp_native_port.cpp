@@ -8,7 +8,7 @@
 #include "esp_native_pin.h"
 #include "esp_native_port.h"
 
-static bool checkPin(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
+static bool CheckPin(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     for(uint8_t i = 0; i < arrayLength; i++) {
         const char *msg = NativePin_CheckPin(pins[i]);
@@ -20,7 +20,7 @@ static bool checkPin(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
     return true;
 }
 
-static bool checkParams(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
+static bool CheckParams(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
     if((pinsObj == NULL) || (arrayLength < 1) || (arrayLength > 32)) {
         if(pinsObj == NULL) {
             env->throwNew(env->findClass("java/lang/NullPointerException"), "pins array cannot be null object");
@@ -31,13 +31,13 @@ static bool checkParams(FNIEnv *env, jbyteArray pinsObj, uint32_t arrayLength) {
             return false;
         }
     }
-    return checkPin(env, pinsObj, arrayLength);
+    return CheckPin(env, pinsObj, arrayLength);
 }
 
-jvoid nativePortSetMode(FNIEnv *env, jbyteArray pinsObj, jint mode) {
+jvoid NativePort_SetMode(FNIEnv *env, jbyteArray pinsObj, jint mode) {
     uint32_t arrayLength = pinsObj ? pinsObj->getLength() : 0;
 
-    if(!checkParams(env, pinsObj, arrayLength)) return;
+    if(!CheckParams(env, pinsObj, arrayLength)) return;
 
     uint8_t *pins = (uint8_t *)pinsObj->getData();
     uint64_t pinMask = 0;
@@ -76,7 +76,7 @@ jvoid nativePortSetMode(FNIEnv *env, jbyteArray pinsObj, jint mode) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while configuring the pin");
 }
 
-jint nativePortRead(FNIEnv *env, jobject obj) {
+jint NativePort_Read(FNIEnv *env, jobject obj) {
     jbyteArray pinsObj = (jbyteArray)obj->getFieldByIndex(0)->getObj();
     if(pinsObj == NULL) return 0;
     uint32_t arrayLength = pinsObj->getLength();
@@ -100,7 +100,7 @@ jint nativePortRead(FNIEnv *env, jobject obj) {
     return value;
 }
 
-jvoid nativePortWrite(FNIEnv *env, jobject obj, jint value) {
+jvoid NativePort_Write(FNIEnv *env, jobject obj, jint value) {
     JInt8Array *pinsObj = (JInt8Array *)obj->getFieldByIndex(0)->getObj();
     if(pinsObj == NULL) return;
     uint32_t arrayLength = pinsObj->getLength();
@@ -136,7 +136,7 @@ jvoid nativePortWrite(FNIEnv *env, jobject obj, jint value) {
     #endif
 }
 
-jvoid nativePortReset(FNIEnv *env, jobject obj) {
+jvoid NativePort_Reset(FNIEnv *env, jobject obj) {
     jbyteArray pinsObj = (jbyteArray)obj->getFieldByIndex(0)->getObj();
     if(!pinsObj) return;
     uint32_t arrayLength = pinsObj->getLength();

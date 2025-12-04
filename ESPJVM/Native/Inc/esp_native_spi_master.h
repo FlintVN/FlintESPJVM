@@ -8,22 +8,22 @@
 
 void NativeSpiMaster_Reset(void);
 
-jobject nativeSpiMasterOpen(FNIEnv *env, jobject obj);
-jbool nativeSpiMasterIsOpen(FNIEnv *env, jobject obj);
-jint nativeSpiMasterGetSpeed(FNIEnv *env, jobject obj);
-jint nativeSpiMasterRead(FNIEnv *env, jobject obj);
-jvoid nativeSpiMasterWrite(FNIEnv *env, jobject obj, jint b);
-jint nativeSpiMasterReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOff, jboolArray rx, jint rxOff, jint length);
-jvoid nativeSpiMasterClose(FNIEnv *env, jobject obj);
+jobject NativeSpiMaster_Open(FNIEnv *env, jobject obj);
+jbool NativeSpiMaster_IsOpen(FNIEnv *env, jobject obj);
+jint NativeSpiMaster_GetSpeed(FNIEnv *env, jobject obj);
+jint NativeSpiMaster_Read(FNIEnv *env, jobject obj);
+jvoid NativeSpiMaster_Write(FNIEnv *env, jobject obj, jint b);
+jint NativeSpiMaster_ReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txOff, jboolArray rx, jint rxOff, jint length);
+jvoid NativeSpiMaster_Close(FNIEnv *env, jobject obj);
 
 static constexpr NativeMethod spiMasterMethods[] = {
-    NATIVE_METHOD("open",            "()Lflint/machine/SpiMaster;", nativeSpiMasterOpen),
-    NATIVE_METHOD("isOpen",          "()Z",                         nativeSpiMasterIsOpen),
-    NATIVE_METHOD("getSpeed",        "()I",                         nativeSpiMasterGetSpeed),
-    NATIVE_METHOD("read",            "()I",                         nativeSpiMasterRead),
-    NATIVE_METHOD("write",           "(I)V",                        nativeSpiMasterWrite),
-    NATIVE_METHOD("readWrite",       "([BI[BII)I",                  nativeSpiMasterReadWrite),
-    NATIVE_METHOD("close",           "()V",                         nativeSpiMasterClose),
+    NATIVE_METHOD("open",            "()Lflint/machine/SpiMaster;", NativeSpiMaster_Open),
+    NATIVE_METHOD("isOpen",          "()Z",                         NativeSpiMaster_IsOpen),
+    NATIVE_METHOD("getSpeed",        "()I",                         NativeSpiMaster_GetSpeed),
+    NATIVE_METHOD("read",            "()I",                         NativeSpiMaster_Read),
+    NATIVE_METHOD("write",           "(I)V",                        NativeSpiMaster_Write),
+    NATIVE_METHOD("readWrite",       "([BI[BII)I",                  NativeSpiMaster_ReadWrite),
+    NATIVE_METHOD("close",           "()V",                         NativeSpiMaster_Close),
 };
 
 #endif /* __ESP_NATIVE_SPI_H */
