@@ -34,25 +34,19 @@ public:
     void setMclk(int32_t val) { getFieldByIndex(8)->setInt32(val); }
 } *I2sMasterObject;
 
-typedef struct {
-    i2s_chan_handle_t handle;
-    I2sMasterObject i2sObj;
-} I2sHandle;
-
-static I2sHandle i2sHandle[SOC_I2S_NUM] = {};
+static i2s_chan_handle_t i2sHandle[SOC_I2S_NUM] = {};
 
 static bool NativeI2sMaster_IsOpen(int32_t i2sId) {
     if(0 <= i2sId || i2sId < LENGTH(i2sHandle))
-        return i2sHandle[i2sId].i2sObj != NULL ? true : false;
+        return i2sHandle[i2sId] != NULL ? true : false;
     return false;
 }
 
 static bool NativeI2sMaster_Write(FNIEnv *env, int32_t i2sId, void *buff, uint32_t size) {
     size_t bw;
     uint8_t *b = (uint8_t *)buff;
-    i2s_chan_handle_t handle = i2sHandle[i2sId].handle;
     while(1) {
-        if(i2s_channel_write(handle, b, size, &bw, portMAX_DELAY) != ESP_OK) {
+        if(i2s_channel_write(i2sHandle[i2sId], b, size, &bw, portMAX_DELAY) != ESP_OK) {
             env->throwNew(env->findClass("java/io/IOException"), "Error while writing");
             return false;
         }
@@ -69,7 +63,7 @@ static bool NativeI2sMaster_Write(FNIEnv *env, int32_t i2sId, void *buff, uint32
 
 static int32_t NativeI2sMaster_Read(FNIEnv *env, int32_t i2sId, void *buff, uint32_t size) {
     size_t br;
-    if(i2s_channel_read(i2sHandle[i2sId].handle, buff, size, &br, portMAX_DELAY) != ESP_OK) {
+    if(i2s_channel_read(i2sHandle[i2sId], buff, size, &br, portMAX_DELAY) != ESP_OK) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while reading");
         return false;
     }
@@ -77,12 +71,12 @@ static int32_t NativeI2sMaster_Read(FNIEnv *env, int32_t i2sId, void *buff, uint
 }
 
 static void NativeI2sMaster_Close(int32_t i2sId) {
-    if(i2sHandle[i2sId].handle != NULL) {
-        i2s_channel_disable(i2sHandle[i2sId].handle);
-        i2s_del_channel(i2sHandle[i2sId].handle);
+    if(i2sHandle[i2sId] != NULL) {
+        i2s_channel_disable(i2sHandle[i2sId]);
+        i2s_del_channel(i2sHandle[i2sId]);
     }
-    i2sHandle[i2sId].handle = NULL;
-    i2sHandle[i2sId].i2sObj = NULL;
+    i2sHandle[i2sId] = NULL;
+    i2sHandle[i2sId] = NULL;
 }
 
 void NativeI2sMaster_Reset(void) {
@@ -148,15 +142,15 @@ static bool CheckPrecondition(FNIEnv *env, I2sMasterObject i2sObj) {
         env->throwNew(env->findClass("java/io/IOException"), "I2S has not been opened yet");
         return false;
     }
-    else if(i2sHandle[i2sId].i2sObj != i2sObj) {
-        env->throwNew(env->findClass("java/io/IOException"), "Access is denied");
-        return false;
-    }
     return true;
 }
 
 jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
+    if(i2sObj->getI2sId() > 0) {
+        env->throwNew(env->findClass("java/io/IOException"), "I2S is already open");
+        return obj;
+    }
     int32_t i2sId = GetI2sId(env, i2sObj->getI2sName());
     uint32_t minBuff = (i2sObj->getDataBits() / 8 * (i2sObj->getDataMode() != 0 ? 2 : 1)) * BUF_LEN_IN_I2S_FRAMES * 2;
     if(i2sId == -1) return obj;
@@ -172,8 +166,7 @@ jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
         return obj;
     }
     if(NativeI2sMaster_IsOpen(i2sId)) {
-        const char *msg = (i2sHandle[i2sId].i2sObj != i2sObj) ? "Access is denied" : "I2S is already open";
-        env->throwNew(env->findClass("java/io/IOException"), msg);
+        env->throwNew(env->findClass("java/io/IOException"), "Access is denied");
         return obj;
     }
     if(!CheckI2sMasterPin(env, i2sObj)) return obj;
@@ -181,7 +174,7 @@ jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
     i2s_chan_config_t channelCfg = I2S_CHANNEL_DEFAULT_CONFIG((i2s_port_t)i2sId, I2S_ROLE_MASTER);
     channelCfg.dma_desc_num = i2sObj->getBufferSize() / BUF_LEN_IN_I2S_FRAMES / (i2sObj->getDataBits() / 8 * (i2sObj->getDataMode() != 0 ? 2 : 1));
     channelCfg.dma_frame_num = BUF_LEN_IN_I2S_FRAMES;
-    esp_err_t err = i2s_new_channel(&channelCfg, &i2sHandle[i2sId].handle, NULL);
+    esp_err_t err = i2s_new_channel(&channelCfg, &i2sHandle[i2sId], NULL);
     if(err == ESP_OK) {
         i2s_data_bit_width_t dataBits;
         switch(i2sObj->getDataBits()) {
@@ -214,15 +207,14 @@ jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
                 },
             },
         };
-        err = i2s_channel_init_std_mode(i2sHandle[i2sId].handle, &i2sStdCfg);
+        err = i2s_channel_init_std_mode(i2sHandle[i2sId], &i2sStdCfg);
     }
-    if(err == ESP_OK) err = i2s_channel_enable(i2sHandle[i2sId].handle);
+    if(err == ESP_OK) err = i2s_channel_enable(i2sHandle[i2sId]);
     if(err != ESP_OK) {
         NativeI2sMaster_Close(i2sId);
         env->throwNew(env->findClass("java/io/IOException"), "Error while opening I2S port");
         return obj;
     }
-    i2sHandle[i2sId].i2sObj = i2sObj;
     i2sObj->setI2sId(i2sId);
     return obj;
 }
@@ -230,9 +222,7 @@ jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
 jbool NativeI2sMaster_IsOpen(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     int32_t i2sId = i2sObj->getI2sId();
-    if(NativeI2sMaster_IsOpen(i2sId))
-        return (i2sHandle[i2sId].i2sObj == i2sObj) ? true : false;
-    return false;
+    return NativeI2sMaster_IsOpen(i2sId);
 }
 
 jint NativeI2sMaster_ReadByte(FNIEnv *env, jobject obj) {
@@ -335,12 +325,7 @@ jvoid NativeI2sMaster_WriteIntArray(FNIEnv *env, jobject obj, jintArray b, jint 
 jvoid NativeI2sMaster_Close(FNIEnv *env, jobject obj) {
     I2sMasterObject i2sObj = (I2sMasterObject)obj;
     int32_t i2sId = i2sObj->getI2sId();
-    if(NativeI2sMaster_IsOpen(i2sId)) {
-        if(i2sHandle[i2sId].i2sObj != i2sObj) {
-            env->throwNew(env->findClass("java/io/IOException"), "Access is denied");
-            return;
-        }
+    if(NativeI2sMaster_IsOpen(i2sId))
         NativeI2sMaster_Close(i2sId);
-    }
     i2sObj->setI2sId(-1);
 }
