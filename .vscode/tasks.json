@@ -127,12 +127,11 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build All",
-            "group": "build",
+            "label": "Build All Parallel",
+            "group": "none",
             "type": "shell",
-            "dependsOrder": "sequence",
+            "dependsOrder": "parallel",
             "dependsOn": [
-                "Clean",
                 "Build ESP32",
                 "Build ESP32-C3FH4",
                 "Build ESP32-C6FH4",
@@ -142,6 +141,16 @@
                 "Build ESP32-S3N4RX",
                 "Build ESP32-S3N8RX",
                 "Build ESP32-S3N16RX"
+            ]
+        },
+        {
+            "label": "Build All",
+            "group": "build",
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Clean",
+                "Build All Parallel"
             ]
         }
     ]
