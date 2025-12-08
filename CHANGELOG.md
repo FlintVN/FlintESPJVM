@@ -1,4 +1,13 @@
 # Change Log
+## V0.3.2
+- Update to [FlintJVM V2.3.3](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.3):
+  - Fixed critical bug, stackPopDouble corrupted java stack frame.
+  - Fixed bug in java.io.FileOutputStream.write method with FileDescriptor.out (Big impact on System.out.print).
+  - Support FileDescriptor.sync native method.
+- Update to compatible with [FlintJDK V1.2.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.2.0).
+  - Add support for flint.machine.I2sMaster.
+  - Add support for flint.machine.Adc.
+  - Add support for flint.machine.Dac.
 ## V0.3.1
 - Update to [FlintJVM V2.3.2](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.2):
   - Terminate all when any thread encounters an unhandled exception.
