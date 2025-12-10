@@ -29,6 +29,20 @@
             "problemMatcher": ["$gcc"]
         },
         {
+            "label": "Monitor",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/${input:chip}"},
+            "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 monitor"},
+            "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 monitor"},
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py -p ${input:com} -b 460800 monitor",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
+        {
             "label": "Clean",
             "group": "build",
             "type": "shell",
