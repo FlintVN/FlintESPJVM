@@ -6,9 +6,28 @@
             "type": "pickString",
             "description": "Select chip to build",
             "options": ["ESP32", "ESP32-C3FH4", "ESP32-C6FH4", "ESP32-C6FH8", "ESP32-S2FN4R2", "ESP32-S3FH4R2", "ESP32-S3N4RX", "ESP32-S3N8RX", "ESP32-S3N16RX"]
+        },
+        {
+            "id": "com",
+            "type": "promptString",
+            "description": "SerialPort Name"
         }
     ],
     "tasks": [
+        {
+            "label": "Flash",
+            "group": "build",
+            "type": "shell",
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/${input:chip}"},
+            "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 flash"},
+            "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 921600 flash"},
+            "windows": {
+                "command": "${env:IDF_PATH}/export.bat && idf.py -p ${input:com} -b 921600 flash",
+                "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
+            },
+            "presentation": {"reveal": "always", "clear": true},
+            "problemMatcher": ["$gcc"]
+        },
         {
             "label": "Clean",
             "group": "build",
