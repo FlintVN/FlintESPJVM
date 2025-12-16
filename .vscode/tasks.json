@@ -18,11 +18,11 @@
             "label": "Flash",
             "group": "build",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/${input:chip}"},
-            "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 flash"},
-            "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 921600 flash"},
+            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/build"},
+            "osx": {"command": ". ${env:IDF_PATH}/export.sh && esptool -p ${input:com} -b 460800 write-flash -z 0x00 ${input:chip}_FlintJVM_Release.bin"},
+            "linux": {"command": ". ${env:IDF_PATH}/export.sh && esptool -p ${input:com} -b 921600 write-flash -z 0x00 ${input:chip}_FlintJVM_Release.bin"},
             "windows": {
-                "command": "${env:IDF_PATH}/export.bat && idf.py -p ${input:com} -b 921600 flash",
+                "command": "${env:IDF_PATH}/export.bat && esptool -p ${input:com} -b 921600 write_flash -z 0x00 ${input:chip}_FlintJVM_Release.bin",
                 "options": {"shell": {"executable": "cmd.exe", "args": ["/c"]}}
             },
             "presentation": {"reveal": "always", "clear": true},
