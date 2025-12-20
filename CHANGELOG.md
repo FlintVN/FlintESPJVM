@@ -1,5 +1,11 @@
 # Change Log
-## V0.3.2
+## V0.4.1
+- Update to [FlintJVM V2.3.4](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.4):
+  - Implement java.lang.reflect.Method.invoke0 and java.lang.reflect.Method.newInstance0 native methods.
+  - Fix FileInputStream.skip that is not working correctly.
+- Compatible with [FlintJDK V1.3.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.3.0).
+- Fixes a critical bug in NativePin_Reset that caused debugging to stop working on the ESP32_S3NxRx board.
+## V0.4.0
 - Update to [FlintJVM V2.3.3](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.3):
   - Fixed critical bug, stackPopDouble corrupted java stack frame.
   - Fixed bug in java.io.FileOutputStream.write method with FileDescriptor.out (Big impact on System.out.print).
