@@ -72,6 +72,7 @@ idf_component_register(
     PRIV_REQUIRES "${priv_requires}"
 )
 
+add_compile_definitions(ESP32_C6FH8)
 add_compile_definitions(MULTI_HEAP_FREERTOS)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address)
