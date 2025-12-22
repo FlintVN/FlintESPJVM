@@ -21,14 +21,14 @@ static constexpr NativeMethod wifiMethods[] = {
 
     NATIVE_METHOD("connect",          "(Ljava/lang/String;Ljava/lang/String;I)V",   NativeWiFi_Connect),
     NATIVE_METHOD("isConnected",      "()Z",                                        NativeWiFi_IsConnected),
-    NATIVE_METHOD("getAPinfo",        "()Lesp/network/AccessPointRecord;",          NativeWiFi_GetAPinfo),
+    NATIVE_METHOD("getAPinfo",        "()Lflint/net/AccessPointRecord;",            NativeWiFi_GetAPinfo),
     NATIVE_METHOD("disconnect",       "()V",                                        NativeWiFi_Disconnect),
 
     NATIVE_METHOD("softAP",           "(Ljava/lang/String;Ljava/lang/String;III)V", NativeWiFi_SoftAP),
     NATIVE_METHOD("softAPdisconnect", "()V",                                        NativeWiFi_SoftAPdisconnect),
 
     NATIVE_METHOD("startScan",        "(Z)V",                                       NativeWiFi_StartScan),
-    NATIVE_METHOD("getScanResults",   "()[Lesp/network/AccessPointRecord;",         NativeWiFi_GetScanResult),
+    NATIVE_METHOD("getScanResults",   "()[Lflint/net/AccessPointRecord;",           NativeWiFi_GetScanResult),
     NATIVE_METHOD("stopScan",         "()V",                                        NativeWiFi_StopScan),
 };
 

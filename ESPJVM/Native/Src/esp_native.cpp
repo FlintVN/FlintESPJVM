@@ -17,11 +17,11 @@
 #include "esp_native_i2s_master.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
+    NATIVE_CLASS("flint/net/WiFi",           wifiMethods),
     NATIVE_CLASS("flint/machine/Adc",        adcMethods),
     NATIVE_CLASS("flint/machine/Dac",        dacMethods),
     NATIVE_CLASS("flint/machine/Pin",        pinMethods),
     NATIVE_CLASS("flint/machine/Port",       portMethods),
-    NATIVE_CLASS("flint/network/WiFi",       wifiMethods),
     NATIVE_CLASS("flint/machine/SerialPort", uartMethods),
     NATIVE_CLASS("flint/machine/OneWire",    oneWireMethods),
     NATIVE_CLASS("flint/machine/SpiMaster",  spiMasterMethods),
