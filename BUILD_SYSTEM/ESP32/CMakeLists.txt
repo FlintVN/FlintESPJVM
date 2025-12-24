@@ -11,7 +11,7 @@ project(ESP32_FlintJVM)
 add_custom_command(
     TARGET app
     POST_BUILD
-    COMMAND $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
+    COMMAND ${PYTHON_EXECUTABLE} $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
             --output_file storage.bin
             --partition_size 0x2F0000
             --sector_size 512
