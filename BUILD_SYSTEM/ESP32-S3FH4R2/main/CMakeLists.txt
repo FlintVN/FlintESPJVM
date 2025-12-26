@@ -27,6 +27,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/Native/Src/esp_native_uart.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_port.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_wifi.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_socket_impl.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_flint_inet_address_impl.cpp"
 
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint.cpp"

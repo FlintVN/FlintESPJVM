@@ -70,7 +70,11 @@ jobjectArray NativeFlintInetAddressImpl_LookupAllHostAddr(FNIEnv *env, jobject o
         else {
             Inet6Address *inetAddr = (Inet6Address *)env->newObject(env->findClass("java/net/Inet6Address"));
             jbyteArray byteArr = env->newByteArray(16);
-            if(byteArr == NULL || inetAddr == NULL) break;
+            if(byteArr == NULL || inetAddr == NULL) {
+                if(inetAddr != NULL) env->freeObject(inetAddr);
+                if(byteArr != NULL) env->freeObject(byteArr);
+                break;
+            }
 
             struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
             memcpy(byteArr->getData(), ipv6->sin6_addr.un.u8_addr, 16);
@@ -131,7 +135,7 @@ jobject NativeFlintInetAddressImpl_AnyLocalAddress(FNIEnv *env, jobject obj) {
     }
 
     inetAddr->setHostName(hostname);
-    inetAddr->setFamily(IPV6);
+    inetAddr->setFamily(IPV4);
     inetAddr->setAddress((int32_t)IPADDR_ANY);
 
     return inetAddr;
