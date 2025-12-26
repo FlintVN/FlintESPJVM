@@ -15,6 +15,7 @@
 #include "esp_native_spi_master.h"
 #include "esp_native_i2c_master.h"
 #include "esp_native_i2s_master.h"
+#include "esp_native_flint_socket_impl.h"
 #include "esp_native_flint_inet_address_impl.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
@@ -29,6 +30,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/machine/I2cMaster",        i2cMasterMethods),
     NATIVE_CLASS("flint/machine/I2sMaster",        i2sMasterMethods),
     NATIVE_CLASS("flint/machine/BitStream",        bitStreamMethods),
+    NATIVE_CLASS("flint/net/FlintSocketImpl",      flintSocketImplMethods),
     NATIVE_CLASS("flint/net/FlintInetAddressImpl", flintInetAddressImplMethods),
 };
 
@@ -40,6 +42,7 @@ void FlintAPI::System::reset(void) {
     NativeSpiMaster_Reset();
     NativeI2cMaster_Reset();
     NativeI2sMaster_Reset();
+    NativeFlintSocketImpl_Reset();
 }
 
 JNMPtr FlintAPI::System::findNativeMethod(MethodInfo *methodInfo) {
