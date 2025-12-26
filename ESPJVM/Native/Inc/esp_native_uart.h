@@ -17,7 +17,7 @@ jvoid NativeUart_WriteByte(FNIEnv *env, jobject obj, int b);
 jvoid NativeUart_Write(FNIEnv *env, jobject obj, jbyteArray b, int off, int count);
 jvoid NativeUart_Close(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod uartMethods[] = {
+inline constexpr NativeMethod uartMethods[] = {
     NATIVE_METHOD("open",        "()Lflint/machine/SerialPort;", NativeUart_Open),
     NATIVE_METHOD("isOpen",      "()Z",                          NativeUart_IsOpen),
     NATIVE_METHOD("getBaudrate", "()I",                          NativeUart_GetBaudrate),

@@ -16,7 +16,7 @@ jvoid NativePin_LogicSet(FNIEnv *env, jobject obj);
 jvoid NativePin_LogicReset(FNIEnv *env, jobject obj);
 jvoid NativePin_Toggle(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod pinMethods[] = {
+inline constexpr NativeMethod pinMethods[] = {
     NATIVE_METHOD("setMode", "(II)V", NativePin_SetMode),
     NATIVE_METHOD("read",    "()Z",   NativePin_Read),
     NATIVE_METHOD("write",   "(Z)V",  NativePin_Write),

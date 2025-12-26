@@ -23,7 +23,7 @@ jvoid NativeI2sMaster_WriteIntArray(FNIEnv *env, jobject obj, jintArray b, jint 
 
 jvoid NativeI2sMaster_Close(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod i2sMasterMethods[] = {
+inline constexpr NativeMethod i2sMasterMethods[] = {
     NATIVE_METHOD("open",   "()Lflint/machine/I2sMaster;", NativeI2sMaster_Open),
     NATIVE_METHOD("isOpen", "()Z",                         NativeI2sMaster_IsOpen),
     NATIVE_METHOD("read",   "()I",                         NativeI2sMaster_ReadByte),

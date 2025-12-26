@@ -16,7 +16,7 @@ jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked);
 jobjectArray NativeWiFi_GetScanResult(FNIEnv *env);
 jvoid NativeWiFi_StopScan(FNIEnv *env);
 
-static constexpr NativeMethod wifiMethods[] = {
+inline constexpr NativeMethod wifiMethods[] = {
     NATIVE_METHOD("isSupported",      "()Z",                                        NativeWiFi_IsSupported),
 
     NATIVE_METHOD("connect",          "(Ljava/lang/String;Ljava/lang/String;I)V",   NativeWiFi_Connect),

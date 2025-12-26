@@ -21,7 +21,7 @@ jvoid NativeI2cMaster_WriteMemByte(FNIEnv *env, jobject obj, jint memAddr, jint 
 jvoid NativeI2cMaster_WriteMem(FNIEnv *env, jobject obj, jint memAddr, jbyteArray buff, jint off, jint count);
 jvoid NativeI2cMaster_Close(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod i2cMasterMethods[] = {
+inline constexpr NativeMethod i2cMasterMethods[] = {
     NATIVE_METHOD("open",     "()Lflint/machine/I2cMaster;", NativeI2cMaster_Open),
     NATIVE_METHOD("isOpen",   "()Z",                         NativeI2cMaster_IsOpen),
     NATIVE_METHOD("getSpeed", "()I",                         NativeI2cMaster_GetSpeed),

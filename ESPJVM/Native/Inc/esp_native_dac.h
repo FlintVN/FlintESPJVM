@@ -10,7 +10,7 @@ void NativeDac_Reset(void);
 jvoid NativeDac_InitDac(FNIEnv *env, jobject obj);
 jvoid NativeDac_Write(FNIEnv *env, jobject obj, jint value);
 
-static constexpr NativeMethod dacMethods[] = {
+inline constexpr NativeMethod dacMethods[] = {
     NATIVE_METHOD("initDac", "()V",  NativeDac_InitDac),
     NATIVE_METHOD("write",   "(I)V", NativeDac_Write),
 };

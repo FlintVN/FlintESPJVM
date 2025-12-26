@@ -12,7 +12,7 @@ jvoid NativeBitStream_WriteByte(FNIEnv *env, jobject obj, jint b);
 jvoid NativeBitStream_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint count);
 jvoid NativeBitStream_Close(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod bitStreamMethods[] = {
+inline constexpr NativeMethod bitStreamMethods[] = {
     NATIVE_METHOD("open",   "()Lflint/machine/BitStream;", NativeBitStream_Open),
     NATIVE_METHOD("isOpen", "()Z",                         NativeBitStream_IsOpen),
     NATIVE_METHOD("write",  "(I)V",                        NativeBitStream_WriteByte),

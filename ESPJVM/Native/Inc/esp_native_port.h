@@ -10,7 +10,7 @@ jint NativePort_Read(FNIEnv *env, jobject obj);
 jvoid NativePort_Write(FNIEnv *env, jobject obj, jint value);
 jvoid NativePort_Reset(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod portMethods[] = {
+inline constexpr NativeMethod portMethods[] = {
     NATIVE_METHOD("setMode", "([BI)V", NativePort_SetMode),
     NATIVE_METHOD("read",    "()I",    NativePort_Read),
     NATIVE_METHOD("write",   "(I)V",   NativePort_Write),

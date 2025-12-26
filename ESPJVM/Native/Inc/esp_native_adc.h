@@ -10,7 +10,7 @@ void NativeAdc_Reset(void);
 jvoid NativeAdc_InitAdc(FNIEnv *env, jobject obj);
 jint NativeAdc_Read(FNIEnv *env, jobject obj);
 
-static constexpr NativeMethod adcMethods[] = {
+inline constexpr NativeMethod adcMethods[] = {
     NATIVE_METHOD("initAdc", "()V", NativeAdc_InitAdc),
     NATIVE_METHOD("read",    "()I", NativeAdc_Read),
 };
