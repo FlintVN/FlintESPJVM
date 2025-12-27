@@ -86,7 +86,7 @@ static bool GetIPv6(InetAddress *inetAddr, int32_t port, struct sockaddr_in6 *ip
     return true;
 }
 
-static int32_t GetSock(FNIEnv *env, jobject socketObj) {
+int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj) {
     jobject fdObj = socketObj->getField(env->exec, "fd")->getObj();
     if(fdObj == NULL) {
         env->throwNew(env->findClass("java/io/IOException"), "socket has not been created");
@@ -124,7 +124,7 @@ jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj) {
 }
 
 jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject address, jint port) {
-    int32_t sock = GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return;
 
     InetAddress *inetAddr = (InetAddress *)address;
@@ -141,7 +141,7 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
 }
 
 jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address, jint port) {
-    int32_t sock = GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return;
 
     InetAddress *inetAddr = (InetAddress *)address;
@@ -155,7 +155,7 @@ jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address
 }
 
 jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
-    int32_t sock = GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return;
 
     if(listen(sock, count) != 0)
@@ -163,7 +163,7 @@ jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
 }
 
 jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
-    int32_t listenSock = GetSock(env, obj);
+    int32_t listenSock = NativeFlintSocketImpl_GetSock(env, obj);
     if(listenSock < 0) return;
 
     struct sockaddr_in6 addr;
@@ -218,7 +218,7 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
 }
 
 jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj) {
-    int32_t sock = GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return -1;
 
     int32_t bytes = 0;
@@ -228,7 +228,7 @@ jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj) {
 }
 
 jvoid NativeFlintSocketImpl_SocketClose(FNIEnv *env, jobject obj) {
-    int32_t sock = GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return;
     SockClose(sock);
 }

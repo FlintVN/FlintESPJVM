@@ -17,21 +17,23 @@
 #include "esp_native_i2s_master.h"
 #include "esp_native_flint_socket_impl.h"
 #include "esp_native_flint_inet_address_impl.h"
+#include "esp_native_flint_socket_output_Stream.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
-    NATIVE_CLASS("flint/net/WiFi",                 wifiMethods),
-    NATIVE_CLASS("flint/machine/Adc",              adcMethods),
-    NATIVE_CLASS("flint/machine/Dac",              dacMethods),
-    NATIVE_CLASS("flint/machine/Pin",              pinMethods),
-    NATIVE_CLASS("flint/machine/Port",             portMethods),
-    NATIVE_CLASS("flint/machine/SerialPort",       uartMethods),
-    NATIVE_CLASS("flint/machine/OneWire",          oneWireMethods),
-    NATIVE_CLASS("flint/machine/SpiMaster",        spiMasterMethods),
-    NATIVE_CLASS("flint/machine/I2cMaster",        i2cMasterMethods),
-    NATIVE_CLASS("flint/machine/I2sMaster",        i2sMasterMethods),
-    NATIVE_CLASS("flint/machine/BitStream",        bitStreamMethods),
-    NATIVE_CLASS("flint/net/FlintSocketImpl",      flintSocketImplMethods),
-    NATIVE_CLASS("flint/net/FlintInetAddressImpl", flintInetAddressImplMethods),
+    NATIVE_CLASS("flint/net/WiFi",                    wifiMethods),
+    NATIVE_CLASS("flint/machine/Adc",                 adcMethods),
+    NATIVE_CLASS("flint/machine/Dac",                 dacMethods),
+    NATIVE_CLASS("flint/machine/Pin",                 pinMethods),
+    NATIVE_CLASS("flint/machine/Port",                portMethods),
+    NATIVE_CLASS("flint/machine/SerialPort",          uartMethods),
+    NATIVE_CLASS("flint/machine/OneWire",             oneWireMethods),
+    NATIVE_CLASS("flint/machine/SpiMaster",           spiMasterMethods),
+    NATIVE_CLASS("flint/machine/I2cMaster",           i2cMasterMethods),
+    NATIVE_CLASS("flint/machine/I2sMaster",           i2sMasterMethods),
+    NATIVE_CLASS("flint/machine/BitStream",           bitStreamMethods),
+    NATIVE_CLASS("flint/net/FlintSocketImpl",         flintSocketImplMethods),
+    NATIVE_CLASS("flint/net/FlintInetAddressImpl",    flintInetAddressImplMethods),
+    NATIVE_CLASS("flint/net/FlintSocketOutputStream", flintSocketOutputStreamMethods),
 };
 
 void FlintAPI::System::reset(void) {
