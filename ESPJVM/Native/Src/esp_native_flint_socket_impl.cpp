@@ -134,10 +134,9 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
         return;
     }
 
-    if(connect(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
-        env->throwNew(env->findClass("java/io/IOException"), "connect error");
-        return;
-    }
+    int32_t ret = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+    if(ret != 0)
+        env->throwNew(env->findClass("java/io/IOException"), "connect error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address, jint port) {
@@ -150,16 +149,18 @@ jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address
         env->throwNew(env->findClass("java/io/IOException"), "invalid address");
         return;
     }
-    if(bind(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "bind error");
+    int32_t ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+    if(ret != 0)
+        env->throwNew(env->findClass("java/io/IOException"), "bind error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
     int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
     if(sock < 0) return;
 
-    if(listen(sock, count) != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "listen error");
+    int32_t ret = listen(sock, count);
+    if(ret != 0)
+        env->throwNew(env->findClass("java/io/IOException"), "listen error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
@@ -222,7 +223,7 @@ jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj) {
     if(sock < 0) return -1;
 
     int32_t bytes = 0;
-    if (ioctl(sock, FIONREAD, &bytes) < 0)
+    if(ioctl(sock, FIONREAD, &bytes) < 0)
         return -1;
     return bytes;
 }
