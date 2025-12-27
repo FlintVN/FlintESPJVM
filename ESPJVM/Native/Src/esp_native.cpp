@@ -17,6 +17,7 @@
 #include "esp_native_i2s_master.h"
 #include "esp_native_flint_socket_impl.h"
 #include "esp_native_flint_inet_address_impl.h"
+#include "esp_native_flint_socket_input_Stream.h"
 #include "esp_native_flint_socket_output_Stream.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
@@ -33,6 +34,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/machine/BitStream",           bitStreamMethods),
     NATIVE_CLASS("flint/net/FlintSocketImpl",         flintSocketImplMethods),
     NATIVE_CLASS("flint/net/FlintInetAddressImpl",    flintInetAddressImplMethods),
+    NATIVE_CLASS("flint/net/FlintSocketInputStream",  flintSocketInputStreamMethods),
     NATIVE_CLASS("flint/net/FlintSocketOutputStream", flintSocketOutputStreamMethods),
 };
 
