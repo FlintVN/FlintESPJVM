@@ -25,7 +25,7 @@ jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArra
         else if(n == 0) return -1;
         else if(errno == EINTR || errno == EAGAIN) continue;
         else {
-            env->throwNew(env->findClass("java/io/IOException"), "Socket write error");
+            env->throwNew(env->findClass("java/io/IOException"), "Socket read error");
             return -1;
         }
     }

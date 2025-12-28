@@ -7,7 +7,7 @@
 
 jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len);
 
-inline constexpr NativeMethod  flintSocketOutputStreamMethods[] = {
+inline constexpr NativeMethod flintSocketOutputStreamMethods[] = {
     NATIVE_METHOD("socketWrite", "([BII)V", NativeFlintSocketOutputStream_SocketWrite),
 };
 

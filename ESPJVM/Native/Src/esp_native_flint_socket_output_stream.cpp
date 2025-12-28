@@ -12,15 +12,16 @@ jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteA
 
     if(!CheckArrayIndexSize(env, b, off, len)) return;
 
-    while(!env->exec->hasTerminateRequest()) {
+    while(len > 0 && !env->exec->hasTerminateRequest()) {
         ssize_t size = send(sock, &b->getData()[off], len, 0);
+        if(size == 0) return;
         if(size < 0) {
+            if(errno == EAGAIN || errno == EWOULDBLOCK)
+                continue;
             env->throwNew(env->findClass("java/io/IOException"), "Socket write error");
             return;
         }
         len -= size;
-        if(len == 0)
-            return;
         off += size;
     }
 }

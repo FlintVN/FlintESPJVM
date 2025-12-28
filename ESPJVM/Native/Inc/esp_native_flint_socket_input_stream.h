@@ -7,7 +7,7 @@
 
 jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len);
 
-inline constexpr NativeMethod  flintSocketInputStreamMethods[] = {
+inline constexpr NativeMethod flintSocketInputStreamMethods[] = {
     NATIVE_METHOD("socketRead", "([BII)I", NativeFlintSocketInputStream_SocketRead),
 };
 

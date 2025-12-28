@@ -19,7 +19,7 @@ jvoid NativeFlintSocketImpl_InitProto(FNIEnv *env);
 jvoid NativeFlintSocketImpl_SocketSetOption(FNIEnv *env, jobject obj, jint cmd, jbool on, jobject value);
 jint NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt);
 
-inline constexpr NativeMethod  flintSocketImplMethods[] = {
+inline constexpr NativeMethod flintSocketImplMethods[] = {
     NATIVE_METHOD("socketCreate",    "()V",                        NativeFlintSocketImpl_SocketCreate),
     NATIVE_METHOD("socketConnect",   "(Ljava/net/InetAddress;I)V", NativeFlintSocketImpl_SocketConnect),
     NATIVE_METHOD("socketBind",      "(Ljava/net/InetAddress;I)V", NativeFlintSocketImpl_SocketBind),
