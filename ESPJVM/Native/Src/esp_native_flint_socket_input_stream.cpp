@@ -10,7 +10,7 @@
 using namespace FlintAPI::System;
 
 jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return -1;
 
     if(!CheckArrayIndexSize(env, b, off, len)) return -1;

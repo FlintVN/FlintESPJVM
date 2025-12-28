@@ -7,6 +7,8 @@
 #define IPV4            1
 #define IPV6            2
 
+using namespace FlintAPI::System;
+
 static uint32_t sockListLength = 0;
 static int32_t *sockList = NULL;
 
@@ -86,15 +88,18 @@ static bool GetIPv6(InetAddress *inetAddr, int32_t port, struct sockaddr_in6 *ip
     return true;
 }
 
-int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj) {
+int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj, bool throwable) {
     jobject fdObj = socketObj->getField(env->exec, "fd")->getObj();
     if(fdObj == NULL) {
-        env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
+        if(throwable)
+            env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
         return -1;
     }
     int32_t sock = fdObj->getField(env->exec, "fd")->getInt32();
-    if(sock < 0)
-        env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
+    if(sock < 0) {
+        if(throwable)
+            env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
+    }
     return sock;
 }
 
@@ -128,7 +133,7 @@ jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj) {
 }
 
 jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject address, jint port) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return;
 
     InetAddress *inetAddr = (InetAddress *)address;
@@ -144,7 +149,7 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
 }
 
 jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address, jint port) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return;
 
     InetAddress *inetAddr = (InetAddress *)address;
@@ -159,7 +164,7 @@ jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address
 }
 
 jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return;
 
     int32_t ret = listen(sock, count);
@@ -168,13 +173,16 @@ jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
 }
 
 jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
-    int32_t listenSock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t listenSock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(listenSock < 0) return;
 
     struct sockaddr_in6 addr;
     socklen_t addrLen = sizeof(addr);
 
-    while(!env->exec->hasTerminateRequest()) {
+    int32_t timeout = obj->getField(env->exec, "timeout")->getInt32();
+    uint64_t startTime = getNanoTime() / 1000000;
+
+    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getNanoTime() / 1000000 - startTime)) < timeout)) {
         int32_t sock = accept(listenSock, (struct sockaddr *)&addr, &addrLen);
         if(sock >= 0) {
             SockListAdd(env, sock);
@@ -219,11 +227,19 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
             s->getField(env->exec, "localport")->setInt32(obj->getField(env->exec, "localport")->getInt32());
             return;
         }
+        else if(errno == EINTR || errno == EAGAIN)
+            continue;
+        else {
+            env->throwNew(env->findClass("java/io/IOException"), "Socket accept error");
+            return;
+        }
     }
+    if(!env->exec->hasTerminateRequest())
+        env->throwNew(env->findClass("java/net/SocketTimeoutException"), "Accept timed out");
 }
 
 jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return -1;
 
     int32_t bytes = 0;
@@ -233,7 +249,7 @@ jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj) {
 }
 
 jvoid NativeFlintSocketImpl_SocketClose(FNIEnv *env, jobject obj) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, false);
     if(sock < 0) return;
     SockClose(sock);
 }

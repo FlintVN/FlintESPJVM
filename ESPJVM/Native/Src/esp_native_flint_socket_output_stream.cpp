@@ -7,7 +7,7 @@
 #include "esp_native_flint_socket_output_stream.h"
 
 jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
-    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj);
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
     if(sock < 0) return;
 
     if(!CheckArrayIndexSize(env, b, off, len)) return;
