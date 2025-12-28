@@ -144,8 +144,30 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
     }
 
     int32_t ret = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
-    if(ret != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "Connect error with error code %d", ret);
+    if(ret == -1) {
+        if(errno == EINPROGRESS) {
+            struct pollfd pfd = {};
+            pfd.fd = sock;
+            pfd.events = POLLOUT;
+            while(!env->exec->hasTerminateRequest()) {
+                ret = poll(&pfd, 1, 100);
+                if(ret > 0) {
+                    if(pfd.revents & (POLLOUT | POLLIN)) {
+                        int32_t err;
+                        socklen_t len = sizeof(err);
+                        getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len);
+                        if(err == 0) return;
+                        break;
+                    }
+                    else if(pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
+                        break;
+                }
+                else if(ret < 0 && errno != EINTR)
+                    break;
+            }
+        }
+        env->throwNew(env->findClass("java/io/IOException"), "Connect error");
+    }
 }
 
 jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address, jint port) {
@@ -230,7 +252,7 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
         else if(errno == EINTR || errno == EAGAIN)
             continue;
         else {
-            env->throwNew(env->findClass("java/io/IOException"), "Socket accept error");
+            env->throwNew(env->findClass("java/io/IOException"), "Accept error");
             return;
         }
     }
