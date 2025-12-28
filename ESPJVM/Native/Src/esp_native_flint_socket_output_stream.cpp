@@ -15,7 +15,7 @@ jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteA
     while(!env->exec->hasTerminateRequest()) {
         ssize_t size = send(sock, &b->getData()[off], len, 0);
         if(size < 0) {
-            env->throwNew(env->findClass("java/io/IOException"), "socket write error");
+            env->throwNew(env->findClass("java/io/IOException"), "Socket write error");
             return;
         }
         len -= size;

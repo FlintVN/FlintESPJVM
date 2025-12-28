@@ -89,12 +89,12 @@ static bool GetIPv6(InetAddress *inetAddr, int32_t port, struct sockaddr_in6 *ip
 int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj) {
     jobject fdObj = socketObj->getField(env->exec, "fd")->getObj();
     if(fdObj == NULL) {
-        env->throwNew(env->findClass("java/io/IOException"), "socket has not been created");
+        env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
         return -1;
     }
     int32_t sock = fdObj->getField(env->exec, "fd")->getInt32();
     if(sock < 0)
-        env->throwNew(env->findClass("java/io/IOException"), "socket has not been created");
+        env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
     return sock;
 }
 
@@ -115,10 +115,14 @@ static bool IsIPv4MappedAddress(uint8_t *addr) {
 jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj) {
     jint sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_IP);
     if(sock < 0) {
-        env->throwNew(env->findClass("java/io/IOException"), "create socket error");
+        env->throwNew(env->findClass("java/io/IOException"), "Create socket error");
         return;
     }
     SockListAdd(env, sock);
+
+    int flags = fcntl(sock, F_GETFL, 0);
+    fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+
     jobject fdObj = obj->getField(env->exec, "fd")->getObj();
     fdObj->getField(env->exec, "fd")->setInt32(sock);
 }
@@ -130,13 +134,13 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
     InetAddress *inetAddr = (InetAddress *)address;
     struct sockaddr_in6 addr;
     if(!GetIPv6(inetAddr, port, &addr)) {
-        env->throwNew(env->findClass("java/io/IOException"), "invalid address");
+        env->throwNew(env->findClass("java/io/IOException"), "Invalid address");
         return;
     }
 
     int32_t ret = connect(sock, (struct sockaddr *)&addr, sizeof(addr));
     if(ret != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "connect error with error code %d", ret);
+        env->throwNew(env->findClass("java/io/IOException"), "Connect error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address, jint port) {
@@ -146,12 +150,12 @@ jvoid NativeFlintSocketImpl_SocketBind(FNIEnv *env, jobject obj, jobject address
     InetAddress *inetAddr = (InetAddress *)address;
     struct sockaddr_in6 addr;
     if(!GetIPv6(inetAddr, port, &addr)) {
-        env->throwNew(env->findClass("java/io/IOException"), "invalid address");
+        env->throwNew(env->findClass("java/io/IOException"), "Invalid address");
         return;
     }
     int32_t ret = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
     if(ret != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "bind error with error code %d", ret);
+        env->throwNew(env->findClass("java/io/IOException"), "Bind error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
@@ -160,7 +164,7 @@ jvoid NativeFlintSocketImpl_SocketListen(FNIEnv *env, jobject obj, jint count) {
 
     int32_t ret = listen(sock, count);
     if(ret != 0)
-        env->throwNew(env->findClass("java/io/IOException"), "listen error with error code %d", ret);
+        env->throwNew(env->findClass("java/io/IOException"), "Listen error with error code %d", ret);
 }
 
 jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
