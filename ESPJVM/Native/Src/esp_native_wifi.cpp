@@ -78,10 +78,8 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
     const char *ssidText = ssid->getAscii();
     const char *passwordText = password ? password->getAscii() : 0;
     wifi_config_t wifiConfig = {};
-    for(uint8_t i = 0; i < ssidLen; i++)
-        wifiConfig.sta.ssid[i] = ssidText[i];
-    for(uint8_t i = 0; i < passwordLen; i++)
-        wifiConfig.sta.password[i] = passwordText[i];
+    memcpy(wifiConfig.sta.ssid, ssidText, ssidLen);
+    memcpy(wifiConfig.sta.password, passwordText, passwordLen);
     wifiConfig.sta.threshold.authmode = authValueList[authMode];
     wifiConfig.sta.pmf_cfg.capable = true;
     wifiConfig.sta.pmf_cfg.required = false;
@@ -99,8 +97,13 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
 
 jbool NativeWiFi_IsConnected(FNIEnv *env) {
     wifi_ap_record_t ap_info;
-    esp_err_t ret = esp_wifi_sta_get_ap_info(&ap_info);
-    return (ret == ESP_OK) ? true : false;
+    if(esp_wifi_sta_get_ap_info(&ap_info) != ESP_OK)
+        return false;
+
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    esp_netif_ip_info_t ip_info;
+    esp_netif_get_ip_info(netif, &ip_info);
+    return ip_info.ip.addr ? true : false;
 }
 
 static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecord) {
