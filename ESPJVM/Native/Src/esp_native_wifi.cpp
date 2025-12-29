@@ -58,9 +58,9 @@ static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
     return true;
 }
 
-static bool CheckReturn(FNIEnv *env, esp_err_t value) {
+static bool CheckReturn(FNIEnv *env, esp_err_t value, const char *msg) {
     if(value != ESP_OK) {
-        env->throwNew(env->findClass("java/io/IOException"), "An error occurred while connecting to wifi");
+        env->throwNew(env->findClass("java/io/IOException"), msg);
         return false;
     }
     return true;
@@ -94,7 +94,7 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
         ret = esp_wifi_connect();
     Flint::unlock();
 
-    CheckReturn(env, ret);
+    CheckReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jbool NativeWiFi_IsConnected(FNIEnv *env) {
@@ -166,7 +166,7 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
         ret = esp_wifi_start();
     Flint::unlock();
 
-    CheckReturn(env, ret);
+    CheckReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
@@ -177,14 +177,14 @@ jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
     Flint::lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, blocked ? true : false);
     Flint::unlock();
-    CheckReturn(env, ret);
+    CheckReturn(env, ret, "An error occurred while starting scan");
 }
 
 jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     uint16_t count = 0;
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
 
-    if(!CheckReturn(env, ret)) return NULL;
+    if(!CheckReturn(env, ret, "An error occurred while getting AP number")) return NULL;
 
     if(count == 0) return NULL;
 
@@ -196,7 +196,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     for(uint16_t i = 0; i < count; i++) {
         wifi_ap_record_t apRecords;
         ret = esp_wifi_scan_get_ap_record(&apRecords);
-        if(!CheckReturn(env, ret)) {
+        if(!CheckReturn(env, ret, "An error occurred while getting AP record")) {
             Flint::unlock();
             return NULL;
         }
