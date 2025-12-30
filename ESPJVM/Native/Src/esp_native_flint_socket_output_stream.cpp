@@ -1,6 +1,5 @@
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include "esp_socket.h"
 #include "esp_native_common.h"
 #include "esp_flint_java_inet_address.h"
 #include "esp_native_flint_socket_impl.h"
@@ -13,15 +12,17 @@ jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteA
     if(!CheckArrayIndexSize(env, b, off, len)) return;
 
     while(len > 0 && !env->exec->hasTerminateRequest()) {
-        ssize_t size = send(sock, &b->getData()[off], len, 0);
-        if(size == 0) return;
-        if(size < 0) {
-            if(errno == EAGAIN || errno == EWOULDBLOCK)
-                continue;
+        int32_t sent;
+        SocketError err = Socket_Send(sock, &b->getData()[off], len, &sent);
+        if(err == SOCKET_OK) {
+            len -= sent;
+            off += sent;
+        }
+        else if(err == SOCKET_CLOSED)
+            return;
+        else if(err == SOCKET_ERR) {
             env->throwNew(env->findClass("java/io/IOException"), "Socket write error");
             return;
         }
-        len -= size;
-        off += size;
     }
 }

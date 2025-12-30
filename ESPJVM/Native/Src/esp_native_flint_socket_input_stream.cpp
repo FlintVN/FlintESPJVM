@@ -1,6 +1,6 @@
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
+
+#include "esp_socket.h"
 #include "flint_java_object.h"
 #include "esp_native_common.h"
 #include "esp_flint_java_inet_address.h"
@@ -20,11 +20,11 @@ jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArra
     uint64_t startTime = getNanoTime() / 1000000;
 
     while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getNanoTime() / 1000000 - startTime)) < timeout)) {
-        int32_t n = recv(sock, &b->getData()[off], len, 0);
-        if(n > 0) return n;
-        else if(n == 0) return -1;
-        else if(errno == EINTR || errno == EAGAIN) continue;
-        else {
+        int32_t n;
+        SocketError err = Socket_Receive(sock, &b->getData()[off], len, &n);
+        if(err == SOCKET_OK) return n;
+        else if(err == SOCKET_CLOSED) return -1;
+        else if(err == SOCKET_ERR) {
             env->throwNew(env->findClass("java/io/IOException"), "Socket read error");
             return -1;
         }

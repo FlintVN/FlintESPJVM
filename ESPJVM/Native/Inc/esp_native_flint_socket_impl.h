@@ -5,7 +5,6 @@
 
 #include "flint_native.h"
 
-void NativeFlintSocketImpl_Reset(void);
 int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj, bool throwable);
 
 jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj);

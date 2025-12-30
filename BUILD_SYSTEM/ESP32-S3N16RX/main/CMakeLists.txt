@@ -14,6 +14,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_io_api.cpp"
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_thread_api.cpp"
 
+    SRCS "../../../ESPJVM/Native/Src/esp_socket.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_common.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_adc.cpp"

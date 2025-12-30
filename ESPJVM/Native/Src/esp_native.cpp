@@ -4,6 +4,7 @@
 #include "flint_system_api.h"
 #include "flint_class_loader.h"
 #include "flint_native.h"
+#include "esp_socket.h"
 #include "esp_native_adc.h"
 #include "esp_native_dac.h"
 #include "esp_native_pin.h"
@@ -46,7 +47,7 @@ void FlintAPI::System::reset(void) {
     NativeSpiMaster_Reset();
     NativeI2cMaster_Reset();
     NativeI2sMaster_Reset();
-    NativeFlintSocketImpl_Reset();
+    Socket_Reset();
 }
 
 JNMPtr FlintAPI::System::findNativeMethod(MethodInfo *methodInfo) {
