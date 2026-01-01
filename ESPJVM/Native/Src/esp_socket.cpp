@@ -31,6 +31,7 @@ static void SockList_Remove(int32_t sock) {
     for(uint32_t i = 0; i < sockListLength; i++) {
         if(sockList[i] == sock) {
             sockList[i] = -1;
+            Flint::unlock();
             return;
         }
     }
