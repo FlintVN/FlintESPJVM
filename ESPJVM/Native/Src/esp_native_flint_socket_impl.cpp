@@ -64,6 +64,42 @@ static bool IsIPv4MappedAddress(uint8_t *addr) {
     return false;
 }
 
+InetAddress *NativeFlintSocketImpl_CreateInetAddress(FNIEnv *env, struct sockaddr_in6 *addr) {
+    if(IsIPv4MappedAddress(addr->sin6_addr.un.u8_addr)) {
+        int32_t ipv4 = addr->sin6_addr.un.u8_addr[12] << 24;
+        ipv4 |= addr->sin6_addr.un.u8_addr[13] << 16;
+        ipv4 |= addr->sin6_addr.un.u8_addr[14] << 8;
+        ipv4 |= addr->sin6_addr.un.u8_addr[15] << 0;
+
+        Inet4Address *inetAddr = (Inet4Address *)env->newObject(env->findClass("java/net/Inet4Address"));
+        if(inetAddr == NULL) return NULL;
+
+        inetAddr->setHostName(NULL);
+        inetAddr->setFamily(IPV4);
+        inetAddr->setAddress(ipv4);
+
+        return inetAddr;
+    }
+    else {
+        Inet6Address *inetAddr = (Inet6Address *)env->newObject(env->findClass("java/net/Inet6Address"));
+        jbyteArray byteArr = env->newByteArray(16);
+        if(byteArr == NULL || inetAddr == NULL) {
+            if(inetAddr != NULL) env->freeObject(inetAddr);
+            if(byteArr != NULL) env->freeObject(byteArr);
+            return NULL;
+        }
+        memcpy(byteArr->getData(), addr->sin6_addr.un.u8_addr, 16);
+
+        inetAddr->setHostName(NULL);
+        inetAddr->setFamily(IPV6);
+        inetAddr->setAddress(byteArr);
+        inetAddr->setScopeId(addr->sin6_scope_id);
+        if(addr->sin6_scope_id > 0)
+            inetAddr->setScopeIdSet(true);
+        return inetAddr;
+    }
+}
+
 jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj) {
     int32_t sock = Socket_Create(true);
     if(sock < 0) {
@@ -138,42 +174,12 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
             return;
         }
         else if(err == SOCKET_OK) {
-            if(IsIPv4MappedAddress(addr.sin6_addr.un.u8_addr)) {
-                int32_t ipv4 = addr.sin6_addr.un.u8_addr[12] << 24;
-                ipv4 |= addr.sin6_addr.un.u8_addr[13] << 16;
-                ipv4 |= addr.sin6_addr.un.u8_addr[14] << 8;
-                ipv4 |= addr.sin6_addr.un.u8_addr[15] << 0;
-
-                Inet4Address *inetAddr = (Inet4Address *)env->newObject(env->findClass("java/net/Inet4Address"));
-                if(inetAddr == NULL) return;
-
-                inetAddr->setHostName(NULL);
-                inetAddr->setFamily(IPV4);
-                inetAddr->setAddress(ipv4);
-
-                s->getField(env->exec, "address")->setObj(inetAddr);
-                inetAddr->clearProtected();
-            }
-            else {
-                Inet6Address *inetAddr = (Inet6Address *)env->newObject(env->findClass("java/net/Inet6Address"));
-                jbyteArray byteArr = env->newByteArray(16);
-                if(byteArr == NULL || inetAddr == NULL) {
-                    if(inetAddr != NULL) env->freeObject(inetAddr);
-                    if(byteArr != NULL) env->freeObject(byteArr);
-                    return;
-                }
-                memcpy(byteArr->getData(), addr.sin6_addr.un.u8_addr, 16);
-
-                inetAddr->setHostName(NULL);
-                inetAddr->setFamily(IPV6);
-                inetAddr->setAddress(byteArr);
-                inetAddr->setScopeId(addr.sin6_scope_id);
-                if(addr.sin6_scope_id > 0)
-                    inetAddr->setScopeIdSet(true);
-                s->getField(env->exec, "address")->setObj(inetAddr);
-                byteArr->clearProtected();
-                inetAddr->clearProtected();
-            }
+            InetAddress *inetAddr = NativeFlintSocketImpl_CreateInetAddress(env, &addr);
+            if(inetAddr == NULL) return;
+            s->getField(env->exec, "address")->setObj(inetAddr);
+            inetAddr->clearProtected();
+            if(inetAddr->getFamily() == IPV6)
+                ((Inet6Address *)inetAddr)->getAddress()->clearProtected();
             s->getField(env->exec, "fd")->getObj()->getField(env->exec, "fd")->setInt32(client);
             s->getField(env->exec, "port")->setInt32(obj->getField(env->exec, "port")->getInt32());
             s->getField(env->exec, "localport")->setInt32(obj->getField(env->exec, "localport")->getInt32());

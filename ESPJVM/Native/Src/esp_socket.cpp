@@ -119,6 +119,17 @@ SocketError Socket_Send(int32_t sock, int8_t *data, int32_t len, int32_t *sent) 
     return SOCKET_OK;
 }
 
+SocketError Socket_SendTo(int32_t sock, struct sockaddr_in6 *addr, int8_t *data, int32_t len, int32_t *sent) {
+    ssize_t n = sendto(sock, data, len, 0, (struct sockaddr *)addr, sizeof(sockaddr_in6));
+    if(n > 0) {
+        *sent = n;
+        return SOCKET_OK;
+    }
+    else if(n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+        return SOCKET_PENDING;
+    return SOCKET_ERR;
+}
+
 SocketError Socket_Receive(int32_t sock, int8_t *buf, int32_t len, int32_t *read) {
     int32_t n = recv(sock, buf, len, 0);
     if(n > 0) {
@@ -132,11 +143,31 @@ SocketError Socket_Receive(int32_t sock, int8_t *buf, int32_t len, int32_t *read
     return SOCKET_ERR;
 }
 
+SocketError Socket_ReceiveFrom(int32_t sock, struct sockaddr_in6 *addr, int8_t *buf, int32_t len, int32_t *read) {
+    socklen_t addrlen = sizeof(sockaddr_in6);
+    int32_t n = recvfrom(sock, buf, len, 0, (struct sockaddr *)addr, &addrlen);
+    if(n > 0) {
+        *read = n;
+        return SOCKET_OK;
+    }
+    else if(n < 0 && (errno == EINTR || errno == EAGAIN))
+        return SOCKET_TIMEOUT;
+    return SOCKET_ERR;
+}
+
 int32_t Socket_Available(int32_t sock) {
     int32_t bytes = 0;
     if(ioctl(sock, FIONREAD, &bytes) < 0)
         return -1;
     return bytes;
+}
+
+SocketError Socket_SetOption(int32_t sock, int32_t level, int32_t optname, const void *optval, int32_t optlen) {
+    return setsockopt(sock, level, optname, optval, optlen) == 0 ? SOCKET_OK : SOCKET_ERR;
+}
+
+SocketError Socket_GetOption(int32_t sock, int32_t level, int32_t optname, void *optval, socklen_t *optlen) {
+    return getsockopt(sock, level, optname, optval, optlen) == 0 ? SOCKET_OK : SOCKET_ERR;
 }
 
 void Socket_Close(int32_t sock) {

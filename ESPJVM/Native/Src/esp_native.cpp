@@ -20,6 +20,7 @@
 #include "esp_native_flint_inet_address_impl.h"
 #include "esp_native_flint_socket_input_Stream.h"
 #include "esp_native_flint_socket_output_Stream.h"
+#include "esp_native_flint_datagram_socket_impl.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                    wifiMethods),
@@ -37,6 +38,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/FlintInetAddressImpl",    flintInetAddressImplMethods),
     NATIVE_CLASS("flint/net/FlintSocketInputStream",  flintSocketInputStreamMethods),
     NATIVE_CLASS("flint/net/FlintSocketOutputStream", flintSocketOutputStreamMethods),
+    NATIVE_CLASS("flint/net/FlintDatagramSocketImpl", flintDatagramSocketImplMethods),
 };
 
 void FlintAPI::System::reset(void) {
