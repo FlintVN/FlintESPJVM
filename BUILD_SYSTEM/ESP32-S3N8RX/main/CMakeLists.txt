@@ -14,6 +14,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_io_api.cpp"
     SRCS "../../../ESPJVM/SystemAPI/Src/esp_system_thread_api.cpp"
 
+    SRCS "../../../ESPJVM/Native/Src/esp_socket.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_common.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_adc.cpp"
@@ -27,6 +28,11 @@ idf_component_register(
     SRCS "../../../ESPJVM/Native/Src/esp_native_uart.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_port.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_wifi.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_socket_impl.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_inet_address_impl.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_socket_input_stream.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_socket_output_stream.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_flint_datagram_socket_impl.cpp"
 
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_utf8.cpp"
