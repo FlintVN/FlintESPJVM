@@ -1,4 +1,22 @@
 # Change Log
+## V0.5.0
+- Update to [FlintJVM V2.3.5](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.5):
+  - Fixes bug static fields not being initialized when the class lacks a static init block.
+  - Correct the behavior of STEP_IN and STEP_OVER commands in the debugger.
+- Compatible with [FlintJDK V1.4.0](https://github.com/FlintVN/FlintJDK/releases/tag/V1.5.0).
+  - Rename package flint.network -> flint.net.
+  - Fix Integer.digitToChar method is not working correctly.
+  - Supports the java.net package:
+    - Support Socket (TCP client).
+    - Support ServerSocket (TCP server).
+    - Support DatagramSocket (UDP).
+- Fix: LinkageError when calling some native WiFi methods.
+- Fix: correctly detect WiFi connection status in WiFi.isConnected.
+- Implement native methods for flint.net.FlintInetAddressImpl.
+- Implement native methods for flint.net.FlintSocketImpl.
+- Implement native methods for flint.net.FlintSocketOutputStream.
+- Implement native methods for flint.net.FlintSocketInputStream.
+- Implement native methods for flint.net.FlintDatagramSocketImpl.
 ## V0.4.1
 - Update to [FlintJVM V2.3.4](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.4):
   - Implement java.lang.reflect.Method.invoke0 and java.lang.reflect.Method.newInstance0 native methods.
