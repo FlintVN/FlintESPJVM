@@ -40,6 +40,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
 
 void FlintAPI::System::reset(void) {
     NativeAdc_Reset();
+    NativeCan_Reset();
     NativeDac_Reset();
     NativePin_Reset();
     NativeUart_Reset();
