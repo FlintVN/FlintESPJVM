@@ -18,6 +18,7 @@ idf_component_register(
     SRCS "../../../ESPJVM/Native/Src/esp_native.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_common.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_adc.cpp"
+    SRCS "../../../ESPJVM/Native/Src/esp_native_can.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_dac.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_pin.cpp"
     SRCS "../../../ESPJVM/Native/Src/esp_native_onewire.cpp"
