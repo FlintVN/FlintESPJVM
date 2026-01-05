@@ -23,8 +23,6 @@ const char *NativePin_CheckPin(int32_t pin) {
     else if((26 <= pin) && (pin <= 32))
         return "Pins 26 to 32 have been used for SPI Flash and PSRAM";
 #elif CONFIG_IDF_TARGET_ESP32S3
-    else if(pin == 0)
-        return "Pin 0 was used to select USB mode";
     else if((pin == 19) || (pin == 20))
         return "Pin 19 and 20 have been used for debugging (USB CDC)";
 #ifdef ESP32_S3FH4R2
