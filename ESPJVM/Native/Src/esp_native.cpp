@@ -6,6 +6,7 @@
 #include "flint_native.h"
 #include "esp_socket.h"
 #include "esp_native_adc.h"
+#include "esp_native_can.h"
 #include "esp_native_dac.h"
 #include "esp_native_pin.h"
 #include "esp_native_port.h"
@@ -23,26 +24,23 @@
 #include "esp_native_flint_datagram_socket_impl.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
-    NATIVE_CLASS("flint/net/WiFi",                    wifiMethods),
-    NATIVE_CLASS("flint/machine/Adc",                 adcMethods),
-    NATIVE_CLASS("flint/machine/Dac",                 dacMethods),
-    NATIVE_CLASS("flint/machine/Pin",                 pinMethods),
-    NATIVE_CLASS("flint/machine/Port",                portMethods),
-    NATIVE_CLASS("flint/machine/SerialPort",          uartMethods),
-    NATIVE_CLASS("flint/machine/OneWire",             oneWireMethods),
-    NATIVE_CLASS("flint/machine/SpiMaster",           spiMasterMethods),
-    NATIVE_CLASS("flint/machine/I2cMaster",           i2cMasterMethods),
-    NATIVE_CLASS("flint/machine/I2sMaster",           i2sMasterMethods),
-    NATIVE_CLASS("flint/machine/BitStream",           bitStreamMethods),
-    NATIVE_CLASS("flint/net/FlintSocketImpl",         flintSocketImplMethods),
-    NATIVE_CLASS("flint/net/FlintInetAddressImpl",    flintInetAddressImplMethods),
-    NATIVE_CLASS("flint/net/FlintSocketInputStream",  flintSocketInputStreamMethods),
-    NATIVE_CLASS("flint/net/FlintSocketOutputStream", flintSocketOutputStreamMethods),
-    NATIVE_CLASS("flint/net/FlintDatagramSocketImpl", flintDatagramSocketImplMethods),
+    NATIVE_CLASS("flint/net/WiFi",           wifiMethods),
+    NATIVE_CLASS("flint/machine/Adc",        adcMethods),
+    NATIVE_CLASS("flint/machine/Can",        canMethods),
+    NATIVE_CLASS("flint/machine/Dac",        dacMethods),
+    NATIVE_CLASS("flint/machine/Pin",        pinMethods),
+    NATIVE_CLASS("flint/machine/Port",       portMethods),
+    NATIVE_CLASS("flint/machine/SerialPort", uartMethods),
+    NATIVE_CLASS("flint/machine/OneWire",    oneWireMethods),
+    NATIVE_CLASS("flint/machine/SpiMaster",  spiMasterMethods),
+    NATIVE_CLASS("flint/machine/I2cMaster",  i2cMasterMethods),
+    NATIVE_CLASS("flint/machine/I2sMaster",  i2sMasterMethods),
+    NATIVE_CLASS("flint/machine/BitStream",  bitStreamMethods),
 };
 
 void FlintAPI::System::reset(void) {
     NativeAdc_Reset();
+    NativeCan_Reset();
     NativeDac_Reset();
     NativePin_Reset();
     NativeUart_Reset();
