@@ -16,7 +16,7 @@ jvoid NativeFlintDatagramSocketImpl_Leave(FNIEnv *env, jobject obj, jobject inet
 jvoid NativeFlintDatagramSocketImpl_DatagramSocketCreate(FNIEnv *env, jobject obj);
 jvoid NativeFlintDatagramSocketImpl_DatagramSocketClose(FNIEnv *env, jobject obj);
 jvoid NativeFlintDatagramSocketImpl_SocketSetOption(FNIEnv *env, jobject obj, jint opt, jobject val);
-jint NativeFlintDatagramSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt);
+jobject NativeFlintDatagramSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt);
 
 inline constexpr NativeMethod flintDatagramSocketImplMethods[] = {
     NATIVE_METHOD("bind",                 "(ILjava/net/InetAddress;)V",   NativeFlintDatagramSocketImpl_Bind),
@@ -30,7 +30,7 @@ inline constexpr NativeMethod flintDatagramSocketImplMethods[] = {
     NATIVE_METHOD("datagramSocketCreate", "()V",                          NativeFlintDatagramSocketImpl_DatagramSocketCreate),
     NATIVE_METHOD("datagramSocketClose",  "()V",                          NativeFlintDatagramSocketImpl_DatagramSocketClose),
     NATIVE_METHOD("socketSetOption",      "(ILjava/lang/Object;)V",       NativeFlintDatagramSocketImpl_SocketSetOption),
-    NATIVE_METHOD("socketGetOption",      "(I)I",                         NativeFlintDatagramSocketImpl_SocketGetOption),
+    NATIVE_METHOD("socketGetOption",      "(I)Ljava/lang/Object;",        NativeFlintDatagramSocketImpl_SocketGetOption),
 };
 
 #endif /* __ESP_NATIVE_FLINT_DATAGRAM_SOCKET_IMPL_H */

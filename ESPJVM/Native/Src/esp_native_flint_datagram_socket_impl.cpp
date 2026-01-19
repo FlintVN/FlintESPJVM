@@ -5,8 +5,15 @@
 #include "esp_native_flint_socket_impl.h"
 #include "esp_native_flint_datagram_socket_impl.h"
 
-#define IPV4            1
-#define IPV6            2
+#define IPV4                    1
+#define IPV6                    2
+
+#define NATIVE_TCP_NODELAY      0x0001
+#define NATIVE_SO_BINDADDR      0x000F
+#define NATIVE_SO_REUSEADDR     0x04
+#define NATIVE_IP_MULTICAST_IF  0x10
+#define NATIVE_SO_LINGER        0x0080
+#define NATIVE_SO_TIMEOUT       0x1006
 
 using namespace FlintAPI::System;
 
@@ -248,10 +255,54 @@ jvoid NativeFlintDatagramSocketImpl_DatagramSocketClose(FNIEnv *env, jobject obj
 }
 
 jvoid NativeFlintDatagramSocketImpl_SocketSetOption(FNIEnv *env, jobject obj, jint opt, jobject val) {
-    // TODO
+    int32_t sock = NativeFlintDatagramSocketImpl_GetSock(env, obj, true);
+    if(sock < 0) return;
+
+    switch(opt) {
+        case NATIVE_SO_REUSEADDR: {
+            if(val == NULL) {
+                env->throwNew(env->findClass("java/lang/NullPointerException"));
+                return;
+            }
+            int32_t optval = val->getFieldByIndex(0)->getInt32();
+            if(Socket_SetOption(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) != SOCKET_OK)
+                env->throwNew(env->findClass("java/io/IOException"), "Set SO_REUSEADDR error");
+            break;
+        }
+        default:
+            env->throwNew(env->findClass("java/io/IOException"), "Unsupported socket option");
+            break;
+    }
 }
 
-jint NativeFlintDatagramSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt) {
-    // TODO
-    return 0;
+jobject NativeFlintDatagramSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt) {
+    int32_t sock = NativeFlintDatagramSocketImpl_GetSock(env, obj, true);
+    if(sock < 0) return NULL;
+
+    switch(opt) {
+        case NATIVE_SO_REUSEADDR: {
+            int32_t val = 0;
+            socklen_t optlen = sizeof(val);
+            if(Socket_GetOption(sock, SOL_SOCKET, SO_REUSEADDR, &val, &optlen) != SOCKET_OK) {
+                env->throwNew(env->findClass("java/io/IOException"), "Get SO_REUSEADDR error");
+                return NULL;
+            }
+            jobject ret = env->newObject(env->findClass("java/lang/Integer"));
+            if(ret == NULL) return NULL;
+            ret->getFieldByIndex(0)->setInt32(val);
+            return ret;
+        }
+        case NATIVE_SO_BINDADDR: {
+            struct sockaddr_in6 addr;
+            socklen_t addrlen = sizeof(addr);
+            if(getsockname(sock, (struct sockaddr *)&addr, &addrlen) != 0) {
+                env->throwNew(env->findClass("java/io/IOException"), "Get SO_BINDADDR error");
+                return NULL;
+            }
+            return NativeFlintSocketImpl_CreateInetAddress(env, &addr);
+        }
+        default:
+            env->throwNew(env->findClass("java/io/IOException"), "Unsupported socket option");
+            return NULL;
+    }
 }
