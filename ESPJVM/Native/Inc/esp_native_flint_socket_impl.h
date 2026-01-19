@@ -14,7 +14,7 @@ jint NativeFlintSocketImpl_SocketAvailable(FNIEnv *env, jobject obj);
 jvoid NativeFlintSocketImpl_SocketClose(FNIEnv *env, jobject obj);
 jvoid NativeFlintSocketImpl_InitProto(FNIEnv *env);
 jvoid NativeFlintSocketImpl_SocketSetOption(FNIEnv *env, jobject obj, jint cmd, jbool on, jobject value);
-jint NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt);
+jobject NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt);
 
 inline constexpr NativeMethod flintSocketImplMethods[] = {
     NATIVE_METHOD("socketCreate",    "()V",                        NativeFlintSocketImpl_SocketCreate),
@@ -26,7 +26,7 @@ inline constexpr NativeMethod flintSocketImplMethods[] = {
     NATIVE_METHOD("socketClose",     "()V",                        NativeFlintSocketImpl_SocketClose),
     NATIVE_METHOD("initProto",       "()V",                        NativeFlintSocketImpl_InitProto),
     NATIVE_METHOD("socketSetOption", "(IZLjava/lang/Object;)V",    NativeFlintSocketImpl_SocketSetOption),
-    NATIVE_METHOD("socketGetOption", "(I)I",                       NativeFlintSocketImpl_SocketGetOption),
+    NATIVE_METHOD("socketGetOption", "(I)Ljava/lang/Object;",      NativeFlintSocketImpl_SocketGetOption),
 };
 
 #endif /* __ESP_NATIVE_FLINT_SOCKET_IMPL_H */

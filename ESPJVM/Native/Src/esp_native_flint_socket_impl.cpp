@@ -3,8 +3,15 @@
 #include "esp_flint_java_inet_address.h"
 #include "esp_native_flint_socket_impl.h"
 
-#define IPV4            1
-#define IPV6            2
+#define IPV4                    1
+#define IPV6                    2
+
+#define NATIVE_TCP_NODELAY      0x0001
+#define NATIVE_SO_BINDADDR      0x000F
+#define NATIVE_SO_REUSEADDR     0x04
+#define NATIVE_IP_MULTICAST_IF  0x10
+#define NATIVE_SO_LINGER        0x0080
+#define NATIVE_SO_TIMEOUT       0x1006
 
 using namespace FlintAPI::System;
 
@@ -207,10 +214,84 @@ jvoid NativeFlintSocketImpl_InitProto(FNIEnv *env) {
 }
 
 jvoid NativeFlintSocketImpl_SocketSetOption(FNIEnv *env, jobject obj, jint cmd, jbool on, jobject value) {
-    // TODO
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
+    if(sock < 0) return;
+
+    switch(cmd) {
+        case NATIVE_TCP_NODELAY: {
+            int32_t opt = on ? 1 : 0;
+            if(Socket_SetOption(sock, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) != SOCKET_OK)
+                env->throwNew(env->findClass("java/io/IOException"), "Set TCP_NODELAY error");
+            break;
+        }
+        case NATIVE_SO_LINGER: {
+            struct linger ling = {};
+            ling.l_onoff = on ? 1 : 0;
+            ling.l_linger = (value != NULL) ? value->getFieldByIndex(0)->getInt32() : 0;
+            if(Socket_SetOption(sock, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling)) != SOCKET_OK)
+                env->throwNew(env->findClass("java/io/IOException"), "Set SO_LINGER error");
+            break;
+        }
+        default:
+            env->throwNew(env->findClass("java/io/IOException"), "Unsupported socket option");
+            break;
+    }
 }
 
-jint NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt) {
-    // TODO
-    return 0;
+jobject NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt) {
+    int32_t sock = NativeFlintSocketImpl_GetSock(env, obj, true);
+    if(sock < 0) return NULL;
+
+    switch(opt) {
+        case NATIVE_SO_TIMEOUT: {
+            jobject ret = env->newObject(env->findClass("java/lang/Integer"));
+            if(ret == NULL) return NULL;
+            ret->getFieldByIndex(0)->setInt32(obj->getField(env->exec, "timeout")->getInt32());
+            return ret;
+        }
+        case NATIVE_TCP_NODELAY: {
+            int32_t val = 0;
+            socklen_t optlen = sizeof(val);
+            if(Socket_GetOption(sock, IPPROTO_TCP, TCP_NODELAY, &val, &optlen) != SOCKET_OK) {
+                env->throwNew(env->findClass("java/io/IOException"), "Get TCP_NODELAY error");
+                return NULL;
+            }
+            jobject ret = env->newObject(env->findClass("java/lang/Integer"));
+            if(ret == NULL) return NULL;
+            ret->getFieldByIndex(0)->setInt32(val);
+            return ret;
+        }
+        case NATIVE_SO_LINGER: {
+            struct linger ling = {};
+            socklen_t optlen = sizeof(ling);
+            if(Socket_GetOption(sock, SOL_SOCKET, SO_LINGER, &ling, &optlen) != SOCKET_OK) {
+                env->throwNew(env->findClass("java/io/IOException"), "Get SO_LINGER error");
+                return NULL;
+            }
+            if(ling.l_onoff == 0) {
+                jobject ret = env->newObject(env->findClass("java/lang/Boolean"));
+                if(ret == NULL) return NULL;
+                ret->getFieldByIndex(0)->setInt32(0);
+                return ret;
+            }
+            else {
+                jobject ret = env->newObject(env->findClass("java/lang/Integer"));
+                if(ret == NULL) return NULL;
+                ret->getFieldByIndex(0)->setInt32(ling.l_linger);
+                return ret;
+            }
+        }
+        case NATIVE_SO_BINDADDR: {
+            struct sockaddr_in6 addr;
+            socklen_t addrlen = sizeof(addr);
+            if(getsockname(sock, (struct sockaddr *)&addr, &addrlen) != 0) {
+                env->throwNew(env->findClass("java/io/IOException"), "Get SO_BINDADDR error");
+                return NULL;
+            }
+            return NativeFlintSocketImpl_CreateInetAddress(env, &addr);
+        }
+        default:
+            env->throwNew(env->findClass("java/io/IOException"), "Unsupported socket option");
+            return NULL;
+    }
 }
