@@ -24,13 +24,13 @@ jvoid NativeI2sMaster_WriteIntArray(FNIEnv *env, jobject obj, jintArray b, jint 
 jvoid NativeI2sMaster_Close(FNIEnv *env, jobject obj);
 
 inline constexpr NativeMethod i2sMasterMethods[] = {
-    NATIVE_METHOD("open",   "()Lflint/machine/I2sMaster;", NativeI2sMaster_Open),
-    NATIVE_METHOD("isOpen", "()Z",                         NativeI2sMaster_IsOpen),
-    NATIVE_METHOD("read",   "()I",                         NativeI2sMaster_ReadByte),
-    NATIVE_METHOD("read",   "([BII)I",                     NativeI2sMaster_ReadByteArray),
-    NATIVE_METHOD("write",  "(I)V",                        NativeI2sMaster_WriteByte),
-    NATIVE_METHOD("write",  "([BII)V",                     NativeI2sMaster_WriteByteArray),
-    NATIVE_METHOD("close",  "()V",                         NativeI2sMaster_Close),
+    NATIVE_METHOD("open",   "()Lflint/io/I2sMaster;", NativeI2sMaster_Open),
+    NATIVE_METHOD("isOpen", "()Z",                    NativeI2sMaster_IsOpen),
+    NATIVE_METHOD("read",   "()I",                    NativeI2sMaster_ReadByte),
+    NATIVE_METHOD("read",   "([BII)I",                NativeI2sMaster_ReadByteArray),
+    NATIVE_METHOD("write",  "(I)V",                   NativeI2sMaster_WriteByte),
+    NATIVE_METHOD("write",  "([BII)V",                NativeI2sMaster_WriteByteArray),
+    NATIVE_METHOD("close",  "()V",                    NativeI2sMaster_Close),
 };
 
 #endif /* __ESP_NATIVE_I2S_MASTER_H */
