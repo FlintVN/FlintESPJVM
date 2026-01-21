@@ -12,6 +12,7 @@
 #include "esp_native_wifi.h"
 #include "esp_native_uart.h"
 #include "esp_native_onewire.h"
+#include "esp_native_touch_pad.h"
 #include "esp_native_bitstream.h"
 #include "esp_native_spi_master.h"
 #include "esp_native_i2c_master.h"
@@ -28,6 +29,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/io/Dac",                      dacMethods),
     NATIVE_CLASS("flint/io/Pin",                      pinMethods),
     NATIVE_CLASS("flint/io/Port",                     portMethods),
+    NATIVE_CLASS("flint/io/TouchPad",                 touchPadMethods),
     NATIVE_CLASS("flint/io/SerialPort",               uartMethods),
     NATIVE_CLASS("flint/io/OneWire",                  oneWireMethods),
     NATIVE_CLASS("flint/io/SpiMaster",                spiMasterMethods),
@@ -46,6 +48,7 @@ void FlintAPI::System::reset(void) {
     NativeDac_Reset();
     NativePin_Reset();
     NativeUart_Reset();
+    NativeTouchPad_Reset();
     NativeSpiMaster_Reset();
     NativeI2cMaster_Reset();
     NativeI2sMaster_Reset();
