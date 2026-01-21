@@ -23,6 +23,10 @@ void FlintAPI::System::consoleWrite(uint8_t *utf8, uint32_t length) {
     fprintf(stdout, "%.*s", (int)length, (char *)utf8);
 }
 
-uint64_t FlintAPI::System::getNanoTime(void) {
-    return (uint64_t)esp_timer_get_time() * 1000;
+int64_t FlintAPI::System::getTimeNanos(void) {
+    return esp_timer_get_time() * 1000;
+}
+
+int64_t FlintAPI::System::getTimeMillis(void) {
+    return esp_timer_get_time() / 1000;
 }

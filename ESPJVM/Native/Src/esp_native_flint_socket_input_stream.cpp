@@ -18,9 +18,9 @@ jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArra
 
     jobject impl = obj->getField(env->exec, "impl")->getObj();
     int32_t timeout = impl->getField(env->exec, "timeout")->getInt32();
-    uint64_t startTime = getNanoTime() / 1000000;
+    uint64_t startTime = getTimeMillis();
 
-    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getNanoTime() / 1000000 - startTime)) < timeout)) {
+    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
         int32_t n;
         SocketError err = Socket_Receive(sock, &b->getData()[off], len, &n);
         if(err == SOCKET_OK) return n;

@@ -171,9 +171,9 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
     struct sockaddr_in6 addr;
 
     int32_t timeout = obj->getField(env->exec, "timeout")->getInt32();
-    uint64_t startTime = getNanoTime() / 1000000;
+    uint64_t startTime = getTimeMillis();
 
-    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getNanoTime() / 1000000 - startTime)) < timeout)) {
+    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
         int32_t client;
         SocketError err = Socket_Accept(listenSock, &addr, &client);
         if(err == SOCKET_ERR) {
