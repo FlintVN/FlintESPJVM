@@ -53,6 +53,8 @@ idf_component_register(
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_execution.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_debugger.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_utf8_dict_node.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_file_reader.cpp"
+    SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_zip_file_reader.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_class_dict_node.cpp"
     SRCS "../../../ESPJVM/FlintJVM/VM/Src/flint_java_string_dict_node.cpp"
     SRCS "../../../ESPJVM/FlintJVM/Native/Src/flint_native_interface.cpp"

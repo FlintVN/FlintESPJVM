@@ -8,15 +8,17 @@ FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM]
 ## How to use
 ### 1. Supported Boards
 FlintESPJVM is compatible with a variety of ESP32 boards, including:
-- Generic ESP32 Boards.
-- ESP32-C3FH4.
-- ESP32-C6FH4.
-- ESP32-C6FH8.
-- ESP32-S2FN4R2.
-- ESP32-S3FH4R2.
-- ESP32-S3N4RX.
-- ESP32-S3N8RX.
-- ESP32-S3N16RX.
+  | Board             | Cores                     | Flash | SRAM  | PSRAM |
+  | ----------------- | ------------------------- | ----- | ----- | ----- |
+  | **Generic ESP32** | 240MHz Xtensa Dual-core   | 4MB   | 520KB | ❌    |
+  | **ESP32-C3FH4**   | 160MHz RISC-V Single-core | 4MB   | 400KB | ❌    |
+  | **ESP32-C6FH4**   | 160MHz RISC-V Single-core | 4MB   | 512KB | ❌    |
+  | **ESP32-C6FH8**   | 160MHz RISC-V Single-core | 8MB   | 512KB | ❌    |
+  | **ESP32-S2FN4R2** | 240MHz Xtensa Single-core | 4MB   | 320KB | 2MB   |
+  | **ESP32-S3FH4R2** | 240MHz Xtensa Dual-core   | 4MB   | 512KB | 2MB   |
+  | **ESP32-S3N4RX**  | 240MHz Xtensa Dual-core   | 4MB   | 512KB | ✅    |
+  | **ESP32-S3N8RX**  | 240MHz Xtensa Dual-core   | 8MB   | 512KB | ✅    |
+  | **ESP32-S3N16RX** | 240MHz Xtensa Dual-core   | 16MB  | 512KB | ✅    |
 ### 2. Flashing the Firmware
 To get FlintESPJVM up and running on your board:
 - Quick Flash: Use the [ESP Web Tool](https://esp.flint.vn) for an easy, browser-based flashing experience.
