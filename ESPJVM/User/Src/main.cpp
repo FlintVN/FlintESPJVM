@@ -25,8 +25,10 @@ extern "C" void app_main() {
     Flint::setCwd("/");
 
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo(defaultApp, NULL) == FlintAPI::IO::FILE_RESULT_OK)
-            Flint::runJarFile(defaultApp);
+        if(FlintAPI::IO::finfo(defaultApp, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+            Flint::setProgram(defaultApp);
+            Flint::start();
+        }
     }
 
     vTaskPrioritySet(NULL, 2);
