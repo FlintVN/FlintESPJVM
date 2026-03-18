@@ -82,13 +82,14 @@ jint NativeTouchPad_InitTouchPad(FNIEnv *env, jobject obj, jint pin) {
     if(pad == -1) return -1;
     esp_err_t err = ESP_OK;
     if(initialized == 0) {
-        Flint::lock();
+        Flint *flint = env->getFlint();
+        flint->lock();
         if(initialized == 0) {
             err = NativeTouchPad_DriverInit();
             if(err == ESP_OK)
                 initialized = 1;
         }
-        Flint::unlock();
+        flint->unlock();
     }
 #if SOC_TOUCH_SENSOR_VERSION == 1
     if(err == ESP_OK) err = touch_pad_config((touch_pad_t)pad, -1);

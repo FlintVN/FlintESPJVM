@@ -3,6 +3,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include "driver/usb_serial_jtag.h"
+#include "flint_system_api.h"
 #include "esp_debugger.h"
 
 EspDbg *EspDbg::espDbgInstance = NULL;
@@ -13,7 +14,7 @@ EspDbg::EspDbg(void) : FDbg() {
 
 EspDbg *EspDbg::getInstance(void) {
     if(espDbgInstance == 0) {
-        espDbgInstance = (EspDbg *)Flint::malloc(NULL, sizeof(EspDbg));
+        espDbgInstance = (EspDbg *)FlintAPI::System::malloc(sizeof(EspDbg));
         new (espDbgInstance)EspDbg();
     }
     return espDbgInstance;

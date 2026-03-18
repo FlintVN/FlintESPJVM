@@ -14,7 +14,7 @@ EspDbg::EspDbg(void) : FDbg() {
 
 EspDbg *EspDbg::getInstance(void) {
     if(espDbgInstance == 0) {
-        espDbgInstance = (EspDbg *)Flint::malloc(NULL, sizeof(EspDbg));
+        espDbgInstance = (EspDbg *)FlintAPI::System::malloc(sizeof(EspDbg));
         new (espDbgInstance)EspDbg();
     }
     return espDbgInstance;

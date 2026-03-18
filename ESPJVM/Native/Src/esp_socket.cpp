@@ -1,41 +1,44 @@
 
 #include "flint.h"
 #include "esp_socket.h"
+#include "flint_system_api.h"
 
 static uint32_t sockListLength = 0;
 static int32_t *sockList = NULL;
 
+static FMutex socketLock;
+
 static int32_t SockList_Add(int32_t sock) {
-    Flint::lock();
+    socketLock.lock();
     for(uint32_t i = 0; i < sockListLength; i++) {
         if(sockList[i] < 0) {
             sockList[i] = sock;
-            Flint::unlock();
+            socketLock.unlock();
             return i;
         }
     }
-    int32_t *newList = (int32_t *)Flint::realloc(NULL, sockList, sockListLength + 10);
+    int32_t *newList = (int32_t *)FlintAPI::System::realloc(sockList, sockListLength + 10);
     if(newList == NULL) {
-        Flint::unlock();
+        socketLock.unlock();
         return -1;
     }
     sockList = newList;
     sockList[sockListLength] = sock;
     sockListLength += 10;
-    Flint::unlock();
+    socketLock.unlock();
     return sockListLength - 10;
 }
 
 static void SockList_Remove(int32_t sock) {
-    Flint::lock();
+    socketLock.lock();
     for(uint32_t i = 0; i < sockListLength; i++) {
         if(sockList[i] == sock) {
             sockList[i] = -1;
-            Flint::unlock();
+            socketLock.unlock();
             return;
         }
     }
-    Flint::unlock();
+    socketLock.unlock();
 }
 
 int32_t Socket_Create(bool stream) {
@@ -182,7 +185,7 @@ void Socket_Reset(void) {
             if(sockList[i] >= 0)
                 close(sockList[i]);
         }
-        Flint::free(sockList);
+        FlintAPI::System::free(sockList);
     }
     sockListLength = 0;
     sockList = NULL;

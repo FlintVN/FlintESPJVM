@@ -67,9 +67,9 @@ FileResult FlintAPI::IO::finfo(const char *fileName, FileInfo *fileInfo) {
 }
 
 FileHandle FlintAPI::IO::fopen(const char *fileName, FileMode mode) {
-    FIL *fp = (FIL *)Flint::malloc(NULL, sizeof(FIL));
+    FIL *fp = (FIL *)FlintAPI::System::malloc(sizeof(FIL));
     if(fp == NULL) return NULL;
-    if(f_open(fp, fileName, (BYTE)mode) != FR_OK) { Flint::free(fp); return NULL; };
+    if(f_open(fp, fileName, (BYTE)mode) != FR_OK) { FlintAPI::System::free(fp); return NULL; };
     return fp;
 }
 
@@ -102,7 +102,7 @@ FileResult FlintAPI::IO::fseek(FileHandle handle, uint32_t offset) {
 FileResult FlintAPI::IO::fclose(FileHandle handle) {
     if(handle != NULL) {
         FileResult ret = convertFileResult(f_close((FIL *)handle));
-        Flint::free(handle);
+        FlintAPI::System::free(handle);
         return ret;
     }
     return FILE_RESULT_OK;
@@ -117,12 +117,12 @@ FileResult FlintAPI::IO::frename(const char *oldName, const char *newName) {
 }
 
 DirHandle FlintAPI::IO::opendir(const char *dirName) {
-    FF_DIR *dir = (FF_DIR *)Flint::malloc(NULL, sizeof(FF_DIR));
+    FF_DIR *dir = (FF_DIR *)FlintAPI::System::malloc(sizeof(FF_DIR));
     FRESULT ret = f_opendir(dir, dirName);
     if(ret == FR_OK)
         return (void *)dir;
     else {
-        Flint::free(dir);
+        FlintAPI::System::free(dir);
         return NULL;
     }
 }
@@ -157,7 +157,7 @@ FileResult FlintAPI::IO::readdir(DirHandle handle, FileInfo *fileInfo) {
 
 FileResult FlintAPI::IO::closedir(DirHandle handle) {
     FRESULT ret = f_closedir((FF_DIR *)handle);
-    Flint::free(handle);
+    FlintAPI::System::free(handle);
     return convertFileResult(ret);
 }
 
