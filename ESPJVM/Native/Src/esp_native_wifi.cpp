@@ -192,12 +192,18 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
 
     if(!CheckReturn(env, ret, "An error occurred while getting AP number")) return NULL;
 
-    if(count == 0) return NULL;
+    if(count == 0) {
+        esp_wifi_clear_ap_list();
+        return NULL;
+    }
 
     Flint *flint = env->getFlint();
     flint->lock();
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
-    if(arrayObj == NULL) return NULL;
+    if(arrayObj == NULL) {
+        esp_wifi_clear_ap_list();
+        return NULL;
+    }
     arrayObj->clearData();
     JObject **data = arrayObj->getData();
     for(uint16_t i = 0; i < count; i++) {
@@ -205,6 +211,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
         ret = esp_wifi_scan_get_ap_record(&apRecords);
         if(!CheckReturn(env, ret, "An error occurred while getting AP record")) {
             flint->unlock();
+            esp_wifi_clear_ap_list();
             return NULL;
         }
         jobject aprObj = createAccessPointRecordObj(env, &apRecords);
@@ -212,12 +219,14 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
             flint->unlock();
             while(i) env->freeObject(data[--i]);
             env->freeObject(arrayObj);
+            esp_wifi_clear_ap_list();
             return NULL;
         }
         data[i] = aprObj;
     }
 
     flint->unlock();
+    esp_wifi_clear_ap_list();
     return arrayObj;
 }
 
