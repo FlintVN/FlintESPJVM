@@ -1,5 +1,5 @@
 ## FlintESPJVM
-FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This allows you to run and debug Java programs directly on the ESP32 hardware.
+FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This enables running and debugging JVM-based languages such as Java, Kotlin, Scala, Groovy, Clojure, JRuby, and Jython on ESP32 hardware.
 
 ![demo](images/demo1.avif)
 ## Key Features
@@ -40,14 +40,11 @@ Below are the performance benchmarks of several different programming languages 
 - Execution time of 10 million iterations using `for` and `while` loops.
 - Maximum toggling frequency of GPIO when driven by the CPU.
 
-  | Platform                     | `for` loop (10M) | `while` loop (10M) | GPIO toggle frequency |
-  | ---------------------------- | ---------------- | ------------------ | --------------------- |
-  | **C/IDF v5.5.0**             | 375 ms           | 375 ms             | 2.2 MHz               |
-  | **Java/FlintESPJVM v0.0.11** | 9254 ms          | 9254 ms            | 295 KHz               |
-  | **MicroPython v1.26.0**      | 43677 ms         | 79582 ms           | 107 KHz               |
-  | **C#/NanoFramework v1.12.4** | 77656 ms         | 77660 ms           | 2.4 KHz               |
+  | Language      | Platform              | `for` loop (10M) | `while` loop (10M) | GPIO toggle frequency |
+  | ------------- | --------------------- | ---------------- | ------------------ | --------------------- |
+  | C             | IDF v5.5.0            | 375 ms           | 375 ms             | 2.2 MHz               |
+  | Java          | FlintJVM v1.1.7       | 9254 ms          | 9254 ms            | 295 KHz               |
+  | MicroPython   | MicroPython v1.26.0   | 43677 ms         | 79582 ms           | 107 KHz               |
+  | C#            | NanoFramework v1.12.4 | 77656 ms         | 77660 ms           | 2.4 KHz               |
 
 The source code of this test can be viewed at [ESP32-Perfomance](https://github.com/FlintVN/ESP32-Perfomance).
-
----
-*Elevate your ESP32 projects by harnessing the robustness of Java with FlintESPJVM.*
