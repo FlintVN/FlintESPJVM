@@ -16,11 +16,11 @@ jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArra
 
     if(!CheckArrayIndexSize(env, b, off, len)) return -1;
 
-    jobject impl = obj->getField(env->exec, "impl")->getObj();
-    int32_t timeout = impl->getField(env->exec, "timeout")->getInt32();
+    jobject impl = env->getObjField(env->getFieldId(obj, "impl"));
+    int32_t timeout = env->getIntField(env->getFieldId(impl, "timeout"));
     uint64_t startTime = getTimeMillis();
 
-    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
+    while(!env->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
         int32_t n;
         SocketError err = Socket_Receive(sock, &b->getData()[off], len, &n);
         if(err == SOCKET_OK) return n;
@@ -30,7 +30,7 @@ jint NativeFlintSocketInputStream_SocketRead(FNIEnv *env, jobject obj, jbyteArra
             return -1;
         }
     }
-    if(!env->exec->hasTerminateRequest())
+    if(!env->hasTerminateRequest())
         env->throwNew(env->findClass("java/net/SocketTimeoutException"), "Read timed out");
     return -1;
 }

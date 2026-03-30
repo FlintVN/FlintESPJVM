@@ -82,7 +82,7 @@ jint NativeTouchPad_InitTouchPad(FNIEnv *env, jobject obj, jint pin) {
     if(pad == -1) return -1;
     esp_err_t err = ESP_OK;
     if(initialized == 0) {
-        Flint *flint = env->getFlint();
+        Flint *flint = ((FExec *)env)->getFlint();
         flint->lock();
         if(initialized == 0) {
             err = NativeTouchPad_DriverInit();

@@ -53,7 +53,7 @@ static bool NativeI2sMaster_Write(FNIEnv *env, int32_t i2sId, void *buff, uint32
         if(bw == size)
             return true;
         else {
-            if(env->exec->hasTerminateRequest())
+            if(env->hasTerminateRequest())
                 return false;
             size -= bw;
             b += bw;

@@ -43,13 +43,13 @@ static bool GetIPv6(InetAddress *inetAddr, int32_t port, struct sockaddr_in6 *ip
 }
 
 int32_t NativeFlintSocketImpl_GetSock(FNIEnv *env, jobject socketObj, bool throwable) {
-    jobject fdObj = socketObj->getField(env->exec, "fd")->getObj();
+    jobject fdObj = env->getObjField(env->getFieldId(socketObj, "fd"));
     if(fdObj == NULL) {
         if(throwable)
             env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
         return -1;
     }
-    int32_t sock = fdObj->getField(env->exec, "fd")->getInt32();
+    int32_t sock = env->getIntField(env->getFieldId(fdObj, "fd"));
     if(sock < 0) {
         if(throwable)
             env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
@@ -113,8 +113,8 @@ jvoid NativeFlintSocketImpl_SocketCreate(FNIEnv *env, jobject obj) {
         env->throwNew(env->findClass("java/io/IOException"), "Create socket error");
         return;
     }
-    jobject fdObj = obj->getField(env->exec, "fd")->getObj();
-    fdObj->getField(env->exec, "fd")->setInt32(sock);
+    jobject fdObj = env->getObjField(env->getFieldId(obj, "fd"));
+    env->setIntField(env->getFieldId(fdObj, "fd"), sock);
 }
 
 jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject address, jint port) {
@@ -131,7 +131,7 @@ jvoid NativeFlintSocketImpl_SocketConnect(FNIEnv *env, jobject obj, jobject addr
     SocketError err = Socket_Connect(sock, &addr);
     if(err == SOCKET_OK) return;
     else if(err == SOCKET_INPROGRESS) {
-        while(!env->exec->hasTerminateRequest()) {
+        while(!env->hasTerminateRequest()) {
             bool isConnected;
             if(Socket_GetConnectionStatus(sock, &isConnected) != SOCKET_OK)
                 break;
@@ -170,10 +170,10 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
 
     struct sockaddr_in6 addr;
 
-    int32_t timeout = obj->getField(env->exec, "timeout")->getInt32();
+    int32_t timeout = env->getIntField(env->getFieldId(obj, "timeout"));
     uint64_t startTime = getTimeMillis();
 
-    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
+    while(!env->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
         int32_t client;
         SocketError err = Socket_Accept(listenSock, &addr, &client);
         if(err == SOCKET_ERR) {
@@ -183,17 +183,17 @@ jvoid NativeFlintSocketImpl_SocketAccept(FNIEnv *env, jobject obj, jobject s) {
         else if(err == SOCKET_OK) {
             InetAddress *inetAddr = NativeFlintSocketImpl_CreateInetAddress(env, &addr);
             if(inetAddr == NULL) return;
-            s->getField(env->exec, "address")->setObj(inetAddr);
+            env->setObjField(env->getFieldId(s, "address"), inetAddr);
             inetAddr->clearProtected();
             if(inetAddr->getFamily() == IPV6)
                 ((Inet6Address *)inetAddr)->getAddress()->clearProtected();
-            s->getField(env->exec, "fd")->getObj()->getField(env->exec, "fd")->setInt32(client);
-            s->getField(env->exec, "port")->setInt32(obj->getField(env->exec, "port")->getInt32());
-            s->getField(env->exec, "localport")->setInt32(obj->getField(env->exec, "localport")->getInt32());
+            env->setIntField(env->getFieldId(env->getObjField(env->getFieldId(s, "fd")), "fd"), client);
+            env->setIntField(env->getFieldId(s, "port"), env->getIntField(env->getFieldId(obj, "port")));
+            env->setIntField(env->getFieldId(s, "localport"), env->getIntField(env->getFieldId(obj, "localport")));
             return;
         }
     }
-    if(!env->exec->hasTerminateRequest())
+    if(!env->hasTerminateRequest())
         env->throwNew(env->findClass("java/net/SocketTimeoutException"), "Accept timed out");
 }
 
@@ -246,7 +246,7 @@ jobject NativeFlintSocketImpl_SocketGetOption(FNIEnv *env, jobject obj, jint opt
         case NATIVE_SO_TIMEOUT: {
             jobject ret = env->newObject(env->findClass("java/lang/Integer"));
             if(ret == NULL) return NULL;
-            ret->getFieldByIndex(0)->setInt32(obj->getField(env->exec, "timeout")->getInt32());
+            ret->getFieldByIndex(0)->setInt32(env->getIntField(env->getFieldId(obj, "timeout")));
             return ret;
         }
         case NATIVE_TCP_NODELAY: {

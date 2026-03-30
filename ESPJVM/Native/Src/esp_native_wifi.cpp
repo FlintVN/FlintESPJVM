@@ -84,7 +84,7 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
     wifiConfig.sta.pmf_cfg.capable = true;
     wifiConfig.sta.pmf_cfg.required = false;
 
-    Flint *flint = env->getFlint();
+    Flint *flint = ((FExec *)env)->getFlint();
     flint->lock();
     esp_err_t ret = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if(ret == ESP_OK)
@@ -116,15 +116,15 @@ static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecor
     if(macArray == NULL) return NULL;
     memcpy(macArray->getData(), apRecord->bssid, 6);
 
-    aprObj->getField(env->exec, "mac")->setObj(macArray);
+    env->setObjField(env->getFieldId(aprObj, "mac"), macArray);
     jstring ssid = env->newString((char *)apRecord->ssid);
     if(ssid == NULL) {
         env->freeObject(macArray);
         return NULL;
     }
-    aprObj->getField(env->exec, "ssid")->setObj(ssid);
-    aprObj->getField(env->exec, "rssi")->setInt32(apRecord->rssi);
-    aprObj->getField(env->exec, "authMode")->setInt32(apRecord->authmode);
+    env->setObjField(env->getFieldId(aprObj, "ssid"), ssid);
+    env->setByteField(env->getFieldId(aprObj, "rssi"), apRecord->rssi);
+    env->setByteField(env->getFieldId(aprObj, "authMode"), apRecord->authmode);
 
     return aprObj;
 }
@@ -162,7 +162,7 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
     for(uint8_t i = 0; i < passwordLen; i++)
         wifiConfig.ap.password[i] = passwordText[i];
 
-    Flint *flint = env->getFlint();
+    Flint *flint = ((FExec *)env)->getFlint();
     flint->lock();
     esp_err_t ret = esp_wifi_set_mode(WIFI_MODE_APSTA);
     if(ret == ESP_OK)
@@ -179,7 +179,7 @@ jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
-    Flint *flint = env->getFlint();
+    Flint *flint = ((FExec *)env)->getFlint();
     flint->lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, blocked ? true : false);
     flint->unlock();
@@ -197,7 +197,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
         return NULL;
     }
 
-    Flint *flint = env->getFlint();
+    Flint *flint = ((FExec *)env)->getFlint();
     flint->lock();
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
     if(arrayObj == NULL) {

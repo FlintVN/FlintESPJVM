@@ -60,13 +60,13 @@ static bool GetIPv6(InetAddress *inetAddr, int32_t port, struct sockaddr_in6 *ip
 }
 
 static int32_t NativeFlintDatagramSocketImpl_GetSock(FNIEnv *env, jobject socketObj, bool throwable) {
-    jobject fdObj = socketObj->getField(env->exec, "fd")->getObj();
+    jobject fdObj = env->getObjField(env->getFieldId(socketObj, "fd"));
     if(fdObj == NULL) {
         if(throwable)
             env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
         return -1;
     }
-    int32_t sock = fdObj->getField(env->exec, "fd")->getInt32();
+    int32_t sock = env->getIntField(env->getFieldId(fdObj, "fd"));
     if(sock < 0) {
         if(throwable)
             env->throwNew(env->findClass("java/io/IOException"), "Socket has not been created");
@@ -87,7 +87,7 @@ jvoid NativeFlintDatagramSocketImpl_Bind(FNIEnv *env, jobject obj, jint lport, j
     if(Socket_Bind(sock, &addr) != SOCKET_OK)
         env->throwNew(env->findClass("java/io/IOException"), "Bind error");
     else
-        obj->getField(env->exec, "localPort")->setInt32(lport);
+        env->setIntField(env->getFieldId(obj, "localPort"), lport);
 }
 
 jvoid NativeFlintDatagramSocketImpl_Send(FNIEnv *env, jobject obj, jobject p) {
@@ -117,7 +117,7 @@ jvoid NativeFlintDatagramSocketImpl_Send(FNIEnv *env, jobject obj, jobject p) {
 
     if(!CheckArrayIndexSize(env, b, 0, len)) return;
 
-    while(len > 0 && !env->exec->hasTerminateRequest()) {
+    while(len > 0 && !env->hasTerminateRequest()) {
         int32_t sent;
         SocketError err = Socket_SendTo(sock, &addr, &b->getData()[off], len, &sent);
         if(err == SOCKET_OK) {
@@ -152,10 +152,10 @@ jvoid NativeFlintDatagramSocketImpl_Receive(FNIEnv *env, jobject obj, jobject p)
 
     if(!CheckArrayIndexSize(env, b, off, len)) return;
 
-    int32_t timeout = obj->getField(env->exec, "timeout")->getInt32();
+    int32_t timeout = env->getIntField(env->getFieldId(obj, "timeout"));
     uint64_t startTime = getTimeMillis();
 
-    while(!env->exec->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
+    while(!env->hasTerminateRequest() && (timeout <= 0 || ((uint64_t)(getTimeMillis() - startTime)) < timeout)) {
         int32_t n;
         struct sockaddr_in6 addr;
         SocketError err = Socket_ReceiveFrom(sock, &addr, b->getData(), len, &n);
@@ -175,7 +175,7 @@ jvoid NativeFlintDatagramSocketImpl_Receive(FNIEnv *env, jobject obj, jobject p)
             return;
         }
     }
-    if(!env->exec->hasTerminateRequest())
+    if(!env->hasTerminateRequest())
         env->throwNew(env->findClass("java/net/SocketTimeoutException"), "Read timed out");
 }
 
@@ -244,8 +244,8 @@ jvoid NativeFlintDatagramSocketImpl_DatagramSocketCreate(FNIEnv *env, jobject ob
         env->throwNew(env->findClass("java/io/IOException"), "Create DatagramSocket error");
         return;
     }
-    jobject fdObj = obj->getField(env->exec, "fd")->getObj();
-    fdObj->getField(env->exec, "fd")->setInt32(sock);
+    jobject fdObj = env->getObjField(env->getFieldId(obj, "fd"));
+    env->setIntField(env->getFieldId(fdObj, "fd"), sock);
 }
 
 jvoid NativeFlintDatagramSocketImpl_DatagramSocketClose(FNIEnv *env, jobject obj) {

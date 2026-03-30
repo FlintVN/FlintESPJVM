@@ -12,7 +12,7 @@ jvoid NativeFlintSocketOutputStream_SocketWrite(FNIEnv *env, jobject obj, jbyteA
 
     if(!CheckArrayIndexSize(env, b, off, len)) return;
 
-    while(len > 0 && !env->exec->hasTerminateRequest()) {
+    while(len > 0 && !env->hasTerminateRequest()) {
         int32_t sent;
         SocketError err = Socket_Send(sock, &b->getData()[off], len, &sent);
         if(err == SOCKET_OK) {
