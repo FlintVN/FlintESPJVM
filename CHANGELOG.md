@@ -1,4 +1,13 @@
 # Change Log
+## V0.7.0
+- Increase the size of the memory partition allocated for FlintESPJVM firmware (1MB -> 1.5MB).
+- Update to [`FlintJVM V2.4.0`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.4.0):
+  - Supports loading and executing `JAR` files instead of classes scattered across memory.
+  - Use the same CRC type for the debugger's send and receive communication.
+  - Implement the ability to run multiple JAR application files (It is possible to create multiple instances of `Flint` class).
+  - Add support for methods in FNIEnv to access fields.
+- Update to [`FlintJDK V1.5.1`](https://github.com/FlintVN/FlintJDK/releases/tag/V1.5.1):
+  - Sockets in java.net must be a Closeable implementation.
 ## V0.6.0
 - Update to [`FlintJVM V2.3.6`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.3.6):
   - Fix `System.arraycopy` is not working correctly.
