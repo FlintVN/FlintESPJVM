@@ -1,4 +1,5 @@
 
+#include <string.h>
 #include <iostream>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -22,7 +23,7 @@ EspDbg *EspDbg::getInstance(void) {
 
 bool EspDbg::sendData(uint8_t *data, uint32_t length) {
     while(length) {
-        size_t byteSent = usb_serial_jtag_write_bytes((const char *)data, length, 20 / portTICK_PERIOD_MS);
+        size_t byteSent = usb_serial_jtag_write_bytes(data, length, 20 / portTICK_PERIOD_MS);
         if(byteSent == 0)
             return false;
         length -= byteSent;
@@ -38,22 +39,28 @@ void EspDbg::receiveTask(void) {
     TickType_t startTick = xTaskGetTickCount();
 
     while(1) {
-        TickType_t tick = xTaskGetTickCount();
-        if(rxDataLengthReceived > 0 && (tick - startTick) >= pdMS_TO_TICKS(100)) {
-            rxDataToltalLength = 0;
-            rxDataLengthReceived = 0;
-        }
         uint32_t rxSize = usb_serial_jtag_read_bytes(&rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, portMAX_DELAY);
         if(rxSize > 0) {
-            rxDataLengthReceived += rxSize;
-            if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4 && rxData[0] == 0x00)
-                    rxDataToltalLength = (rxData[1] >> 6) | (rxData[2] << 2) | (rxData[3] << 10);
+            TickType_t tick = xTaskGetTickCount();
+            if(rxDataLengthReceived > 0 && (tick - startTick) >= pdMS_TO_TICKS(100)) {
+                memcpy(rxData, &rxData[rxDataLengthReceived], rxSize);
+                rxDataLengthReceived = 0;
+                rxDataToltalLength = 0;
+            }
+            if(rxDataLengthReceived == 0) {
+                if(rxData[0] == 0)
+                    rxDataLengthReceived += rxSize;
+            }
+            else
+                rxDataLengthReceived += rxSize;
+            if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4)
+                rxDataToltalLength = (rxData[1] >> 6) | (rxData[2] << 2) | (rxData[3] << 10);
             if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
                 espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                 rxDataToltalLength = 0;
                 rxDataLengthReceived = 0;
             }
-            startTick = tick;
+            startTick = xTaskGetTickCount();
         }
     }
 }

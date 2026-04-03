@@ -58,7 +58,12 @@ void EspDbg::receiveTask(void) {
             }
             uint32_t rxSize = tud_cdc_n_read(TINYUSB_CDC_ACM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived);
             if(rxSize > 0) {
-                rxDataLengthReceived += rxSize;
+                if(rxDataLengthReceived == 0) {
+                    if(rxData[0] == 0)
+                        rxDataLengthReceived += rxSize;
+                }
+                else
+                    rxDataLengthReceived += rxSize;
                 if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4 && rxData[0] == 0x00)
                     rxDataToltalLength = (rxData[1] >> 6) | (rxData[2] << 2) | (rxData[3] << 10);
                 if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
@@ -67,7 +72,7 @@ void EspDbg::receiveTask(void) {
                     rxDataLengthReceived = 0;
                 }
             }
-            startTick = tick;
+            startTick = xTaskGetTickCount();
         }
     }
 }
