@@ -1,4 +1,12 @@
 # Change Log
+## V0.7.1
+- Update to [`FlintJVM V2.4.1`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.4.1):
+  - Fix serious bug: The comparison operation in FDict is running incorrectly.
+  - Check current thread in FMutex::unlock.
+  - Use a separate mutex for the debugger's console.
+- Fix: Debugging communication is unstable over `USB Serial JTAG` (`ESP32-C3`, `ESP32-C6`, `ESP32-S3`).
+- Reduce the tx buffer and rx buffer of the `USB Serial Jtag` (`ESP32-C3`, `ESP32-C6`, `ESP32-S3`):
+  - RX buffer: 1025 -> 256 (byte).
 ## V0.7.0
 - Increase the size of the memory partition allocated for FlintESPJVM firmware (1MB -> 1.5MB).
 - Update to [`FlintJVM V2.4.0`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.4.0):
