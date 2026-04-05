@@ -22,7 +22,7 @@ static void NVS_Init(void) {
 
 static void USBSerialJtag_Init() {
     usb_serial_jtag_driver_config_t usb_serial_jtag_config = {};
-    usb_serial_jtag_config.rx_buffer_size = 1024 + 1;
+    usb_serial_jtag_config.rx_buffer_size = 256;
     usb_serial_jtag_config.tx_buffer_size = DBG_TX_BUFFER_SIZE;
     ESP_ERROR_CHECK(usb_serial_jtag_driver_install(&usb_serial_jtag_config));
 }
