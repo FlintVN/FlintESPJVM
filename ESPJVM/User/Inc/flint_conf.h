@@ -3,6 +3,7 @@
 #define __FLINT_CONF_H
 
 #include "sdkconfig.h"
+#include <sys/socket.h> /* Workaround for IPV6_UNICAST_HOPS */
 #include "flint_common.h"
 
 #define KILO_BYTE(_value)           ((_value) * 1024)
@@ -38,5 +39,7 @@
 #define MAX_OF_BREAK_POINT          20
 #define DBG_TX_BUFFER_SIZE          512
 #define DBG_CONSOLE_BUFFER_SIZE     KILO_BYTE(1)
+
+#define FLINT_API_NET_ENABLED       1
 
 #endif /* __FLINT_CONF_H */

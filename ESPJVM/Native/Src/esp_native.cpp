@@ -4,7 +4,6 @@
 #include "flint_system_api.h"
 #include "flint_class_loader.h"
 #include "flint_native.h"
-#include "esp_socket.h"
 #include "esp_native_adc.h"
 #include "esp_native_dac.h"
 #include "esp_native_pin.h"
@@ -17,11 +16,6 @@
 #include "esp_native_spi_master.h"
 #include "esp_native_i2c_master.h"
 #include "esp_native_i2s_master.h"
-#include "esp_native_flint_socket_impl.h"
-#include "esp_native_flint_inet_address_impl.h"
-#include "esp_native_flint_socket_input_Stream.h"
-#include "esp_native_flint_socket_output_Stream.h"
-#include "esp_native_flint_datagram_socket_impl.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                    wifiMethods),
@@ -36,11 +30,6 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/io/I2cMaster",                i2cMasterMethods),
     NATIVE_CLASS("flint/io/I2sMaster",                i2sMasterMethods),
     NATIVE_CLASS("flint/io/BitStream",                bitStreamMethods),
-    NATIVE_CLASS("flint/net/FlintSocketImpl",         flintSocketImplMethods),
-    NATIVE_CLASS("flint/net/FlintInetAddressImpl",    flintInetAddressImplMethods),
-    NATIVE_CLASS("flint/net/FlintSocketInputStream",  flintSocketInputStreamMethods),
-    NATIVE_CLASS("flint/net/FlintSocketOutputStream", flintSocketOutputStreamMethods),
-    NATIVE_CLASS("flint/net/FlintDatagramSocketImpl", flintDatagramSocketImplMethods),
 };
 
 void FlintAPI::System::reset(void) {
@@ -52,7 +41,6 @@ void FlintAPI::System::reset(void) {
     NativeSpiMaster_Reset();
     NativeI2cMaster_Reset();
     NativeI2sMaster_Reset();
-    Socket_Reset();
 }
 
 JNMPtr FlintAPI::System::findNativeMethod(MethodInfo *methodInfo) {

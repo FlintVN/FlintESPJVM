@@ -5,7 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "flint_system_api.h"
-#include "esp_native_common.h"
+#include "flint_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_i2s_master.h"
 
