@@ -33,13 +33,14 @@ static CANContext g_can_contexts[2] = {};
 
 static CANContext* get_context(FNIEnv *env, jobject obj) {
     FieldValue *field = obj->getField(env->exec, "nativeHandle");
+    if (!field) return nullptr;
     uintptr_t handle = (uintptr_t)field->getInt64();
     return (CANContext*)handle;
 }
 
 static void set_context(FNIEnv *env, jobject obj, CANContext* ctx) {
     FieldValue *field = obj->getField(env->exec, "nativeHandle");
-    field->setInt64((int64_t)(uintptr_t)ctx);
+    if (field) field->setInt64((int64_t)(uintptr_t)ctx);
 }
 
 static int get_controller_id(FNIEnv *env, jobject obj) {
@@ -434,27 +435,33 @@ jobject NativeCan_ReceiveMessage(FNIEnv *env, jobject obj, jlong timeoutMs) {
     }
     
     // Set ID
-    msg->getField(env->exec, "id")->setInt32(frame.identifier);
+    FieldValue *id_fv = msg->getField(env->exec, "id");
+    if (id_fv) id_fv->setInt32(frame.identifier);
     
     // Set extended flag
     bool is_extended = (frame.flags & TWAI_MSG_FLAG_EXTD) != 0;
-    msg->getField(env->exec, "extended")->setBool(is_extended);
+    FieldValue *ext_fv = msg->getField(env->exec, "extended");
+    if (ext_fv) ext_fv->setBool(is_extended);
     
     // Set RTR flag
     bool is_rtr = (frame.flags & TWAI_MSG_FLAG_RTR) != 0;
-    msg->getField(env->exec, "rtr")->setBool(is_rtr);
+    FieldValue *rtr_fv = msg->getField(env->exec, "rtr");
+    if (rtr_fv) rtr_fv->setBool(is_rtr);
     
     // Set DLC
-    msg->getField(env->exec, "dlc")->setInt32(frame.data_length_code);
+    FieldValue *dlc_fv = msg->getField(env->exec, "dlc");
+    if (dlc_fv) dlc_fv->setInt32(frame.data_length_code);
     
     // Set data if not RTR frame
     if (!is_rtr && frame.data_length_code > 0) {
         jbyteArray arr = can_frame_to_bytearray(env, &frame);
-        msg->getField(env->exec, "data")->setObj(arr);
+        FieldValue *data_fv = msg->getField(env->exec, "data");
+        if (data_fv) data_fv->setObj(arr);
     } else {
         // Empty byte array for RTR frames
         jbyteArray arr = env->newByteArray(0);
-        msg->getField(env->exec, "data")->setObj(arr);
+        FieldValue *data_fv = msg->getField(env->exec, "data");
+        if (data_fv) data_fv->setObj(arr);
     }
     
     return msg;
@@ -491,33 +498,32 @@ jobject NativeCan_GetStatusInfo(FNIEnv *env, jobject obj) {
     }
     
     // Set error counters
-    info->getField(env->exec, "txErrorCounter")->setInt32(st.tx_error_counter);
-    info->getField(env->exec, "rxErrorCounter")->setInt32(st.rx_error_counter);
+    FieldValue *tx_err = info->getField(env->exec, "txErrorCounter");
+    if (tx_err) tx_err->setInt32(st.tx_error_counter);
     
-    // Set queue info (ESP32 doesn't provide these directly, use default values)
-    info->getField(env->exec, "txQueueFree")->setInt32(32); // Default queue size
-    info->getField(env->exec, "rxQueueFill")->setInt32(0);
+    FieldValue *rx_err = info->getField(env->exec, "rxErrorCounter");
+    if (rx_err) rx_err->setInt32(st.rx_error_counter);
+    
+    // Set queue info
+    FieldValue *tx_free = info->getField(env->exec, "txQueueFree");
+    if (tx_free) tx_free->setInt32(32);
+    
+    FieldValue *rx_fill = info->getField(env->exec, "rxQueueFill");
+    if (rx_fill) rx_fill->setInt32(0);
     
     // Set state
-    JClass *state_cls = env->findClass("flint/machine/CanStatus$State");
     FieldValue *state_field = info->getField(env->exec, "state");
-    
-    if (state_cls && state_field) {
-        // Map TWAI states to Java enum
-        const char* enum_name = "RUNNING";
+    if (state_field) {
+        // Map TWAI states to Java field value
+        int state_value = 0; // RUNNING default
         if (!ctx->is_started) {
-            enum_name = "STOPPED";
+            state_value = 1; // STOPPED
         } else if (st.state == TWAI_STATE_BUS_OFF) {
-            enum_name = "BUS_OFF";
+            state_value = 2; // BUS_OFF
         } else if (st.state == TWAI_STATE_RECOVERING) {
-            enum_name = "RECOVERING";
+            state_value = 3; // RECOVERING
         }
-        
-        // Get enum value
-        FieldValue *enum_val = state_cls->getClassLoader()->getStaticField(env->exec, enum_name);
-        if (enum_val) {
-            state_field->setObj(enum_val->getObj());
-        }
+        state_field->setInt32(state_value);
     }
     
     return info;
