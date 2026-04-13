@@ -23,6 +23,21 @@ void FlintAPI::System::consoleWrite(uint8_t *utf8, uint32_t length) {
     fprintf(stdout, "%.*s", (int)length, (char *)utf8);
 }
 
-uint64_t FlintAPI::System::getNanoTime(void) {
-    return (uint64_t)esp_timer_get_time() * 1000;
+int64_t FlintAPI::System::getTimeNanos(void) {
+    return esp_timer_get_time() * 1000;
+}
+
+int64_t FlintAPI::System::getTimeMillis(void) {
+    return esp_timer_get_time() / 1000;
+}
+
+const char *FlintAPI::System::getClassPath(uint32_t index) {
+    static const char *jars[] = {
+        "/lib/java.base.jar",
+        "/lib/flint.io.jar",
+        "/lib/flint.net.jar",
+    };
+    if(index < LENGTH(jars))
+        return jars[index];
+    return NULL;        
 }

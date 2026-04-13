@@ -6,7 +6,10 @@
 #include "esp_board.h"
 #include "esp_debugger.h"
 
+static Flint flint;
+
 extern "C" void app_main() {
+    static const char *defaultApp = "FlintApp.jar";
     static const esp_vfs_fat_mount_config_t mount_config = {
         .format_if_mount_failed = true,
         .max_files = 16,
@@ -20,13 +23,16 @@ extern "C" void app_main() {
 
     ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
 
-    Flint::println();
-    Flint::setCwd("/");
-    Flint::setClassPaths("/lib/java.base;/lib/flint.io;/lib/flint.net");
+    EspDbg::getInstance()->setTarget(&flint);
+
+    flint.println();
+    flint.setCwd("/");
 
     if(esp_reset_reason() != ESP_RST_PANIC) {
-        if(FlintAPI::IO::finfo("Main.class", NULL) == FlintAPI::IO::FILE_RESULT_OK)
-            Flint::runToMain("Main");
+        if(FlintAPI::IO::finfo(defaultApp, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+            flint.setProgram(defaultApp);
+            flint.start();
+        }
     }
 
     vTaskPrioritySet(NULL, 2);

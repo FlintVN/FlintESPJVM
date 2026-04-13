@@ -1,5 +1,5 @@
 ## FlintESPJVM
-FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This allows you to run and debug Java programs directly on the ESP32 hardware.
+FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM](https://github.com/FlintVN/FlintJVM) on the ESP-IDF framework. This enables running and debugging JVM-based languages such as Java, Kotlin, Scala, Groovy, Clojure, JRuby, and Jython on ESP32 hardware.
 
 ![demo](images/demo1.avif)
 ## Key Features
@@ -8,15 +8,17 @@ FlintESPJVM brings the power of Java to ESP32 devices by implementing [FlintJVM]
 ## How to use
 ### 1. Supported Boards
 FlintESPJVM is compatible with a variety of ESP32 boards, including:
-- Generic ESP32 Boards.
-- ESP32-C3FH4.
-- ESP32-C6FH4.
-- ESP32-C6FH8.
-- ESP32-S2FN4R2.
-- ESP32-S3FH4R2.
-- ESP32-S3N4RX.
-- ESP32-S3N8RX.
-- ESP32-S3N16RX.
+  | Board             | Cores                     | Flash | SRAM  | PSRAM |
+  | ----------------- | ------------------------- | ----- | ----- | ----- |
+  | **Generic ESP32** | 240MHz Xtensa Dual-core   | 4MB   | 520KB | ❌    |
+  | **ESP32-C3FH4**   | 160MHz RISC-V Single-core | 4MB   | 400KB | ❌    |
+  | **ESP32-C6FH4**   | 160MHz RISC-V Single-core | 4MB   | 512KB | ❌    |
+  | **ESP32-C6FH8**   | 160MHz RISC-V Single-core | 8MB   | 512KB | ❌    |
+  | **ESP32-S2FN4R2** | 240MHz Xtensa Single-core | 4MB   | 320KB | 2MB   |
+  | **ESP32-S3FH4R2** | 240MHz Xtensa Dual-core   | 4MB   | 512KB | 2MB   |
+  | **ESP32-S3N4RX**  | 240MHz Xtensa Dual-core   | 4MB   | 512KB | ✅    |
+  | **ESP32-S3N8RX**  | 240MHz Xtensa Dual-core   | 8MB   | 512KB | ✅    |
+  | **ESP32-S3N16RX** | 240MHz Xtensa Dual-core   | 16MB  | 512KB | ✅    |
 ### 2. Flashing the Firmware
 To get FlintESPJVM up and running on your board:
 - Quick Flash: Use the [ESP Web Tool](https://esp.flint.vn) for an easy, browser-based flashing experience.
@@ -34,18 +36,15 @@ Refer to the [FlintExample](https://github.com/FlintVN/FlintExample) project, wh
 > git clone --recurse-submodules https://github.com/FlintVN/FlintESPJVM.git
 ```
 ## Benchmark
-Below are the performance benchmarks of several different programming languages on the ESP32, focusing on.
+Below are the performance benchmarks of several different programming languages on the ESP32, focusing on:
 - Execution time of 10 million iterations using `for` and `while` loops.
 - Maximum toggling frequency of GPIO when driven by the CPU.
 
-  | Platform                     | `for` loop (10M) | `while` loop (10M) | GPIO toggle frequency |
-  | ---------------------------- | ---------------- | ------------------ | --------------------- |
-  | **C/IDF v5.5.0**             | 375 ms           | 375 ms             | 2.2 MHz               |
-  | **Java/FlintESPJVM v0.0.11** | 9254 ms          | 9254 ms            | 295 KHz               |
-  | **MicroPython v1.26.0**      | 43677 ms         | 79582 ms           | 107 KHz               |
-  | **C#/NanoFramework v1.12.4** | 77656 ms         | 77660 ms           | 2.4 KHz               |
+  | Language      | Platform              | `for` loop (10M) | `while` loop (10M) | GPIO toggle frequency |
+  | ------------- | --------------------- | ---------------- | ------------------ | --------------------- |
+  | C             | IDF v5.5.0            | 375 ms           | 375 ms             | 2.2 MHz               |
+  | Java          | FlintJVM v2.4.1       | 8920 ms          | 8920 ms            | 294 KHz               |
+  | MicroPython   | MicroPython v1.26.0   | 43677 ms         | 79582 ms           | 107 KHz               |
+  | C#            | NanoFramework v1.12.4 | 77656 ms         | 77660 ms           | 2.4 KHz               |
 
 The source code of this test can be viewed at [ESP32-Perfomance](https://github.com/FlintVN/ESP32-Perfomance).
-
----
-*Elevate your ESP32 projects by harnessing the robustness of Java with FlintESPJVM.*

@@ -16,14 +16,14 @@ jvoid NativeOneWire_Write(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint
 jvoid NativeOneWire_Close(FNIEnv *env, jobject obj);
 
 inline constexpr NativeMethod oneWireMethods[] = {
-    NATIVE_METHOD("open",   "()Lflint/machine/OneWire;", NativeOneWire_Open),
-    NATIVE_METHOD("isOpen", "()Z",                       NativeOneWire_IsOpen),
-    NATIVE_METHOD("reset",  "()V",                       NativeOneWire_Reset),
-    NATIVE_METHOD("read",   "()I",                       NativeOneWire_ReadByte),
-    NATIVE_METHOD("read",   "([BII)I",                   NativeOneWire_Read),
-    NATIVE_METHOD("write",  "(I)V",                      NativeOneWire_WriteByte),
-    NATIVE_METHOD("write",  "([BII)V",                   NativeOneWire_Write),
-    NATIVE_METHOD("close",  "()V",                       NativeOneWire_Close),
+    NATIVE_METHOD("open",   "()Lflint/io/OneWire;", NativeOneWire_Open),
+    NATIVE_METHOD("isOpen", "()Z",                  NativeOneWire_IsOpen),
+    NATIVE_METHOD("reset",  "()V",                  NativeOneWire_Reset),
+    NATIVE_METHOD("read",   "()I",                  NativeOneWire_ReadByte),
+    NATIVE_METHOD("read",   "([BII)I",              NativeOneWire_Read),
+    NATIVE_METHOD("write",  "(I)V",                 NativeOneWire_WriteByte),
+    NATIVE_METHOD("write",  "([BII)V",              NativeOneWire_Write),
+    NATIVE_METHOD("close",  "()V",                  NativeOneWire_Close),
 };
 
 #endif /* __ESP_NATIVE_ONEWIRE_H */

@@ -4,7 +4,7 @@
 #include "soc/uart_pins.h"
 #include "driver/uart.h"
 #include "flint_system_api.h"
-#include "esp_native_common.h"
+#include "flint_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_uart.h"
 
@@ -209,7 +209,7 @@ jint NativeUart_ReadByte(FNIEnv *env, jobject obj) {
     SerialPortObject portObj = (SerialPortObject)obj;
     int32_t portId = portObj->getPortId();
     if(!CheckPrecondition(env, portObj)) return -1;
-    while(!env->exec->hasTerminateRequest()) {
+    while(!env->hasTerminateRequest()) {
         if(uart_read_bytes((uart_port_t)portId, &buff, 1, pdMS_TO_TICKS(10)) == 1)
             return buff;
     }
@@ -221,7 +221,7 @@ jint NativeUart_Read(FNIEnv *env, jobject obj, jbyteArray b, int off, int count)
     int32_t portId = portObj->getPortId();
     if(!CheckPrecondition(env, portObj)) return 0;
     if(!CheckArrayIndexSize(env, b, off, count)) return 0;
-    while(!env->exec->hasTerminateRequest()) {
+    while(!env->hasTerminateRequest()) {
         int32_t rxSize = uart_read_bytes((uart_port_t)portId, &b->getData()[off], count, pdMS_TO_TICKS(10));
         if(rxSize != 0) return rxSize;
     }

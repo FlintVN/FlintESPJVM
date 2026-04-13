@@ -17,13 +17,13 @@ jint NativeSpiMaster_ReadWrite(FNIEnv *env, jobject obj, jbyteArray tx, jint txO
 jvoid NativeSpiMaster_Close(FNIEnv *env, jobject obj);
 
 inline constexpr NativeMethod spiMasterMethods[] = {
-    NATIVE_METHOD("open",            "()Lflint/machine/SpiMaster;", NativeSpiMaster_Open),
-    NATIVE_METHOD("isOpen",          "()Z",                         NativeSpiMaster_IsOpen),
-    NATIVE_METHOD("getSpeed",        "()I",                         NativeSpiMaster_GetSpeed),
-    NATIVE_METHOD("read",            "()I",                         NativeSpiMaster_Read),
-    NATIVE_METHOD("write",           "(I)V",                        NativeSpiMaster_Write),
-    NATIVE_METHOD("readWrite",       "([BI[BII)I",                  NativeSpiMaster_ReadWrite),
-    NATIVE_METHOD("close",           "()V",                         NativeSpiMaster_Close),
+    NATIVE_METHOD("open",            "()Lflint/io/SpiMaster;", NativeSpiMaster_Open),
+    NATIVE_METHOD("isOpen",          "()Z",                    NativeSpiMaster_IsOpen),
+    NATIVE_METHOD("getSpeed",        "()I",                    NativeSpiMaster_GetSpeed),
+    NATIVE_METHOD("read",            "()I",                    NativeSpiMaster_Read),
+    NATIVE_METHOD("write",           "(I)V",                   NativeSpiMaster_Write),
+    NATIVE_METHOD("readWrite",       "([BI[BII)I",             NativeSpiMaster_ReadWrite),
+    NATIVE_METHOD("close",           "()V",                    NativeSpiMaster_Close),
 };
 
 #endif /* __ESP_NATIVE_SPI_H */

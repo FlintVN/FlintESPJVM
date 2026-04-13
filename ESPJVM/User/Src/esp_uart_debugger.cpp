@@ -14,7 +14,7 @@ EspDbg::EspDbg(void) : FDbg() {
 
 EspDbg *EspDbg::getInstance(void) {
     if(espDbgInstance == 0) {
-        espDbgInstance = (EspDbg *)Flint::malloc(NULL, sizeof(EspDbg));
+        espDbgInstance = (EspDbg *)FlintAPI::System::malloc(sizeof(EspDbg));
         new (espDbgInstance)EspDbg();
     }
     return espDbgInstance;
@@ -50,16 +50,21 @@ void EspDbg::receiveTask(void) {
             }
             uint32_t rxSize = uart_read_bytes(UART_NUM_0, &rxData[rxDataLengthReceived], sizeof(rxData) - rxDataLengthReceived, 0);
             if(rxSize > 0) {
-                rxDataLengthReceived += rxSize;
-                if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4)
-                    rxDataToltalLength = rxData[1] | (rxData[2] << 8) | (rxData[3] << 16);
+                if(rxDataLengthReceived == 0) {
+                    if(rxData[0] == 0)
+                        rxDataLengthReceived += rxSize;
+                }
+                else
+                    rxDataLengthReceived += rxSize;
+                if(rxDataToltalLength == 0 && rxDataLengthReceived >= 4 && rxData[0] == 0x00)
+                    rxDataToltalLength = (rxData[1] >> 6) | (rxData[2] << 2) | (rxData[3] << 10);
                 if(rxDataToltalLength && (rxDataLengthReceived >= rxDataToltalLength) && espDbgInstance) {
                     espDbgInstance->receivedDataHandler(rxData, rxDataLengthReceived);
                     rxDataToltalLength = 0;
                     rxDataLengthReceived = 0;
                 }
             }
-            startTick = tick;
+            startTick = xTaskGetTickCount();
         }
     }
 }

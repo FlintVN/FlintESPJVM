@@ -6,13 +6,7 @@
 extern "C" {
 #endif
 
-typedef enum {
-    USB_CDC = 0,
-    USB_CDC_MSC,
-} USB_Mode;
-
-void USB_DeviceDisconnect(void);
-void USB_DeviceInit(USB_Mode mode);
+void USB_DeviceInit(void);
 
 #ifdef __cplusplus
 }

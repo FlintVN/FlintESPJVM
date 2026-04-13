@@ -13,7 +13,7 @@ static void GPIO_Init(void) {
 
 static void NVS_Init(void) {
     esp_err_t err = nvs_flash_init();
-    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if(err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         err = nvs_flash_init();
     }
@@ -22,7 +22,7 @@ static void NVS_Init(void) {
 
 static void USBSerialJtag_Init() {
     usb_serial_jtag_driver_config_t usb_serial_jtag_config = {};
-    usb_serial_jtag_config.rx_buffer_size = 1024 + 1;
+    usb_serial_jtag_config.rx_buffer_size = 256;
     usb_serial_jtag_config.tx_buffer_size = DBG_TX_BUFFER_SIZE;
     ESP_ERROR_CHECK(usb_serial_jtag_driver_install(&usb_serial_jtag_config));
 }

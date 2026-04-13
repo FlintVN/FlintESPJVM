@@ -4,7 +4,7 @@
 #include "soc/spi_pins.h"
 #include "driver/spi_master.h"
 #include "flint_system_api.h"
-#include "esp_native_common.h"
+#include "flint_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_spi_master.h"
 

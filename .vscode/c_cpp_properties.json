@@ -7,9 +7,8 @@
                 "${env:IDF_PATH}/components/**"
             ],
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
+                "FLINT_API_NET_ENABLED=1",
+                "IPV6_UNICAST_HOPS"
             ]
         }
     ],

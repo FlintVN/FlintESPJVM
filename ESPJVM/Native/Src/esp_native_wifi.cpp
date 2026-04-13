@@ -84,13 +84,14 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
     wifiConfig.sta.pmf_cfg.capable = true;
     wifiConfig.sta.pmf_cfg.required = false;
 
-    Flint::lock();
+    Flint *flint = ((FExec *)env)->getFlint();
+    flint->lock();
     esp_err_t ret = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if(ret == ESP_OK)
         ret = esp_wifi_start();
     if(ret == ESP_OK)
         ret = esp_wifi_connect();
-    Flint::unlock();
+    flint->unlock();
 
     CheckReturn(env, ret, "An error occurred while connecting to wifi");
 }
@@ -115,15 +116,15 @@ static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecor
     if(macArray == NULL) return NULL;
     memcpy(macArray->getData(), apRecord->bssid, 6);
 
-    aprObj->getField(env->exec, "mac")->setObj(macArray);
+    env->setObjField(env->getFieldId(aprObj, "mac"), macArray);
     jstring ssid = env->newString((char *)apRecord->ssid);
     if(ssid == NULL) {
         env->freeObject(macArray);
         return NULL;
     }
-    aprObj->getField(env->exec, "ssid")->setObj(ssid);
-    aprObj->getField(env->exec, "rssi")->setInt32(apRecord->rssi);
-    aprObj->getField(env->exec, "authMode")->setInt32(apRecord->authmode);
+    env->setObjField(env->getFieldId(aprObj, "ssid"), ssid);
+    env->setByteField(env->getFieldId(aprObj, "rssi"), apRecord->rssi);
+    env->setByteField(env->getFieldId(aprObj, "authMode"), apRecord->authmode);
 
     return aprObj;
 }
@@ -161,13 +162,14 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
     for(uint8_t i = 0; i < passwordLen; i++)
         wifiConfig.ap.password[i] = passwordText[i];
 
-    Flint::lock();
+    Flint *flint = ((FExec *)env)->getFlint();
+    flint->lock();
     esp_err_t ret = esp_wifi_set_mode(WIFI_MODE_APSTA);
     if(ret == ESP_OK)
         ret = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
     if(ret == ESP_OK)
         ret = esp_wifi_start();
-    Flint::unlock();
+    flint->unlock();
 
     CheckReturn(env, ret, "An error occurred while connecting to wifi");
 }
@@ -177,9 +179,10 @@ jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
-    Flint::lock();
+    Flint *flint = ((FExec *)env)->getFlint();
+    flint->lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, blocked ? true : false);
-    Flint::unlock();
+    flint->unlock();
     CheckReturn(env, ret, "An error occurred while starting scan");
 }
 
@@ -189,31 +192,41 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
 
     if(!CheckReturn(env, ret, "An error occurred while getting AP number")) return NULL;
 
-    if(count == 0) return NULL;
+    if(count == 0) {
+        esp_wifi_clear_ap_list();
+        return NULL;
+    }
 
-    Flint::lock();
+    Flint *flint = ((FExec *)env)->getFlint();
+    flint->lock();
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
-    if(arrayObj == NULL) return NULL;
+    if(arrayObj == NULL) {
+        esp_wifi_clear_ap_list();
+        return NULL;
+    }
     arrayObj->clearData();
     JObject **data = arrayObj->getData();
     for(uint16_t i = 0; i < count; i++) {
         wifi_ap_record_t apRecords;
         ret = esp_wifi_scan_get_ap_record(&apRecords);
         if(!CheckReturn(env, ret, "An error occurred while getting AP record")) {
-            Flint::unlock();
+            flint->unlock();
+            esp_wifi_clear_ap_list();
             return NULL;
         }
         jobject aprObj = createAccessPointRecordObj(env, &apRecords);
         if(aprObj == NULL) {
-            Flint::unlock();
+            flint->unlock();
             while(i) env->freeObject(data[--i]);
             env->freeObject(arrayObj);
+            esp_wifi_clear_ap_list();
             return NULL;
         }
         data[i] = aprObj;
     }
 
-    Flint::unlock();
+    flint->unlock();
+    esp_wifi_clear_ap_list();
     return arrayObj;
 }
 

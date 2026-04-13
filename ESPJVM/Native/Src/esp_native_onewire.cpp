@@ -4,6 +4,7 @@
 #include "soc/gpio_reg.h"
 #include "esp_rom_sys.h"
 #include "flint_system_api.h"
+#include "flint_native_common.h"
 #include "esp_native_common.h"
 #include "esp_native_pin.h"
 #include "esp_native_onewire.h"
