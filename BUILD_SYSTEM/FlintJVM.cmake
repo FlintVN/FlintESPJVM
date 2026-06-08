@@ -24,6 +24,7 @@ set(FLINTJVM_SRCS
     "../../../ESPJVM/FlintJVM/VM/Src/flint_java_class_dict_node.cpp"
     "../../../ESPJVM/FlintJVM/VM/Src/flint_java_string_dict_node.cpp"
     "../../../ESPJVM/FlintJVM/VM/Src/flint_native_interface.cpp"
+
     "../../../ESPJVM/FlintJVM/Impl/Src/fatfs_system_io_api.cpp"
     "../../../ESPJVM/FlintJVM/Impl/Src/lwip_system_net_api.cpp"
     "../../../ESPJVM/FlintJVM/Impl/Src/freertos_system_thread_api.cpp"
@@ -54,12 +55,20 @@ set(FLINTJVM_SRCS
     "../../../ESPJVM/FlintJVM/Native/Net/Src/flint_native_flint_socket_input_stream.cpp"
     "../../../ESPJVM/FlintJVM/Native/Net/Src/flint_native_flint_socket_output_stream.cpp"
     "../../../ESPJVM/FlintJVM/Native/Net/Src/flint_native_flint_datagram_socket_impl.cpp"
+
+    "../../../ESPJVM/FlintJVM/Native/Draw/Src/flint_fixed_point.cpp"
+    "../../../ESPJVM/FlintJVM/Native/Draw/Src/flint_gfx_common.cpp"
+    "../../../ESPJVM/FlintJVM/Native/Draw/Src/flint_rgb565_sw_gfx.cpp"
+    "../../../ESPJVM/FlintJVM/Native/Draw/Src/flint_rgb565_sw_gfx_helper.cpp"
+    "../../../ESPJVM/FlintJVM/Native/Draw/Src/flint_native_rgb565_graphics.cpp"
 )
 
 set(FLINTJVM_INCS
     INCLUDE_DIRS "../../../ESPJVM/FlintJVM/VM/Inc"
     INCLUDE_DIRS "../../../ESPJVM/FlintJVM/Impl/Inc"
+
     INCLUDE_DIRS "../../../ESPJVM/FlintJVM/Native/Net/Inc"
     INCLUDE_DIRS "../../../ESPJVM/FlintJVM/Native/Base/Inc"
     INCLUDE_DIRS "../../../ESPJVM/FlintJVM/Native/Common/Inc"
+    INCLUDE_DIRS "../../../ESPJVM/FlintJVM/Native/Draw/Inc"
 )

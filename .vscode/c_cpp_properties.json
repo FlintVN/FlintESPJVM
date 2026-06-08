@@ -3,7 +3,18 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/ESPJVM/**",
+                "${workspaceFolder}/ESPJVM/User/Inc",
+                "${workspaceFolder}/ESPJVM/SystemAPI/Inc",
+                "${workspaceFolder}/ESPJVM/Native/Inc",
+
+                "${workspaceFolder}/ESPJVM/FlintJVM/VM/Inc",
+                "${workspaceFolder}/ESPJVM/FlintJVM/Impl/Inc",
+
+                "${workspaceFolder}/ESPJVM/FlintJVM/Native/Net/Inc",
+                "${workspaceFolder}/ESPJVM/FlintJVM/Native/Base/Inc",
+                "${workspaceFolder}/ESPJVM/FlintJVM/Native/Common/Inc",
+                "${workspaceFolder}/ESPJVM/FlintJVM/Native/Draw/Inc",
+
                 "${env:IDF_PATH}/components/**"
             ],
             "defines": [

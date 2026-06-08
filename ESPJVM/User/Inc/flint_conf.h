@@ -41,5 +41,6 @@
 #define DBG_CONSOLE_BUFFER_SIZE     KILO_BYTE(1)
 
 #define FLINT_API_NET_ENABLED       1
+#define FLINT_API_DRAW_ENABLED      1
 
 #endif /* __FLINT_CONF_H */
