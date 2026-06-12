@@ -1,4 +1,22 @@
 # Change Log
+## V0.8.0
+- Fix: SPI master transmit error.
+- Set the default value for **CONFIG_FREERTOS_HZ** = **1000**.
+- Update to [`FlintJVM V2.5.0`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.5.0) and [`FlintJDK V1.6.0`](https://github.com/FlintVN/FlintJDK/releases/tag/V1.6.0):
+  - Add the missing methods `PrintStream.print(char)` and `PrintStream.println(char)`.
+  - Add `flint.drawing` module to support 2D graphics.
+  - Implement the `Object.notify()` `Object.notifyAll()` and `Object.wait()`.
+  - Add more basic methods to the Thread class:
+    - `Thread.interrupt()`
+    - `Thread.isAlive()`
+    - `Thread.threadId()`
+    - `Thread.setPriority(int)` and `Thread.getPriority()`
+    - `Thread.setName(String)` and `Thread.getName()`
+    - `Thread.setDaemon(bool)` and `Thread.isDaemon()`
+    - `Thread.toString()`
+  - Added support for `java.util.Timer`.
+  - Implement `System.exit()`.
+  - Support build with java 17.
 ## V0.7.1
 - Update to [`FlintJVM V2.4.1`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.4.1):
   - Fix serious bug: The comparison operation in FDict is running incorrectly.
