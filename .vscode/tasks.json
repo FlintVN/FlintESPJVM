@@ -18,7 +18,7 @@
             "label": "Flash",
             "group": "build",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/build"},
+            "options": {"cwd": "${workspaceFolder}/boards/build"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && esptool -p ${input:com} -b 460800 write-flash -z 0x00 ${input:chip}_FlintJVM_Release.bin"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && esptool -p ${input:com} -b 921600 write-flash -z 0x00 ${input:chip}_FlintJVM_Release.bin"},
             "windows": {
@@ -32,7 +32,7 @@
             "label": "Monitor",
             "group": "build",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/${input:chip}"},
+            "options": {"cwd": "${workspaceFolder}/boards/${input:chip}"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 monitor"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py -p ${input:com} -b 460800 monitor"},
             "windows": {
@@ -46,7 +46,7 @@
             "label": "Clean",
             "group": "build",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM"},
+            "options": {"cwd": "${workspaceFolder}/boards"},
             "osx": {"command": "rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"},
             "linux": {"command": "rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"},
             "windows": {"command": "Tools/rm -rf build/* */build */sdkconfig */dependencies.lock */managed_components"}
@@ -55,7 +55,7 @@
             "label": "Build (Select Chip)",
             "group": "build",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/${input:chip}"},
+            "options": {"cwd": "${workspaceFolder}/boards/${input:chip}"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -69,7 +69,7 @@
             "label": "Build ESP32",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -83,7 +83,7 @@
             "label": "Build ESP32-C3FH4",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C3FH4"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-C3FH4"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -97,7 +97,7 @@
             "label": "Build ESP32-C6FH4",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C6FH4"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-C6FH4"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -111,7 +111,7 @@
             "label": "Build ESP32-C6FH8",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-C6FH8"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-C6FH8"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -125,7 +125,7 @@
             "label": "Build ESP32-S2FN4R2",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S2FN4R2"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-S2FN4R2"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -139,7 +139,7 @@
             "label": "Build ESP32-S3FH4R2",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3FH4R2"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-S3FH4R2"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -153,7 +153,7 @@
             "label": "Build ESP32-S3N4RX",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N4RX"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-S3N4RX"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -167,7 +167,7 @@
             "label": "Build ESP32-S3N8RX",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N8RX"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-S3N8RX"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
@@ -181,7 +181,7 @@
             "label": "Build ESP32-S3N16RX",
             "group": "none",
             "type": "shell",
-            "options": {"cwd": "${workspaceFolder}/BUILD_SYSTEM/ESP32-S3N16RX"},
+            "options": {"cwd": "${workspaceFolder}/boards/ESP32-S3N16RX"},
             "osx": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "linux": {"command": ". ${env:IDF_PATH}/export.sh && idf.py build"},
             "windows": {
