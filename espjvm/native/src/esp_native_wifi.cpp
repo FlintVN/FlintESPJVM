@@ -201,6 +201,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     flint->lock();
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
     if(arrayObj == NULL) {
+        flint->unlock();
         esp_wifi_clear_ap_list();
         return NULL;
     }
