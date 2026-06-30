@@ -185,7 +185,7 @@ jobject NativeOneWire_Open(FNIEnv *env, jobject obj) {
         env->throwNew(env->findClass("java/io/IOException"), msg);
         return obj;
     }
-    if(!NativePin_SetPinMode(1 << pin, 5)) {
+    if(!NativePin_SetPinMode(1ULL << pin, 5)) {
         env->throwNew(env->findClass("java/io/IOException"), "Error while opening");
         return obj;
     }

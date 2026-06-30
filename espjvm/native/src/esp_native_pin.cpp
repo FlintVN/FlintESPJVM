@@ -44,7 +44,7 @@ const char *NativePin_CheckPin(int32_t pin) {
     return NULL;
 }
 
-bool NativePin_SetPinMode(int32_t pinMask, uint32_t mode) {
+bool NativePin_SetPinMode(uint64_t pinMask, uint32_t mode) {
     gpio_config_t io_conf = {};
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.pin_bit_mask = pinMask;
@@ -98,7 +98,7 @@ static bool CheckPin(FNIEnv *env, int32_t pin) {
 
 jvoid NativePin_SetMode(FNIEnv *env, jint pin, jint mode) {
     if(!CheckPin(env, pin)) return;
-    if(!NativePin_SetPinMode(1 << pin, mode))
+    if(!NativePin_SetPinMode(1ULL << pin, mode))
         env->throwNew(env->findClass("java/io/IOException"));
 }
 

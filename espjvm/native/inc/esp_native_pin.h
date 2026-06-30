@@ -5,7 +5,7 @@
 #include "flint_native.h"
 
 const char *NativePin_CheckPin(int32_t pn);
-bool NativePin_SetPinMode(int32_t pinMask, uint32_t mode);
+bool NativePin_SetPinMode(uint64_t pinMask, uint32_t mode);
 void NativePin_Reset(void);
 
 jvoid NativePin_SetMode(FNIEnv *env, jint pin, jint mode);
