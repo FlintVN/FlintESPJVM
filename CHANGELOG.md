@@ -1,4 +1,31 @@
 # Change Log
+## V0.8.1
+- [`FlintJVM V2.5.1`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.5.1):
+  - Fix Rgb565Graphics:
+    - Fixed `fillRect` and `fillRoundRect`, which were 1 pixel too large.
+    - Fixed `drawString` dose not apply the clip area.
+    - Fixed `fillRoundRect` and `drawRoundRect` rounded corners being drawn with a missing stroke.
+  - Add support `Graphics.measureString`, `Graphics.measureStringWidth` and `Graphics.measureStringHeight`.
+  - Remove zero-initialization of local variables before a method is called (because it is not necessary, and it also helps improve method invocation performance).
+  - Implemented native methods `Graphics.isVisible`, `Graphics.setClip0`.
+  - Implemented missing instruction (swap instruction).
+  - FatFs wrapper implementation: Zero-initialize FIL before calling f_open.
+- [`FlintJDK V1.6.1`](https://github.com/FlintVN/FlintJDK/releases/tag/V1.6.1):
+  - flint.drawing:
+    - Support creating `Color` from an integer value.
+    - Add the methods `Graphics.measureString`, `Graphics.measureStringWidth` and `Graphics.measureStringHeight`.
+    - Add `Graphics.isVisible` method.
+    - Nativeize method `Graphics.setClip` to improve for perfomance.
+  - Add the following classes:
+    - `java.io.UncheckedIOException`.
+    - `java.io.ByteArrayInputStream`.
+    - `java.io.DataInputStream`.
+    - `java.io.FilterInputStream`.
+    - `java.lang.SecurityException`.
+    - `java.io.Serializable`.
+- Fix: missing unlock in `NativeWiFi_GetScanResult`.
+- Fix: integer overflow in `NativePin_SetPinMode` with the pinMark parameter (32-bit).
+- Prioritize using PSRAM first.
 ## V0.8.0
 - Fix: SPI master transmit error.
 - Set the default value for **CONFIG_FREERTOS_HZ** = **1000**.
