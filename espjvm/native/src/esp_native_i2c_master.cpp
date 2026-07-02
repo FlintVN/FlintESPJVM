@@ -116,8 +116,8 @@ jobject NativeI2cMaster_Open(FNIEnv *env, jobject obj) {
 
     i2c_config_t conf = {};
     conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = i2cObj->getSda();
-    conf.scl_io_num = i2cObj->getScl();
+    conf.sda_io_num = (gpio_num_t)i2cObj->getSda();
+    conf.scl_io_num = (gpio_num_t)i2cObj->getScl();
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = i2cObj->getSpeed();

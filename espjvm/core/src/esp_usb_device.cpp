@@ -5,9 +5,8 @@
 #include "esp_partition.h"
 #include "driver/gpio.h"
 #include "tinyusb.h"
-#include "tusb_cdc_acm.h"
-#include "tusb_msc_storage.h"
-#include "tusb_tasks.h"
+#include "tinyusb_cdc_acm.h"
+#include "tinyusb_default_config.h"
 #include "esp_usb_device.h"
 
 #define CDC_INTERFACE_IDX       0x00
@@ -136,22 +135,19 @@ static const char *string_desc_arr[] = {
 
 void USB_DeviceInit(void) {
     tinyusb_config_cdcacm_t acmCfg = {
-        .usb_dev = TINYUSB_USBDEV_0,
         .cdc_port = TINYUSB_CDC_ACM_0,
-        .rx_unread_buf_sz = 64,
         .callback_rx = NULL,
         .callback_rx_wanted_char = NULL,
         .callback_line_state_changed = NULL,
         .callback_line_coding_changed = NULL
     };
-    ESP_ERROR_CHECK(tusb_cdc_acm_init(&acmCfg));
 
-    static const tinyusb_config_t tusb_cfg = {
-        .device_descriptor = &descriptor_config,
-        .string_descriptor = string_desc_arr,
-        .string_descriptor_count = sizeof(string_desc_arr) / sizeof(string_desc_arr[0]),
-        .external_phy = false,
-        .configuration_descriptor = cdc_desc_configuration,
-    };
+    ESP_ERROR_CHECK(tinyusb_cdcacm_init(&acmCfg));
+
+    tinyusb_config_t tusb_cfg = TINYUSB_DEFAULT_CONFIG();
+    tusb_cfg.descriptor.device = &descriptor_config;
+    tusb_cfg.descriptor.full_speed_config = cdc_desc_configuration;
+    tusb_cfg.descriptor.string = string_desc_arr;
+    tusb_cfg.descriptor.string_count = sizeof(string_desc_arr) / sizeof(string_desc_arr[0]);
     ESP_ERROR_CHECK(tinyusb_driver_install(&tusb_cfg));
 }

@@ -7,9 +7,9 @@
 #include "esp_native_pin.h"
 #include "esp_native_touch_pad.h"
 
-#if SOC_TOUCH_SENSOR_SUPPORTED
+#if 0 // SOC_TOUCH_SENSOR_SUPPORTED
 
-#include "driver/touch_pad.h"
+#include "driver/touch_sens.h"
 
 #if CONFIG_IDF_TARGET_ESP32
 static const int8_t touchPin[] = {4, 0, 2, 15, 13, 12, 14, 27, 33, 32};

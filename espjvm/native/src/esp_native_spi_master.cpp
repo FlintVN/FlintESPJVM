@@ -2,6 +2,7 @@
 #include <string.h>
 #include "flint.h"
 #include "soc/spi_pins.h"
+#include "hal/spi_types.h"
 #include "driver/spi_master.h"
 #include "flint_system_api.h"
 #include "flint_native_common.h"
@@ -166,14 +167,14 @@ static int32_t GetSpiId(FNIEnv *env, jstring spiName) {
 #endif
 #if CONFIG_IDF_TARGET_ESP32
     else if(spiName->compareTo("HSPI", strlen("HSPI")) == 0)
-        return HSPI_HOST;
+        return SPI2_HOST;
     else if(spiName->compareTo("VSPI", strlen("VSPI")) == 0)
-        return VSPI_HOST;
+        return SPI3_HOST;
 #elif CONFIG_IDF_TARGET_ESP32S2
     else if(spiName->compareTo("FSPI", strlen("FSPI")) == 0)
-        return FSPI_HOST;
+        return SPI2_HOST;
     else if(spiName->compareTo("HSPI", strlen("HSPI")) == 0)
-        return HSPI_HOST;
+        return SPI3_HOST;
 #endif
     else {
         env->throwNew(env->findClass("java/io/IOException"), "Invalid SPI name");

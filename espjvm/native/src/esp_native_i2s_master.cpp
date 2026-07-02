@@ -11,6 +11,28 @@
 
 #define BUF_LEN_IN_I2S_FRAMES   256
 
+#if CONFIG_IDF_TARGET_ESP32
+    #define SOC_I2S_NUM         2
+#elif CONFIG_IDF_TARGET_ESP32S2
+    #define SOC_I2S_NUM         1
+#elif CONFIG_IDF_TARGET_ESP32C3
+    #define SOC_I2S_NUM         1
+#elif CONFIG_IDF_TARGET_ESP32C6
+    #define SOC_I2S_NUM         1
+#elif CONFIG_IDF_TARGET_ESP32S3
+    #define SOC_I2S_NUM         2
+#elif CONFIG_IDF_TARGET_ESP32H2
+    #define SOC_I2S_NUM         1
+#elif CONFIG_IDF_TARGET_ESP32P4
+    #define SOC_I2S_NUM         3
+#elif CONFIG_IDF_TARGET_ESP32C5
+    #define SOC_I2S_NUM         1
+#elif CONFIG_IDF_TARGET_ESP32C61
+    #define SOC_I2S_NUM         1
+#else
+    #error "Unknown ESP32 target"
+#endif
+
 typedef class : public JObject {
 public:
     jstring getI2sName() { return (jstring)getFieldByIndex(0)->getObj(); }
@@ -171,7 +193,7 @@ jobject NativeI2sMaster_Open(FNIEnv *env, jobject obj) {
     }
     if(!CheckI2sMasterPin(env, i2sObj)) return obj;
 
-    i2s_chan_config_t channelCfg = I2S_CHANNEL_DEFAULT_CONFIG((i2s_port_t)i2sId, I2S_ROLE_MASTER);
+    i2s_chan_config_t channelCfg = I2S_CHANNEL_DEFAULT_CONFIG(i2sId, I2S_ROLE_MASTER);
     channelCfg.dma_desc_num = i2sObj->getBufferSize() / BUF_LEN_IN_I2S_FRAMES / (i2sObj->getDataBits() / 8 * (i2sObj->getDataMode() != 0 ? 2 : 1));
     channelCfg.dma_frame_num = BUF_LEN_IN_I2S_FRAMES;
     esp_err_t err = i2s_new_channel(&channelCfg, &i2sHandle[i2sId], NULL);

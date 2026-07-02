@@ -1,6 +1,19 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../Common.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../FlintJVM.cmake)
-set(priv_requires fatfs console esp_adc esp_driver_dac esp_timer nvs_flash driver wear_levelling esp_partition esp_wifi)
+
+set(priv_requires
+    fatfs console
+    esp_adc
+    driver
+    esp_driver_dac
+    esp_driver_uart
+    esp_driver_i2s
+    esp_timer
+    nvs_flash
+    wear_levelling
+    esp_partition
+    esp_wifi
+)
 
 idf_component_register(
     SRCS "../../../espjvm/core/src/esp_board_esp32.cpp"

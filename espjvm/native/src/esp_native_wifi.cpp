@@ -21,8 +21,8 @@ static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_WAPI_PSK,
     WIFI_AUTH_OWE,
     WIFI_AUTH_WPA3_ENT_192,
-    WIFI_AUTH_WPA3_EXT_PSK,
-    WIFI_AUTH_WPA3_EXT_PSK_MIXED_MODE,
+    WIFI_AUTH_DUMMY_1,
+    WIFI_AUTH_DUMMY_2,
     WIFI_AUTH_DPP,
 };
 

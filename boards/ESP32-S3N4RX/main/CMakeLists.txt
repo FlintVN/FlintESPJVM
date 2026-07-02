@@ -1,6 +1,19 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../Common.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../FlintJVM.cmake)
-set(priv_requires fatfs console esp_adc esp_driver_dac esp_timer nvs_flash driver esp_wifi)
+
+set(priv_requires
+    fatfs
+    console
+    esp_adc
+    driver
+    esp_driver_dac
+    esp_driver_uart
+    esp_driver_i2s
+    esp_driver_usb_serial_jtag
+    esp_timer
+    nvs_flash
+    esp_wifi
+)
 
 if(CONFIG_EXAMPLE_STORAGE_MEDIA_SPIFLASH)
     list(APPEND priv_requires wear_levelling esp_partition)

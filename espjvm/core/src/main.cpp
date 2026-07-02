@@ -8,6 +8,13 @@
 
 static Flint flint;
 
+static void test() {
+    void *ptr = FlintAPI::System::malloc(256);
+    FlintAPI::System::free(ptr);
+}
+
+#include "ff.h"
+
 extern "C" void app_main() {
     static const char *defaultApp = "FlintApp.jar";
     static const esp_vfs_fat_mount_config_t mount_config = {
@@ -17,6 +24,7 @@ extern "C" void app_main() {
         .disk_status_check_enable = false,
         .use_one_fat = false
     };
+
     static wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
 
     Board_Init();
