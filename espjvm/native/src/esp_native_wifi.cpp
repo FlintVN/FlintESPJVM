@@ -26,7 +26,7 @@ static const wifi_auth_mode_t authValueList[] = {
     WIFI_AUTH_DPP,
 };
 
-static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
+static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
     if(authMode >= sizeof(authValueList)) {
         env->throwNew(env->findClass("java/io/IOException"), "Authentication mode is invalid");
         return false;
@@ -58,9 +58,9 @@ static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
     return true;
 }
 
-static bool CheckReturn(FNIEnv *env, esp_err_t value, const char *msg) {
+static bool checkReturn(FNIEnv *env, esp_err_t value, const char *msg) {
     if(value != ESP_OK) {
-        env->throwNew(env->findClass("java/io/IOException"), msg);
+        env->throwNew(env->findClass("java/io/UncheckedIOException"), msg);
         return false;
     }
     return true;
@@ -71,7 +71,7 @@ jbool NativeWiFi_IsSupported(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authMode) {
-    if(!CheckParams(env, ssid, password, authMode)) return;
+    if(!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -93,7 +93,7 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
         ret = esp_wifi_connect();
     flint->unlock();
 
-    CheckReturn(env, ret, "An error occurred while connecting to wifi");
+    checkReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jbool NativeWiFi_IsConnected(FNIEnv *env) {
@@ -132,12 +132,10 @@ static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecor
 jobject NativeWiFi_GetAPinfo(FNIEnv *env) {
     wifi_ap_record_t apInfo;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apInfo);
-    if(ret == ESP_OK) {
-        jobject obj = createAccessPointRecordObj(env, &apInfo);
-        if(obj == NULL) return NULL;
-        return obj;
-    }
-    return NULL;
+    if(!checkReturn(env, ret, "getAPinfo error")) return NULL;
+    jobject obj = createAccessPointRecordObj(env, &apInfo);
+    if(obj == NULL) return NULL;
+    return obj;
 }
 
 jvoid NativeWiFi_Disconnect(FNIEnv *env) {
@@ -145,7 +143,7 @@ jvoid NativeWiFi_Disconnect(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMode, jint channel, jint maxConnection) {
-    if(!CheckParams(env, ssid, password, authMode)) return;
+    if(!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -171,7 +169,7 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
         ret = esp_wifi_start();
     flint->unlock();
 
-    CheckReturn(env, ret, "An error occurred while connecting to wifi");
+    checkReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
@@ -183,14 +181,14 @@ jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
     flint->lock();
     esp_err_t ret = esp_wifi_scan_start(NULL, blocked ? true : false);
     flint->unlock();
-    CheckReturn(env, ret, "An error occurred while starting scan");
+    checkReturn(env, ret, "An error occurred while starting scan");
 }
 
 jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     uint16_t count = 0;
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
 
-    if(!CheckReturn(env, ret, "An error occurred while getting AP number")) return NULL;
+    if(!checkReturn(env, ret, "An error occurred while getting AP number")) return NULL;
 
     if(count == 0) {
         esp_wifi_clear_ap_list();
@@ -210,7 +208,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     for(uint16_t i = 0; i < count; i++) {
         wifi_ap_record_t apRecords;
         ret = esp_wifi_scan_get_ap_record(&apRecords);
-        if(!CheckReturn(env, ret, "An error occurred while getting AP record")) {
+        if(!checkReturn(env, ret, "An error occurred while getting AP record")) {
             flint->unlock();
             esp_wifi_clear_ap_list();
             return NULL;
