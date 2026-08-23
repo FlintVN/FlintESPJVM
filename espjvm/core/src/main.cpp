@@ -31,7 +31,7 @@ extern "C" void app_main() {
     if(esp_reset_reason() != ESP_RST_PANIC) {
         if(FlintAPI::IO::finfo(defaultApp, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
             flint.setProgram(defaultApp);
-            flint.start();
+            flint.startToMain();
         }
     }
 
