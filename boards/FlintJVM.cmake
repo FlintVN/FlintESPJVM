@@ -51,6 +51,7 @@ set(FLINTJVM_SRCS
     "../../../flintjvm/native/base/src/flint_native_file_output_stream.cpp"
     "../../../flintjvm/native/base/src/flint_native_random_access_file.cpp"
     "../../../flintjvm/native/base/src/flint_native_crc32.cpp"
+    "../../../flintjvm/native/base/src/flint_native_inflater.cpp"
 
     "../../../flintjvm/native/net/src/flint_native_flint_socket_impl.cpp"
     "../../../flintjvm/native/net/src/flint_native_flint_inet_address_impl.cpp"
@@ -62,8 +63,12 @@ set(FLINTJVM_SRCS
     "../../../flintjvm/native/draw/src/flint_gfx_common.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx_helper.cpp"
+    "../../../flintjvm/native/draw/src/flint_png_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_graphics.cpp"
+    "../../../flintjvm/native/draw/src/flint_native_image_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics.cpp"
+
+    "../../../flintjvm/comp/miniz/miniz.c"
 )
 
 set(FLINTJVM_INCS
@@ -74,4 +79,6 @@ set(FLINTJVM_INCS
     INCLUDE_DIRS "../../../flintjvm/native/base/inc"
     INCLUDE_DIRS "../../../flintjvm/native/common/inc"
     INCLUDE_DIRS "../../../flintjvm/native/draw/inc"
+
+    INCLUDE_DIRS "../../../flintjvm/comp/miniz"
 )
