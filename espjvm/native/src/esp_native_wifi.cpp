@@ -108,7 +108,7 @@ jbool NativeWiFi_IsConnected(FNIEnv *env) {
 }
 
 static jobject createAccessPointRecordObj(FNIEnv *env, wifi_ap_record_t *apRecord) {
-    jobject aprObj = env->newObject(env->findClass("flint/net/AccessPointRecord"));
+    jobject aprObj = env->newObject(env->findClass("flint/net/wifi/AccessPointRecord"));
     if(aprObj == NULL) return NULL;
 
     /* mac array */
@@ -197,7 +197,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
 
     Flint *flint = ((FExec *)env)->getFlint();
     flint->lock();
-    jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
+    jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/wifi/AccessPointRecord"), count);
     if(arrayObj == NULL) {
         flint->unlock();
         esp_wifi_clear_ap_list();

@@ -18,7 +18,7 @@
 #include "esp_native_i2s_master.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
-    NATIVE_CLASS("flint/net/WiFi",                    wifiMethods),
+    NATIVE_CLASS("flint/net/wifi/WiFi",               wifiMethods),
     NATIVE_CLASS("flint/io/Adc",                      adcMethods),
     NATIVE_CLASS("flint/io/Dac",                      dacMethods),
     NATIVE_CLASS("flint/io/Pin",                      pinMethods),
