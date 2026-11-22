@@ -9,3 +9,5 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(ESP32-C6FH8_FlintJVM)
 
 fatfs_create_spiflash_image(storage ../../files FLASH_IN_PROJECT)
+
+include(../MergeBin.cmake)
