@@ -42,6 +42,7 @@ set(FLINTJVM_SRCS
     "../../../flintjvm/native/base/src/flint_native_system.cpp"
     "../../../flintjvm/native/base/src/flint_native_thread.cpp"
     "../../../flintjvm/native/base/src/flint_native_method.cpp"
+    "../../../flintjvm/native/base/src/flint_native_runtime.cpp"
     "../../../flintjvm/native/base/src/flint_native_character.cpp"
     "../../../flintjvm/native/base/src/flint_native_reflection.cpp"
     "../../../flintjvm/native/base/src/flint_native_constructor.cpp"
@@ -62,11 +63,12 @@ set(FLINTJVM_SRCS
     "../../../flintjvm/native/draw/src/flint_fixed_point.cpp"
     "../../../flintjvm/native/draw/src/flint_gfx_common.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx.cpp"
-    "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx_helper.cpp"
     "../../../flintjvm/native/draw/src/flint_png_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_graphics.cpp"
+    "../../../flintjvm/native/draw/src/flint_native_rgb565_image.cpp"
     "../../../flintjvm/native/draw/src/flint_native_image_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics.cpp"
+    "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics_factory.cpp"
 
     "../../../flintjvm/comp/miniz/miniz.c"
 )

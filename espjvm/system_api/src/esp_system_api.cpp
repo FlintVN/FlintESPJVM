@@ -21,6 +21,16 @@ void FlintAPI::System::free(void *p) {
     ::free(p);
 }
 
+uint32_t FlintAPI::System::freeMemory(void) {
+    return heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+}
+
+uint32_t FlintAPI::System::totalMemory(void) {
+    multi_heap_info_t info;
+    heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+    return info.total_free_bytes + info.total_allocated_bytes;
+}
+
 void FlintAPI::System::consoleWrite(uint8_t *utf8, uint32_t length) {
     fprintf(stdout, "%.*s", (int)length, (char *)utf8);
 }
@@ -33,17 +43,24 @@ int64_t FlintAPI::System::getTimeMillis(void) {
     return esp_timer_get_time() / 1000;
 }
 
-bool FlintAPI::System::openClassFile(FExec *ctx, const char *clsName, uint16_t length, FileReader *reader) {
+const char *FlintAPI::System::getClassPath(uint32_t index) {
     static const char *jars[] = {
         "/lib/java.base.jar",
         "/lib/flint.io.jar",
         "/lib/flint.net.jar",
         "/lib/flint.drawing.jar",
     };
+    if (index < LENGTH(jars))
+        return jars[index];
+    return NULL;
+}
 
+bool FlintAPI::System::openClassFile(FExec *ctx, const char *clsName, uint16_t length, FileReader *reader) {
     if (length == 0xFFFF) length = strlen(clsName);
-    for (uint32_t i = 0; i < LENGTH(jars); i++) {
-        ZipFileReader zip(ctx, jars[i]);
+    for (uint32_t i = 0; true; i++) {
+        const char *jar = FlintAPI::System::getClassPath(i);
+        if (jar == NULL) break;
+        ZipFileReader zip(ctx, jar);
         if (zip.open()) {
             if (zip.openClassFileEntry(clsName, length)) {
                 memcpy(reader, &zip, sizeof(FileReader));
