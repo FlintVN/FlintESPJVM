@@ -1,4 +1,64 @@
 # Change Log
+## V0.9.0
+- [`FlintJVM V2.6.0`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.6.0):
+  - New Java API support:
+    - `java.util.zip.Inflater` and `java.util.zip.CRC32`.
+    - `java.io.RandomAccessFile`.
+    - `java.lang.Runtime`.
+    - `Class.getResourceAsStream`, `System.getProperty` (including the `flint.application` property) and `System.err`.
+    - `Thread.holdsLock`.
+    - `Object.clone` now works for objects that implement `Cloneable`.
+  - `flint.drawing`:
+    - Added a PNG decoder for `flint.drawing.ImageDecoder`.
+    - Implemented `Rgb565Graphics.Factory.createImage` (including the overload with source region and transform) and added a few necessary methods for `flint.drawing.Image`.
+    - `Graphics.clear` supports clearing a specified area.
+    - **Breaking:** Removed the `Color` object; colors are now represented by `int`.
+    - **Breaking:** Removed line thickness support in `Graphics`.
+    - Fixed several drawing bugs (`drawImage` wrong position and memory overflow, `fillEllipse` and `fillRoundRect` off-by-one/double-drawing, `clear`).
+  - Performance:
+    - `invokevirtual`/`invokeinterface` use a method cache (and fixed a race in this cache).
+    - `lookupswitch` uses binary search.
+    - `ClassLoader::getInterface` is now O(1).
+    - Various other performance improvements for method invocation and `Rgb565Graphics`.
+  - Critical fixes:
+    - `System.arraycopy` operated incorrectly.
+    - Missing unlock of the class/object for synchronized native methods.
+    - Several critical issues in the execution engine; `instanceof` crashed when checking a null object.
+    - `Utf8DictNode` copied text incorrectly.
+    - Incorrect parameters passed to the `main` method.
+    - Null pointer access in the PNG decoder.
+    - Memory overflow in the class loader (rare).
+  - Other fixes:
+    - `FileInputStream.read`, `RandomAccessFile.read` and `FileReader.readLine` now return -1 at end of file.
+    - `Method.getExceptionTypes()` now conforms to the specification.
+    - Fixed memory leaks (`Inflater`, hooks) and other minor issues in the debugger, networking (lwIP) and FatFs implementations.
+- [`FlintJDK V1.7.0`](https://github.com/FlintVN/FlintJVM/releases/tag/V1.7.0):
+  - **Breaking changes:**
+    - flint.drawing: Remove the `Color` object, colors are now represented by `int` (ARGB) values. The `Color` class now only contains predefined color constants.
+    - flint.drawing: Remove the `thickness` parameter from the `Graphics` drawing methods (`drawLine`, `drawRect`, `drawRoundRect`, ...).
+    - Move Wi-Fi-related APIs (`WiFi`, `WiFiAuthMode`, `AccessPointRecord`) from `flint.net` to `flint.net.wifi`.
+    - Move the socket implementations from `flint.net` to `java.base`.
+  - flint.drawing:
+    - Add `ImageDecoder` to support decoding images.
+    - Support immutable images and add a few more methods to `Image`.
+    - `Graphics.clear` supports clearing a specified area.
+  - Add support for `java.net.URL` with `file` and `http` protocols (`URLConnection`, `HttpURLConnection`, chunked/fixed-length streams).
+  - Add support for `java.net.Socket.connect` method.
+  - Add `java.util.zip` support: `CRC32`, `Inflater`, `ZipInputStream` and `ZipFile`.
+  - Implement `Class.getResourceAsStream`.
+  - Add support for `System.getProperty`, `System.lineSeparator` and `System.err`.
+  - Add support for `java.lang.Runtime`.
+  - Support `Thread.holdsLock` method.
+  - Add the following classes:
+    - `java.io.RandomAccessFile`.
+    - `java.io.BufferedInputStream` and `java.io.BufferedOutputStream`.
+    - `java.io.PushbackInputStream`.
+    - `java.util.Stack`.
+    - `java.util.StringTokenizer`.
+    - Several exception classes (`UTFDataFormatException`, `MalformedURLException`, `UnknownServiceException`, ...).
+  - Fix critical bug: `Arrays.copyOfRange` working incorrectly.
+  - Add missing methods to `String` and `Character` classes.
+  - Fix several bugs in `String`, `StringBuilder`, `StringBuffer`, `DatagramPacket`, `Socket` and RGB565 image buffer handling.
 ## V0.8.1
 - [`FlintJVM V2.5.1`](https://github.com/FlintVN/FlintJVM/releases/tag/V2.5.1):
   - Fix Rgb565Graphics:
