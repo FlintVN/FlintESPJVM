@@ -63,7 +63,7 @@ bool FlintAPI::System::openClassFile(FExec *ctx, const char *clsName, uint16_t l
         ZipFileReader zip(ctx, jar);
         if (zip.open()) {
             if (zip.openClassFileEntry(clsName, length)) {
-                memcpy(reader, &zip, sizeof(FileReader));
+                memcpy((void *)reader, (void *)&zip, sizeof(FileReader));
                 return true;
             }
             zip.close();
